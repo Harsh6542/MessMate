@@ -418,16 +418,19 @@ const seed = async () => {
           sess.actualServedCount = actualServed;
           await sess.save();
 
-          // Create Attendance records for served students
+          // Create Attendance records for served students in batch for fast execution
+          const attendanceBatch = [];
           for (let sIdx = 0; sIdx < actualServed; sIdx++) {
-            await Attendance.create({
+            attendanceBatch.push({
               student: studentDocs[sIdx]._id,
               mealSession: sess._id,
-              mess: kosiMess._id,
               verifiedBy: staffDocs[0]._id,
-              verificationType: sIdx % 4 === 0 ? 'manual_override' : 'qr_scan',
-              verifiedAt: new Date(sess.startTime.getTime() + sIdx * 60000)
+              verificationMethod: sIdx % 4 === 0 ? 'admin_override' : 'qr_scan',
+              timestamp: new Date(sess.startTime.getTime() + sIdx * 60000)
             });
+          }
+          if (attendanceBatch.length > 0) {
+            await Attendance.insertMany(attendanceBatch);
           }
 
           // Create Waste Log
@@ -486,21 +489,20 @@ const seed = async () => {
     console.log('[Seed] Populated 10 Inventory Commodities with low-stock test triggers & stock receipts.');
 
     // 11. Populate Verified Feedback
-    const pastAttendances = await Attendance.find({ mess: kosiMess._id }).limit(15);
+    const pastAttendances = await Attendance.find().limit(15);
     for (const att of pastAttendances) {
       await Feedback.create({
         student: att.student,
         mealSession: att.mealSession,
-        mess: kosiMess._id,
+        attendance: att._id,
         ratings: {
-          overall: 4 + (Math.random() > 0.4 ? 1 : 0),
           taste: 4,
           hygiene: 5,
           temperature: 4,
-          portion: 5
+          portionSize: 5,
+          overall: 5
         },
-        comment: 'Fresh, piping hot and well-seasoned. Paneer gravy was excellent.',
-        isVerifiedAttendance: true
+        comment: 'Fresh, piping hot and well-seasoned. Paneer gravy was excellent.'
       });
     }
     console.log('[Seed] Created verified student feedback records.');
@@ -508,33 +510,38 @@ const seed = async () => {
     // 12. Populate Grievance / Complaint Tickets with SLA Tracking
     const complaintsSeed = [
       {
-        ticketId: 'CMP-2026-0001',
-        student: studentDocs[4]._id, // Ayush
+        complaintId: 'CMP-2026-0001',
+        complainant: studentDocs[4]._id, // Ayush
         mess: kosiMess._id,
-        hostel: kosiHostel._id,
         category: 'hygiene',
         priority: 'high',
-        title: 'Water dispenser filter near dining hall entrance needs cleaning',
+        subject: 'Water dispenser filter near dining hall entrance needs cleaning',
         description: 'The cold water dispenser in the dining lobby has a slight odor. Please replace or service the RO filter cartridge.',
         status: 'under_review',
         isConfidential: false,
-        slaDeadline: new Date(Date.now() + 18 * 3600000)
+        resolutionDeadline: new Date(Date.now() + 18 * 3600000)
       },
       {
-        ticketId: 'CMP-2026-0002',
-        student: studentDocs[18]._id, // Priya
+        complaintId: 'CMP-2026-0002',
+        complainant: studentDocs[18]._id, // Priya
         mess: kosiMess._id,
-        hostel: kosiHostel._id,
         category: 'food_quality',
-        priority: 'normal',
-        title: 'Dal salt proportion in Monday dinner was slightly high',
+        priority: 'medium',
+        subject: 'Dal salt proportion in Monday dinner was slightly high',
         description: 'Moong dal during Monday night dinner was noticeably salty. Requesting kitchen cooks to taste test before bulk serving.',
         status: 'resolved',
         isConfidential: true,
-        slaDeadline: new Date(Date.now() - 4 * 3600000),
-        resolutionNotes: 'Cooks instructed to use standardized measuring spoons for salt in bulk preparation.',
-        resolvedBy: managerKosi._id,
-        resolvedAt: new Date()
+        resolutionDeadline: new Date(Date.now() - 4 * 3600000),
+        resolvedAt: new Date(),
+        responses: [
+          {
+            by: managerKosi._id,
+            role: 'mess_manager',
+            message: 'Cooks instructed to use standardized measuring spoons for salt in bulk preparation.',
+            isInternal: false,
+            createdAt: new Date()
+          }
+        ]
       }
     ];
 
@@ -547,12 +554,13 @@ const seed = async () => {
     await Announcement.create({
       title: 'Special Feast on Friday Evening',
       content: 'A special dinner including Veg Biryani, Kadai Paneer, and Gulab Jamun will be served this Friday from 19:30 to 22:00. Advance opt-out cutoff is Friday 15:00.',
-      priority: 'high',
-      isPinned: true,
-      targetHostel: kosiHostel._id,
-      targetMess: kosiMess._id,
-      author: wardenKosi._id
+      priority: 'important',
+      hostel: kosiHostel._id,
+      mess: kosiMess._id,
+      publishedBy: wardenKosi._id,
+      targetRoles: [ROLES.STUDENT, ROLES.MESS_STAFF, ROLES.MESS_MANAGER]
     });
+    console.log('[Seed] Pinned announcement created.');
 
     console.log('\n======================================================');
     console.log('  MESSMATE COMPREHENSIVE SEEDING COMPLETED');
