@@ -105,6 +105,20 @@ export const StudentDashboard = () => {
         <div className="min-h-[250px] flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
+      ) : !dashboardData ? (
+        <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-8 text-center space-y-4">
+          <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
+          <h3 className="text-base font-bold text-slate-200">Connecting to Mess Telemetry...</h3>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            Unable to load meal dashboard information. Please make sure the backend server is running and click retry.
+          </p>
+          <button
+            onClick={fetchDashboard}
+            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition"
+          >
+            Retry Connection
+          </button>
+        </div>
       ) : (
         <>
           {/* Active / Next Meal Hero Card */}
