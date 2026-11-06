@@ -30,10 +30,12 @@ export const StudentDashboard = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/student');
-      if (res.success && res.data) {
-        setDashboardData(res.data);
+      const payload = res?.data || res;
+      if (res?.success || res?.status === 'success' || payload) {
+        setDashboardData(payload);
       }
     } catch (err) {
+      console.error('Failed to load dashboard:', err);
       toast.error('Failed to load dashboard data.');
     } finally {
       setLoading(false);
@@ -146,7 +148,7 @@ export const StudentDashboard = () => {
                   </div>
 
                   {/* Opt-out state indicator */}
-                  {dashboardData.hasDeclaredOptOut ? (
+                  {dashboardData?.hasDeclaredOptOut ? (
                     <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-300 text-xs font-bold border border-rose-500/30">
                       <XCircle className="w-4 h-4 text-rose-400" />
                       You have declared absence for this meal (Coupon Inactive)
@@ -226,7 +228,7 @@ export const StudentDashboard = () => {
                 Guest Passes
               </span>
               <div className="text-2xl font-black text-cyan-400 mt-1">
-                {dashboardData.guestRequests?.length || 0}
+                {dashboardData?.guestRequests?.length || 0}
               </div>
               <p className="text-[10px] text-slate-500 mt-0.5">Upcoming visitor tickets</p>
             </div>
@@ -236,7 +238,7 @@ export const StudentDashboard = () => {
                 Open Grievances
               </span>
               <div className="text-2xl font-black text-amber-400 mt-1">
-                {dashboardData.recentComplaints?.filter((c) => c.status !== 'closed' && c.status !== 'resolved').length || 0}
+                {dashboardData?.recentComplaints?.filter((c) => c.status !== 'closed' && c.status !== 'resolved').length || 0}
               </div>
               <p className="text-[10px] text-slate-500 mt-0.5">Active tickets in SLA</p>
             </div>
@@ -257,7 +259,7 @@ export const StudentDashboard = () => {
                   </Link>
                 </div>
 
-                {!dashboardData.recentComplaints?.length ? (
+                {!dashboardData?.recentComplaints?.length ? (
                   <p className="text-xs text-slate-500 italic py-6 text-center">
                     No complaints lodged recently. Tap below if you need food hygiene or quantity assistance.
                   </p>
@@ -270,7 +272,7 @@ export const StudentDashboard = () => {
                         className="block bg-slate-900/80 hover:bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs transition"
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-slate-200">{c.title}</span>
+                          <span className="font-bold text-slate-200">{c.title || c.subject}</span>
                           <span
                             className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
                               c.status === 'resolved'
@@ -307,7 +309,7 @@ export const StudentDashboard = () => {
                 </h3>
               </div>
 
-              {!dashboardData.announcements?.length ? (
+              {!dashboardData?.announcements?.length ? (
                 <p className="text-xs text-slate-500 italic py-6 text-center">
                   No active announcements for your hostel.
                 </p>

@@ -9,6 +9,8 @@ export const generateSecureToken = (bytes = 32) => {
   return crypto.randomBytes(bytes).toString('hex');
 };
 
+export const generateSecureCouponToken = generateSecureToken;
+
 /**
  * Hash a token using SHA-256 for secure database storage
  * @param {string} token - Raw token string

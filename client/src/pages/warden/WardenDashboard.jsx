@@ -37,8 +37,9 @@ export const WardenDashboard = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/warden');
-      if (res.success && res.data) {
-        setWardenData(res.data);
+      const payload = res?.data || res;
+      if (res?.success || res?.status === 'success' || payload) {
+        setWardenData(payload);
       }
     } catch (err) {
       toast.error('Failed to load warden dashboard.');

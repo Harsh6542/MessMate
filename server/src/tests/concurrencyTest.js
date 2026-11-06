@@ -66,6 +66,7 @@ const runConcurrencyTest = async () => {
       student: student._id,
       mealSession: session._id,
       tokenHash,
+      qrPayload: `MESSMATE:COUPON:${rawToken}`,
       status: COUPON_STATUS.ACTIVE,
       expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 mins validity
     });

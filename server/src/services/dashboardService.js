@@ -79,7 +79,7 @@ export const getStudentDashboardData = async (user) => {
   const [attendedMealsCount, totalOptOutsCount] = await Promise.all([
     Attendance.countDocuments({
       student: user._id,
-      verifiedAt: { $gte: thirtyDaysAgo }
+      timestamp: { $gte: thirtyDaysAgo }
     }),
     MealDeclaration.countDocuments({
       student: user._id,
@@ -95,14 +95,14 @@ export const getStudentDashboardData = async (user) => {
   }).sort({ date: 1 }).limit(5);
 
   // 4. Recent grievances / complaints
-  const recentComplaints = await Complaint.find({ student: user._id })
+  const recentComplaints = await Complaint.find({ complainant: user._id })
     .sort({ createdAt: -1 })
     .limit(4);
 
   // 5. Active announcements
   const announcements = await Announcement.find({
     isActive: true,
-    $or: [{ targetMess: null, targetHostel: null }, { targetMess: messId }, { targetHostel: hostelId }]
+    $or: [{ mess: null, hostel: null }, { mess: messId }, { hostel: hostelId }]
   })
     .sort({ isPinned: -1, createdAt: -1 })
     .limit(4);
@@ -180,10 +180,10 @@ export const getStaffDashboardData = async (staffUser) => {
     actualServedCount: s.actualServedCount
   }));
 
-  // Recent 12 scans in this mess
-  const recentScans = await Attendance.find({ mess: messId })
+  // Recent 12 scans
+  const recentScans = await Attendance.find()
     .populate('student', 'firstName lastName rollNumber roomNumber')
-    .sort({ verifiedAt: -1 })
+    .sort({ timestamp: -1 })
     .limit(12);
 
   // Check if waste log is pending for today's most recently passed session
@@ -351,7 +351,7 @@ export const getManagerDashboardData = async (messId) => {
         status: { $in: ['submitted', 'under_review', 'in_progress'] },
         priority: { $in: ['critical', 'high'] }
       })
-        .populate('student', 'firstName lastName rollNumber')
+        .populate('complainant', 'firstName lastName rollNumber')
         .sort({ priority: 1, createdAt: -1 })
         .limit(5),
       GuestMealRequest.countDocuments({
@@ -420,7 +420,7 @@ export const getWardenDashboardData = async (hostelId, messId) => {
   // Check overdue SLA complaints
   const now = new Date();
   const overdueCount = complaints.filter(
-    (c) => ['submitted', 'under_review', 'in_progress'].includes(c.status) && new Date(c.slaDeadline) < now
+    (c) => ['submitted', 'under_review', 'in_progress'].includes(c.status) && c.resolutionDeadline && new Date(c.resolutionDeadline) < now
   ).length;
 
   const confidentialCount = complaints.filter((c) => c.isConfidential).length;
@@ -470,7 +470,7 @@ export const getWardenDashboardData = async (hostelId, messId) => {
   const oversightComplaints = await Complaint.find({
     ...(hostelId ? { hostel: hostelId } : queryMess)
   })
-    .populate('student', 'firstName lastName rollNumber')
+    .populate('complainant', 'firstName lastName rollNumber')
     .sort({ isConfidential: -1, priority: 1, createdAt: -1 })
     .limit(6);
 

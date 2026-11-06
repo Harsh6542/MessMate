@@ -73,8 +73,9 @@ export const AdminDashboard = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/admin');
-      if (res.success && res.data) {
-        setAdminData(res.data);
+      const payload = res?.data || res;
+      if (res?.success || res?.status === 'success' || payload) {
+        setAdminData(payload);
       }
     } catch (err) {
       toast.error('Failed to load system dashboard.');

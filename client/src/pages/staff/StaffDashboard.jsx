@@ -26,8 +26,9 @@ export const StaffDashboard = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/staff');
-      if (res.success && res.data) {
-        setStaffData(res.data);
+      const payload = res?.data || res;
+      if (res?.success || res?.status === 'success' || payload) {
+        setStaffData(payload);
       }
     } catch (err) {
       toast.error('Failed to load staff dashboard.');

@@ -41,8 +41,9 @@ export const ManagerDashboard = () => {
     try {
       setLoading(true);
       const res = await api.get('/dashboard/manager');
-      if (res.success && res.data) {
-        setManagerData(res.data);
+      const payload = res?.data || res;
+      if (res?.success || res?.status === 'success' || payload) {
+        setManagerData(payload);
       }
     } catch (err) {
       toast.error('Failed to load manager dashboard.');

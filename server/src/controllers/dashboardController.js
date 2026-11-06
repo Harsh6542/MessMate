@@ -5,6 +5,7 @@ export const getStudentDashboard = async (req, res, next) => {
   try {
     const data = await dashboardService.getStudentDashboardData(req.user);
     res.status(200).json({
+      success: true,
       status: 'success',
       data
     });
@@ -17,6 +18,7 @@ export const getStaffDashboard = async (req, res, next) => {
   try {
     const data = await dashboardService.getStaffDashboardData(req.user);
     res.status(200).json({
+      success: true,
       status: 'success',
       data
     });
@@ -34,6 +36,7 @@ export const getManagerDashboard = async (req, res, next) => {
 
     const data = await dashboardService.getManagerDashboardData(messId);
     res.status(200).json({
+      success: true,
       status: 'success',
       data
     });
@@ -46,6 +49,7 @@ export const getWardenDashboard = async (req, res, next) => {
   try {
     const data = await dashboardService.getWardenDashboardData(req.user.hostel, req.user.mess);
     res.status(200).json({
+      success: true,
       status: 'success',
       data
     });
@@ -58,6 +62,7 @@ export const getAdminDashboard = async (req, res, next) => {
   try {
     const data = await dashboardService.getAdminDashboardData();
     res.status(200).json({
+      success: true,
       status: 'success',
       data
     });
