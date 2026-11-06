@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Database Service
+  mongodb:
+    image: mongo:7.0
+    container_name: messmate_mongodb
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - messmate-network
+
+  # Backend Express & WebSocket API Service
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: messmate_server
+    restart: always
+    ports:
+      - '5000:5000'
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/messmate_dev
+      - CLIENT_URL=http://localhost
+      - JWT_SECRET=messmate_dev_jwt_secret_key_change_in_production_2026_super_secure
+      - JWT_EXPIRES_IN=7d
+      - JWT_COOKIE_EXPIRES_IN=7
+    depends_on:
+      - mongodb
+    networks:
+      - messmate-network
+
+  # Frontend React SPA & Nginx Reverse Proxy
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: messmate_client
+    restart: always
+    ports:
+      - '80:80'
+    depends_on:
+      - server
+    networks:
+      - messmate-network
+
+volumes:
+  mongo-data:
+
+networks:
+  messmate-network:
+    driver: bridge
