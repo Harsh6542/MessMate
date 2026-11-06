@@ -31,3 +31,4 @@ router.put(
 router.post('/:id/reopen', authorize(ROLES.STUDENT), reopenStudentComplaint);
 
 export default router;
+

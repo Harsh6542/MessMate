@@ -47,6 +47,7 @@ export const DashboardLayout = () => {
           { name: 'Weekly Menu', path: '/student/menu', icon: Calendar },
           { name: 'Meal Declaration', path: '/student/declarations', icon: Calendar },
           { name: 'Digital Coupon', path: '/student/coupon', icon: QrCode },
+          { name: 'Guest Meal Booking', path: '/student/guest-meals', icon: Users },
           { name: 'Feedback & Ratings', path: '/student/feedback', icon: Star },
           { name: 'Grievance / Complaints', path: '/student/complaints', icon: AlertCircle }
         ];
@@ -62,12 +63,19 @@ export const DashboardLayout = () => {
         return [
           { name: 'Manager Dashboard', path: '/manager/dashboard', icon: LayoutDashboard },
           { name: 'Menu Planning', path: '/manager/menu', icon: Calendar },
+          { name: 'Demand & Portions', path: '/manager/demand', icon: FileSpreadsheet },
+          { name: 'Inventory & Stock', path: '/manager/inventory', icon: Package },
+          { name: 'Food Wastage Logs', path: '/manager/wastage', icon: TrendingDown },
+          { name: 'Guest Meal Passes', path: '/manager/guest-meals', icon: Users },
           { name: 'Complaints Queue', path: '/manager/complaints', icon: AlertCircle },
-          { name: 'Broadcast Announcements', path: '/manager/announcements', icon: Bell }
+          { name: 'Announcements', path: '/manager/announcements', icon: Bell }
         ];
       case 'warden':
         return [
           { name: 'Warden Dashboard', path: '/warden/dashboard', icon: LayoutDashboard },
+          { name: 'Demand Oversight', path: '/warden/demand', icon: FileSpreadsheet },
+          { name: 'Wastage Oversight', path: '/warden/wastage', icon: TrendingDown },
+          { name: 'Guest Meal Passes', path: '/warden/guest-meals', icon: Users },
           { name: 'Complaints Oversight', path: '/warden/complaints', icon: AlertCircle },
           { name: 'Broadcast Bulletins', path: '/warden/announcements', icon: Bell }
         ];

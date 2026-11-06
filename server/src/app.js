@@ -18,6 +18,10 @@ import feedbackRoutes from './routes/feedbackRoutes.js';
 import complaintRoutes from './routes/complaintRoutes.js';
 import announcementRoutes from './routes/announcementRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import demandRoutes from './routes/demandRoutes.js';
+import wasteLogRoutes from './routes/wasteLogRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import guestMealRoutes from './routes/guestMealRoutes.js';
 
 import { errorHandler } from './middleware/errorHandler.js';
 import { AppError } from './utils/AppError.js';
@@ -87,6 +91,11 @@ app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/complaints', complaintRoutes);
 app.use('/api/v1/announcements', announcementRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/demand', demandRoutes);
+app.use('/api/v1/kitchen', demandRoutes);
+app.use('/api/v1/waste-logs', wasteLogRoutes);
+app.use('/api/v1/inventory', inventoryRoutes);
+app.use('/api/v1/guest-meals', guestMealRoutes);
 
 // 8. 404 handler for undefined routes
 app.all('*', (req, res, next) => {

@@ -67,3 +67,4 @@ announcementSchema.index({ isActive: 1, publishedAt: -1 });
 
 export const Announcement = mongoose.model('Announcement', announcementSchema);
 export default Announcement;
+

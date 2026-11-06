@@ -250,3 +250,4 @@ export const ComplaintsQueue = () => {
 };
 
 export default ComplaintsQueue;
+

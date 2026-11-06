@@ -128,3 +128,4 @@ complaintSchema.index({ complainant: 1, createdAt: -1 });
 
 export const Complaint = mongoose.model('Complaint', complaintSchema);
 export default Complaint;
+

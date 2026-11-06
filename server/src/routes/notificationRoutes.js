@@ -17,3 +17,4 @@ router.put('/:id/read', markNotificationRead);
 router.put('/read-all', markAllNotificationsRead);
 
 export default router;
+

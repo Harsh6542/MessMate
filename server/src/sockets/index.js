@@ -99,3 +99,4 @@ export const emitToRoom = (room, event, payload) => {
     io.to(room).emit(event, payload);
   }
 };
+

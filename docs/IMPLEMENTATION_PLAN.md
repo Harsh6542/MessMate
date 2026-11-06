@@ -218,38 +218,42 @@ Connect advance student opt-outs to kitchen operations: forecast meal preparatio
 ### Detailed Task Breakdown
 
 #### Backend Development
-- [ ] Implement `src/models/WasteLog.js`, `src/models/InventoryItem.js`, `src/models/StockTransaction.js`, and `src/models/GuestMealRequest.js`.
-- [ ] Build Smart Demand Prediction Engine (`/api/v1/demand`):
+- [x] Implement `src/models/WasteLog.js`, `src/models/InventoryItem.js`, `src/models/StockTransaction.js`, and `src/models/GuestMealRequest.js`.
+- [x] Build Smart Demand Prediction Engine (`/api/v1/demand`):
   - Formula: $\text{Declared Demand} = \text{Total Active Residents} - \text{Opt Outs} + \text{Approved Guests}$.
   - Compute historical turnout buffer percentage based on past 30-day attendance.
   - Expose manager endpoint to approve and adjust final preparation quantity.
-- [ ] Build Kitchen Preparation Sheet API (`/api/v1/kitchen`):
+- [x] Build Kitchen Preparation Sheet API (`/api/v1/kitchen`):
   - Aggregated view of approved cooking count, special dietary notes, and key menu ingredients.
-- [ ] Build Food Wastage Monitoring (`/api/v1/waste-logs`):
+- [x] Build Food Wastage Monitoring (`/api/v1/waste-logs`):
   - Separate recording of:
     1. Unserved surplus food weight (kg).
     2. Plate waste weight (kg).
   - Calculate estimated cost lost based on raw material benchmarks.
-- [ ] Build Inventory & Stock Tracker (`/api/v1/inventory`):
+- [x] Build Inventory & Stock Tracker (`/api/v1/inventory`):
   - CRUD for items (Rice, Dal, Oil, Vegetables, Milk).
   - Purchase inflow and consumption outflow logging.
   - Low-stock notification triggers when stock drops below threshold.
-- [ ] Guest Meal Management (`/api/v1/guest-meals`):
+- [x] Guest Meal Management (`/api/v1/guest-meals`):
   - Student guest booking request and manager approval pipeline.
 
 #### Frontend Development
-- [ ] Manager Demand Prediction View:
+- [x] Manager Demand Prediction View:
   - Card breakdown: Total Residents (500) - Opt Outs (65) + Guests (10) = Expected Meals (445).
   - Visual comparison between Declared Demand and Historical Recommendation.
   - Quick-edit input for Manager to set final approved cooking quantity.
-- [ ] Kitchen Preparation Sheet (Tablet / Mobile Friendly):
+- [x] Kitchen Preparation Sheet (Tablet / Mobile Friendly):
   - High-contrast, large-font operational screen designed for kitchen staff.
   - Dish names, approved target quantities, and countdown to meal start.
-- [ ] Staff Food Wastage Logging Form:
+- [x] Staff Food Wastage Logging Form:
   - Post-meal simple form: Enter Surplus (kg), Plate Waste (kg), and optional notes.
-- [ ] Manager Inventory Manager:
+- [x] Manager Inventory Manager:
   - Visual stock level progress bars with red warning indicators for items near depletion.
   - "Log Stock Transaction" modal (Purchase vs Kitchen Usage).
+- [x] Student Guest Meal Booking (`/student/guest-meals`):
+  - Booking form with dynamic tariff preview, purpose, guest names, and cancellation.
+- [x] Manager & Warden Guest Meals Oversight (`/manager/guest-meals`, `/warden/guest-meals`):
+  - Review queue with approval / rejection actions and meal demand syncing.
 
 ### Verification & Testing Gate
 1. 10 students opt out of Dinner + 2 guest meals approved -> Demand shows exactly `Residents - 10 + 2`.

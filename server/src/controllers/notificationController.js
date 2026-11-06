@@ -66,3 +66,4 @@ export const markAllNotificationsRead = asyncHandler(async (req, res) => {
     message: 'All notifications marked as read.'
   });
 });
+

@@ -31,3 +31,4 @@ export const createNotification = async ({
     return null;
   }
 };
+

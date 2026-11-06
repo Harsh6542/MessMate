@@ -40,6 +40,15 @@ import ComplaintDetail from './pages/student/ComplaintDetail';
 import ComplaintsQueue from './pages/manager/ComplaintsQueue';
 import AnnouncementsManager from './pages/manager/AnnouncementsManager';
 
+// Phase 4 Administration & Operations Pages
+import DemandForecast from './pages/manager/DemandForecast';
+import InventoryManager from './pages/manager/InventoryManager';
+import FoodWastageView from './pages/manager/FoodWastageView';
+import GuestMealsManager from './pages/manager/GuestMealsManager';
+import KitchenPrepSheet from './pages/staff/KitchenPrepSheet';
+import WasteEntryForm from './pages/staff/WasteEntryForm';
+import GuestMealRequest from './pages/student/GuestMealRequest';
+
 // Root redirector based on authentication status
 const RootRedirect = () => {
   const { user, loading } = useAuth();
@@ -102,6 +111,7 @@ export const App = () => {
                   <Route path="/student/complaints" element={<ComplaintsList />} />
                   <Route path="/student/complaints/new" element={<NewComplaint />} />
                   <Route path="/student/complaints/:id" element={<ComplaintDetail />} />
+                  <Route path="/student/guest-meals" element={<GuestMealRequest />} />
                 </Route>
 
                 {/* Mess Staff Role Routes */}
@@ -109,12 +119,18 @@ export const App = () => {
                   <Route path="/staff/dashboard" element={<StaffDashboard />} />
                   <Route path="/staff/scanner" element={<QRScanner />} />
                   <Route path="/staff/manual-verify" element={<ManualVerify />} />
+                  <Route path="/staff/prep-sheet" element={<KitchenPrepSheet />} />
+                  <Route path="/staff/waste-entry" element={<WasteEntryForm />} />
                 </Route>
 
                 {/* Mess Manager Role Routes */}
                 <Route element={<RoleRoute allowedRoles={['mess_manager']} />}>
                   <Route path="/manager/dashboard" element={<ManagerDashboard />} />
                   <Route path="/manager/menu" element={<MenuEditor />} />
+                  <Route path="/manager/demand" element={<DemandForecast />} />
+                  <Route path="/manager/inventory" element={<InventoryManager />} />
+                  <Route path="/manager/wastage" element={<FoodWastageView />} />
+                  <Route path="/manager/guest-meals" element={<GuestMealsManager />} />
                   <Route path="/manager/complaints" element={<ComplaintsQueue />} />
                   <Route path="/manager/announcements" element={<AnnouncementsManager />} />
                 </Route>
@@ -122,6 +138,9 @@ export const App = () => {
                 {/* Warden / Committee Role Routes */}
                 <Route element={<RoleRoute allowedRoles={['warden']} />}>
                   <Route path="/warden/dashboard" element={<WardenDashboard />} />
+                  <Route path="/warden/demand" element={<DemandForecast />} />
+                  <Route path="/warden/wastage" element={<FoodWastageView />} />
+                  <Route path="/warden/guest-meals" element={<GuestMealsManager />} />
                   <Route path="/warden/complaints" element={<ComplaintsQueue />} />
                   <Route path="/warden/announcements" element={<AnnouncementsManager />} />
                 </Route>

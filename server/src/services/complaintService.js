@@ -138,3 +138,4 @@ export const reopenComplaint = async (complaintId, studentId, reopenReason) => {
 
   return complaint;
 };
+

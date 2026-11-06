@@ -191,3 +191,4 @@ export const AnnouncementsManager = () => {
 };
 
 export default AnnouncementsManager;
+
