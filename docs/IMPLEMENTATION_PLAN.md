@@ -339,7 +339,7 @@ End-to-end integration testing, security penetration testing, automated seed scr
 | **Phase 1** | Project Setup, Database & Auth (RBAC) | **COMPLETED** | Express backend, React Vite client, JWT HTTP-only cookies, 5 role dashboard shells, seed script |
 | **Phase 2** | Menus, Declarations & Digital QR Coupons | **COMPLETED** | Full meal cycle, weekly menus, advance opt-outs, cryptographic QR coupon generator, camera scanner, manual roll fallback |
 | **Phase 3** | Feedback, Complaints & Real-Time Sockets | **COMPLETED** | Verified 5-star ratings, grievance SLAs, confidential complaints, Socket.IO real-time alerts, broadcast bulletins |
-| **Phase 4** | Demand Forecasting, Kitchen Sheet & Wastage | **NEXT UP** | Demand engine, waste tracking, inventory |
-| **Phase 5** | Analytics & High-Impact Dashboards | *Pending* | Recharts dashboards for all 5 roles |
-| **Phase 6** | Testing, Security, Seed Data & Deployment | *Pending* | Integration tests, seed script, README |
+| **Phase 4** | Demand Forecasting, Kitchen Sheet & Wastage | **COMPLETED** | Demand engine, waste tracking, inventory |
+| **Phase 5** | Analytics & High-Impact Dashboards | **COMPLETED** | Recharts dashboards for all 5 roles |
+| **Phase 6** | Testing, Security, Seed Data & Deployment | **NEXT UP** | Integration tests, seed script, README |
 
