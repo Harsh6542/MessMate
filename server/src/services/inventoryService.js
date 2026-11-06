@@ -140,7 +140,8 @@ export const recordTransaction = async (
     vendor,
     invoiceNumber,
     remarks,
-    performedBy: performedByUserId
+    performedBy: performedByUserId,
+    recordedBy: performedByUserId
   });
 
   // Check low stock condition

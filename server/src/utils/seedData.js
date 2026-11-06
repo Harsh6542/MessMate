@@ -479,7 +479,8 @@ const seed = async () => {
         vendor: 'Patna Wholesale Grains',
         invoiceNumber: `INV-2026-${Math.floor(Math.random() * 9000 + 1000)}`,
         remarks: 'Monthly opening stock intake',
-        performedBy: managerKosi._id
+        performedBy: managerKosi._id,
+        recordedBy: managerKosi._id
       });
     }
     console.log('[Seed] Populated 10 Inventory Commodities with low-stock test triggers & stock receipts.');

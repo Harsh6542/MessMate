@@ -52,10 +52,15 @@ const stockTransactionSchema = new mongoose.Schema(
       trim: true,
       default: ''
     },
+    performedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      index: true
+    },
     recordedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      index: true
     },
     timestamp: {
       type: Date,
@@ -67,6 +72,20 @@ const stockTransactionSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Fallback synchronization between performedBy and recordedBy
+stockTransactionSchema.pre('validate', function (next) {
+  if (!this.recordedBy && this.performedBy) {
+    this.recordedBy = this.performedBy;
+  }
+  if (!this.performedBy && this.recordedBy) {
+    this.performedBy = this.recordedBy;
+  }
+  if (!this.recordedBy && !this.performedBy) {
+    return next(new Error('Transaction requires a recordedBy or performedBy user reference.'));
+  }
+  next();
+});
 
 stockTransactionSchema.index({ item: 1, timestamp: -1 });
 stockTransactionSchema.index({ mess: 1, type: 1, timestamp: -1 });
