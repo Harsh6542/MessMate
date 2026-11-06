@@ -55,3 +55,4 @@ volumes:
 networks:
   messmate-network:
     driver: bridge
+
