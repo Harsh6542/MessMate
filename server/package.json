@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "seed": "node src/utils/seedData.js"
+    "seed": "node src/utils/seedData.js",
+    "test:concurrency": "node src/tests/concurrencyTest.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

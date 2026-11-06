@@ -21,3 +21,4 @@ router.get('/warden', authorize(ROLES.WARDEN), getWardenDashboard);
 router.get('/admin', authorize(ROLES.ADMIN), getAdminDashboard);
 
 export default router;
+
