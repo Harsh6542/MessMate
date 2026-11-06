@@ -14,6 +14,10 @@ import mealSessionRoutes from './routes/mealSessionRoutes.js';
 import declarationRoutes from './routes/declarationRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
+import complaintRoutes from './routes/complaintRoutes.js';
+import announcementRoutes from './routes/announcementRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 import { errorHandler } from './middleware/errorHandler.js';
 import { AppError } from './utils/AppError.js';
@@ -79,6 +83,10 @@ app.use('/api/v1/meal-sessions', mealSessionRoutes);
 app.use('/api/v1/declarations', declarationRoutes);
 app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/attendance', attendanceRoutes);
+app.use('/api/v1/feedback', feedbackRoutes);
+app.use('/api/v1/complaints', complaintRoutes);
+app.use('/api/v1/announcements', announcementRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // 8. 404 handler for undefined routes
 app.all('*', (req, res, next) => {

@@ -326,3 +326,4 @@ export const MealDeclaration = () => {
 };
 
 export default MealDeclaration;
+

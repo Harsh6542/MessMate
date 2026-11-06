@@ -84,3 +84,4 @@ menuSchema.index({ mess: 1, dayOfWeek: 1, mealType: 1, isSpecial: 1 }, { unique:
 
 export const Menu = mongoose.model('Menu', menuSchema);
 export default Menu;
+

@@ -35,3 +35,4 @@ export const getSessionAttendance = asyncHandler(async (req, res) => {
     }
   });
 });
+

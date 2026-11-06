@@ -57,3 +57,4 @@ export const manualVerify = asyncHandler(async (req, res) => {
     data: result
   });
 });
+

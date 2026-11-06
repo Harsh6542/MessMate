@@ -145,3 +145,4 @@ export const QRScanner = () => {
 };
 
 export default QRScanner;
+

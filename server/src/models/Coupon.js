@@ -60,3 +60,4 @@ couponSchema.index({ student: 1, mealSession: 1 }, { unique: true });
 
 export const Coupon = mongoose.model('Coupon', couponSchema);
 export default Coupon;
+

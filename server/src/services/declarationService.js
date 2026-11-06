@@ -174,3 +174,4 @@ export const cancelDeclaration = async (declarationId, studentId) => {
 
   return declaration;
 };
+

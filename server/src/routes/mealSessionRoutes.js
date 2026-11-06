@@ -13,3 +13,4 @@ router.get('/current', getCurrentSession);
 router.get('/today', getTodaySessions);
 
 export default router;
+

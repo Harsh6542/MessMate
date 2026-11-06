@@ -166,39 +166,42 @@ Empower students to rate meals, file actionable complaints with image evidence, 
 ### Detailed Task Breakdown
 
 #### Backend Development
-- [ ] Implement `src/models/Feedback.js`, `src/models/Complaint.js`, `src/models/Announcement.js`, and `src/models/Notification.js`.
-- [ ] Setup Socket.IO Server (`src/sockets/index.js`):
+- [x] Implement `src/models/Feedback.js`, `src/models/Complaint.js`, `src/models/Announcement.js`, and `src/models/Notification.js`.
+- [x] Setup Socket.IO Server (`src/sockets/index.js`):
   - Authenticate socket connection using JWT cookie.
-  - Join rooms based on `hostel:<id>`, `mess:<id>`, and `user:<userId>`.
-- [ ] Build Meal Feedback System (`/api/v1/feedback`):
+  - Join rooms based on `hostel:<id>`, `mess:<id>`, `role:<role>`, and `user:<userId>`.
+- [x] Build Meal Feedback System (`/api/v1/feedback`):
   - `POST /feedback`: Validates student attended the meal session before accepting rating.
   - 5-metric ratings: Taste, Hygiene, Temperature, Portion Size, Overall (1-5 scale).
-  - Aggregation endpoint calculating running averages per dish and session.
-- [ ] Build Grievance & Complaint Workflow (`/api/v1/complaints`):
-  - Auto-generate formatted IDs (`CMP-2026-0001`).
-  - File upload handling via `multer` + Cloudinary for photo evidence.
+  - Scorecard calculation with averages per meal session.
+  - Manager response capability to student reviews.
+- [x] Build Grievance & Complaint Workflow (`/api/v1/complaints`):
+  - Auto-generate formatted human-readable IDs (`CMP-2026-0001`).
+  - Image evidence proof attachment.
   - Status progression: `submitted` -> `under_review` -> `in_progress` -> `resolved` -> `closed`.
-  - Confidential mode: Omits complainant student details from manager/staff view.
-  - Escalation mechanism for complaints past SLA resolution deadlines.
-- [ ] Announcements & Notifications:
+  - Confidential mode: Anonymizes complainant identity from mess staff/managers while allowing warden audit.
+  - SLA resolution deadlines (12h for critical/food safety, 24h high, 48h normal).
+  - Student reopening capability for inadequately addressed tickets.
+- [x] Announcements & Notifications:
   - Broadcast emergency announcements (e.g., "Special Dinner timing changed to 20:00").
-  - Socket.IO emission to connected student clients.
+  - Socket.IO real-time event emissions (`notification:new`, `announcement:new`, `complaint:new`).
 
 #### Frontend Development
-- [ ] Student Meal Rating Modal:
-  - Pops up after meal completion or accessible from Attendance History.
-  - Interactive 5-star rating inputs with comment box.
-- [ ] Student Complaint Portal:
-  - "Lodge New Complaint" form with category dropdown, photo upload dropzone, and confidentiality toggle.
-  - "My Complaints" list with live status badges (`Submitted`, `Under Review`, `Resolved`).
-  - Threaded timeline view of manager responses and resolutions.
-- [ ] Manager & Warden Grievance Dashboard:
-  - Filterable complaint queue by priority (`Critical`, `High`, `Medium`, `Low`) and category.
-  - Response dialog to update status, assign staff, or post resolution message.
-  - Warden escalation button for neglected grievances.
-- [ ] In-App Notification Center:
-  - Bell icon with unread count badge in navbar.
+- [x] Student Meal Rating Modal:
+  - Verified post-attendance rating page (`/student/feedback`).
+  - Interactive 5-star metric ratings with comments and historical scorecard view.
+- [x] Student Complaint Portal:
+  - "Lodge New Complaint" form (`/student/complaints/new`) with category dropdown, priority, confidentiality toggle.
+  - "My Complaints" list (`/student/complaints`) with live status badges (`Submitted`, `Under Review`, `Resolved`).
+  - Threaded detail timeline view (`/student/complaints/:id`) with manager responses and "Reopen Ticket" action.
+- [x] Manager & Warden Grievance Dashboard:
+  - Filterable complaint queue (`/manager/complaints`, `/warden/complaints`) by status and priority.
+  - Response dialog to update status and post resolution messages.
+- [x] In-App Notification Center:
+  - Live bell icon with unread count badge in header.
   - Real-time dropdown alerting menu updates, complaint responses, and reminders.
+- [x] Announcements Management Console:
+  - Publish broadcasts with priority levels (`/manager/announcements`, `/warden/announcements`).
 
 ### Verification & Testing Gate
 1. Student who did not attend lunch tries to submit feedback -> Blocked with `400 Attended meal required`.
@@ -331,8 +334,8 @@ End-to-end integration testing, security penetration testing, automated seed scr
 | **Phase 0** | Architecture, Schemas & Requirements | **COMPLETED** | Complete `docs/` suite |
 | **Phase 1** | Project Setup, Database & Auth (RBAC) | **COMPLETED** | Express backend, React Vite client, JWT HTTP-only cookies, 5 role dashboard shells, seed script |
 | **Phase 2** | Menus, Declarations & Digital QR Coupons | **COMPLETED** | Full meal cycle, weekly menus, advance opt-outs, cryptographic QR coupon generator, camera scanner, manual roll fallback |
-| **Phase 3** | Feedback, Complaints & Real-Time Sockets | **NEXT UP** | 5-star ratings, grievance SLAs, Cloudinary, Socket.IO |
-| **Phase 4** | Demand Forecasting, Kitchen Sheet & Wastage | *Pending* | Demand engine, waste tracking, inventory |
+| **Phase 3** | Feedback, Complaints & Real-Time Sockets | **COMPLETED** | Verified 5-star ratings, grievance SLAs, confidential complaints, Socket.IO real-time alerts, broadcast bulletins |
+| **Phase 4** | Demand Forecasting, Kitchen Sheet & Wastage | **NEXT UP** | Demand engine, waste tracking, inventory |
 | **Phase 5** | Analytics & High-Impact Dashboards | *Pending* | Recharts dashboards for all 5 roles |
 | **Phase 6** | Testing, Security, Seed Data & Deployment | *Pending* | Integration tests, seed script, README |
 

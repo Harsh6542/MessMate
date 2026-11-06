@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
+import api from '../services/api';
 import {
   Utensils,
   LayoutDashboard,
@@ -19,14 +21,22 @@ import {
   Building,
   ScanLine,
   FileSpreadsheet,
-  ShieldCheck
+  ShieldCheck,
+  Check
 } from 'lucide-react';
 
 export const DashboardLayout = () => {
   const { user, logout } = useAuth();
+  const socketCtx = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Notifications dropdown state
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifList, setNotifList] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifRef = useRef(null);
 
   // Role-based navigation links
   const getNavItems = () => {
@@ -38,8 +48,7 @@ export const DashboardLayout = () => {
           { name: 'Meal Declaration', path: '/student/declarations', icon: Calendar },
           { name: 'Digital Coupon', path: '/student/coupon', icon: QrCode },
           { name: 'Feedback & Ratings', path: '/student/feedback', icon: Star },
-          { name: 'Complaints', path: '/student/complaints', icon: AlertCircle },
-          { name: 'Guest Meals', path: '/student/guest-meals', icon: Users }
+          { name: 'Grievance / Complaints', path: '/student/complaints', icon: AlertCircle }
         ];
       case 'mess_staff':
         return [
@@ -53,26 +62,20 @@ export const DashboardLayout = () => {
         return [
           { name: 'Manager Dashboard', path: '/manager/dashboard', icon: LayoutDashboard },
           { name: 'Menu Planning', path: '/manager/menu', icon: Calendar },
-          { name: 'Demand Prediction', path: '/manager/demand', icon: TrendingDown },
-          { name: 'Inventory & Stock', path: '/manager/inventory', icon: Package },
           { name: 'Complaints Queue', path: '/manager/complaints', icon: AlertCircle },
-          { name: 'Food Wastage Logs', path: '/manager/wastage', icon: TrendingDown },
-          { name: 'Announcements', path: '/manager/announcements', icon: Bell }
+          { name: 'Broadcast Announcements', path: '/manager/announcements', icon: Bell }
         ];
       case 'warden':
         return [
           { name: 'Warden Dashboard', path: '/warden/dashboard', icon: LayoutDashboard },
-          { name: 'Hostel Performance', path: '/warden/performance', icon: Building },
           { name: 'Complaints Oversight', path: '/warden/complaints', icon: AlertCircle },
-          { name: 'Wastage Analytics', path: '/warden/wastage', icon: TrendingDown },
-          { name: 'Quality Scorecards', path: '/warden/quality', icon: Star }
+          { name: 'Broadcast Bulletins', path: '/warden/announcements', icon: Bell }
         ];
       case 'admin':
         return [
           { name: 'Admin Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
           { name: 'User Management', path: '/admin/users', icon: Users },
-          { name: 'Hostels & Mess', path: '/admin/hostels', icon: Building },
-          { name: 'System Settings', path: '/admin/settings', icon: ShieldCheck }
+          { name: 'Hostels & Mess', path: '/admin/hostels', icon: Building }
         ];
       default:
         return [];
@@ -80,6 +83,45 @@ export const DashboardLayout = () => {
   };
 
   const navItems = getNavItems();
+
+  const fetchNotifications = async () => {
+    try {
+      const [listRes, countRes] = await Promise.all([
+        api.get('/notifications'),
+        api.get('/notifications/unread-count')
+      ]);
+      if (listRes.success && listRes.data?.notifications) {
+        setNotifList(listRes.data.notifications);
+      }
+      if (countRes.success && countRes.data?.count !== undefined) {
+        setUnreadCount(countRes.data.count);
+      }
+    } catch {
+      // Quiet fail if offline
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  // Update when socket receives notification
+  useEffect(() => {
+    if (socketCtx?.notifications?.length) {
+      setNotifList((prev) => [socketCtx.notifications[0], ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    }
+  }, [socketCtx?.notifications]);
+
+  const markAllRead = async () => {
+    try {
+      await api.put('/notifications/read-all');
+      setUnreadCount(0);
+      setNotifList((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -240,7 +282,7 @@ export const DashboardLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen">
         {/* Desktop Top Bar */}
-        <header className="hidden md:flex items-center justify-between h-16 px-8 bg-white border-b border-slate-200">
+        <header className="hidden md:flex items-center justify-between h-16 px-8 bg-white border-b border-slate-200 relative">
           <div>
             <h1 className="text-base font-semibold text-slate-800">
               Welcome, {user?.firstName}
@@ -249,15 +291,66 @@ export const DashboardLayout = () => {
               {user?.hostel?.name ? `Hostel: ${user.hostel.name}` : 'NIT Patna Mess Ecosystem'}
             </p>
           </div>
+
           <div className="flex items-center gap-4">
-            <button
-              title="Notifications"
-              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative"
-            >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
-            </button>
+            {/* Notification Bell with Dropdown */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                title="Notifications"
+                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 px-1.5 py-0.2 text-[9px] font-black bg-rose-500 text-white rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Panel */}
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-fade-in">
+                  <div className="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800">Notifications</span>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllRead}
+                        className="text-[10px] text-emerald-600 hover:underline font-semibold"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                    {notifList.length === 0 ? (
+                      <div className="p-6 text-center text-xs text-slate-400">
+                        No notifications yet.
+                      </div>
+                    ) : (
+                      notifList.map((n) => (
+                        <div
+                          key={n._id}
+                          className={`p-3 text-xs transition-colors hover:bg-slate-50 ${
+                            !n.isRead ? 'bg-emerald-50/40' : ''
+                          }`}
+                        >
+                          <p className="font-bold text-slate-800">{n.title}</p>
+                          <p className="text-slate-500 mt-0.5 text-[11px]">{n.message}</p>
+                          <span className="text-[9px] text-slate-400 mt-1 block">
+                            {new Date(n.createdAt).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="h-6 w-px bg-slate-200"></div>
+
             <Link
               to="/profile"
               className="flex items-center gap-2.5 text-slate-700 hover:text-slate-900 group"
@@ -281,4 +374,3 @@ export const DashboardLayout = () => {
 };
 
 export default DashboardLayout;
-

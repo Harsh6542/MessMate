@@ -75,3 +75,4 @@ mealDeclarationSchema.index({ student: 1, date: 1, mealType: 1 }, { unique: true
 
 export const MealDeclaration = mongoose.model('MealDeclaration', mealDeclarationSchema);
 export default MealDeclaration;
+

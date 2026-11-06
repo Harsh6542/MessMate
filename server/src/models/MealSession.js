@@ -73,3 +73,4 @@ mealSessionSchema.index({ mess: 1, date: 1, mealType: 1 }, { unique: true });
 
 export const MealSession = mongoose.model('MealSession', mealSessionSchema);
 export default MealSession;
+

@@ -136,3 +136,4 @@ export const ManualVerify = () => {
 };
 
 export default ManualVerify;
+

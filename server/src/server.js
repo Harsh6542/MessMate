@@ -1,16 +1,25 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import http from 'http';
 import app from './app.js';
 import { connectDB } from './config/database.js';
+import { initSocket } from './sockets/index.js';
 
 // Connect to MongoDB
 connectDB();
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
+// Create HTTP server instance
+const httpServer = http.createServer(app);
+
+// Initialize Socket.IO with WebSocket handshake auth
+initSocket(httpServer);
+
+httpServer.listen(PORT, () => {
   console.log(`[MessMate Server] Running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`[MessMate Server] Real-time WebSockets initialized via Socket.IO`);
   console.log(`[MessMate Server] Health check available at http://localhost:${PORT}/api/v1/health`);
 });
 
@@ -26,4 +35,3 @@ process.on('uncaughtException', (err) => {
   console.error(err.stack);
   process.exit(1);
 });
-

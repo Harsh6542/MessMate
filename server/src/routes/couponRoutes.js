@@ -17,3 +17,4 @@ router.post('/verify', authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.ADM
 router.post('/manual-verify', authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.ADMIN), manualVerify);
 
 export default router;
+

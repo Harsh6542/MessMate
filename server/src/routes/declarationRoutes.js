@@ -19,3 +19,4 @@ router.get('/my', authorize(ROLES.STUDENT), getMyDeclarations);
 router.delete('/:id', authorize(ROLES.STUDENT), cancelMyDeclaration);
 
 export default router;
+

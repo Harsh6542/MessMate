@@ -48,3 +48,4 @@ export const getTodaySessions = asyncHandler(async (req, res, next) => {
     }
   });
 });
+

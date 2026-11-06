@@ -158,3 +158,4 @@ export const WeeklyMenuView = () => {
 };
 
 export default WeeklyMenuView;
+

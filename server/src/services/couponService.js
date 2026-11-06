@@ -270,3 +270,4 @@ export const manualVerifyStudent = async ({ rollNumber, staffId, reason }) => {
     attendance
   };
 };
+

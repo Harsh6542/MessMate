@@ -17,3 +17,4 @@ router.get('/weekly', getWeeklyMenu);
 router.post('/', authorize(ROLES.MESS_MANAGER, ROLES.ADMIN), upsertMenu);
 
 export default router;
+
