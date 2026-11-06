@@ -1,0 +1,20 @@
+import express from 'express';
+import {
+  getUsers,
+  createUser,
+  updateUserStatus
+} from '../controllers/userController.js';
+import { authenticate } from '../middleware/auth.js';
+import { authorize } from '../middleware/authorize.js';
+import { ROLES } from '../config/constants.js';
+
+const router = express.Router();
+
+router.use(authenticate);
+
+router.get('/', authorize(ROLES.ADMIN, ROLES.WARDEN), getUsers);
+router.post('/', authorize(ROLES.ADMIN), createUser);
+router.put('/:id/status', authorize(ROLES.ADMIN), updateUserStatus);
+
+export default router;
+

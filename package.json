@@ -1,0 +1,26 @@
+{
+  "name": "messmate",
+  "version": "1.0.0",
+  "description": "Smart Hostel Mess Management & Food Waste Reduction System",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "server": "npm run dev --workspace=server",
+    "client": "npm run dev --workspace=client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build:client": "npm run build --workspace=client",
+    "install:all": "npm install --workspace=server && npm install --workspace=client"
+  },
+  "keywords": [
+    "hostel-mess",
+    "food-waste-reduction",
+    "mern",
+    "qr-coupon"
+  ],
+  "author": "",
+  "license": "ISC"
+}
+
