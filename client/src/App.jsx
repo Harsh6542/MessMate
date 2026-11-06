@@ -148,6 +148,8 @@ export const App = () => {
                 {/* Super Admin Role Routes */}
                 <Route element={<RoleRoute allowedRoles={['admin']} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/users" element={<AdminDashboard />} />
+                  <Route path="/admin/hostels" element={<AdminDashboard />} />
                 </Route>
               </Route>
             </Route>

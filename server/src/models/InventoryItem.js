@@ -60,3 +60,4 @@ inventoryItemSchema.index({ mess: 1, currentStock: 1, minimumThreshold: 1 });
 
 export const InventoryItem = mongoose.model('InventoryItem', inventoryItemSchema);
 export default InventoryItem;
+

@@ -73,3 +73,4 @@ stockTransactionSchema.index({ mess: 1, type: 1, timestamp: -1 });
 
 export const StockTransaction = mongoose.model('StockTransaction', stockTransactionSchema);
 export default StockTransaction;
+

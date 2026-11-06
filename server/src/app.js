@@ -22,6 +22,7 @@ import demandRoutes from './routes/demandRoutes.js';
 import wasteLogRoutes from './routes/wasteLogRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import guestMealRoutes from './routes/guestMealRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 import { errorHandler } from './middleware/errorHandler.js';
 import { AppError } from './utils/AppError.js';
@@ -96,6 +97,7 @@ app.use('/api/v1/kitchen', demandRoutes);
 app.use('/api/v1/waste-logs', wasteLogRoutes);
 app.use('/api/v1/inventory', inventoryRoutes);
 app.use('/api/v1/guest-meals', guestMealRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // 8. 404 handler for undefined routes
 app.all('*', (req, res, next) => {

@@ -86,3 +86,4 @@ guestMealRequestSchema.index({ mess: 1, date: 1, status: 1 });
 
 export const GuestMealRequest = mongoose.model('GuestMealRequest', guestMealRequestSchema);
 export default GuestMealRequest;
+

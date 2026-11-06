@@ -64,3 +64,4 @@ wasteLogSchema.index({ mess: 1, createdAt: -1 });
 
 export const WasteLog = mongoose.model('WasteLog', wasteLogSchema);
 export default WasteLog;
+

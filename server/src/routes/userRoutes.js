@@ -2,7 +2,8 @@ import express from 'express';
 import {
   getUsers,
   createUser,
-  updateUserStatus
+  updateUserStatus,
+  updateUser
 } from '../controllers/userController.js';
 import { authenticate } from '../middleware/auth.js';
 import { authorize } from '../middleware/authorize.js';
@@ -15,6 +16,6 @@ router.use(authenticate);
 router.get('/', authorize(ROLES.ADMIN, ROLES.WARDEN), getUsers);
 router.post('/', authorize(ROLES.ADMIN), createUser);
 router.put('/:id/status', authorize(ROLES.ADMIN), updateUserStatus);
+router.put('/:id', authorize(ROLES.ADMIN), updateUser);
 
 export default router;
-

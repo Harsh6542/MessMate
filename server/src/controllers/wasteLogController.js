@@ -198,3 +198,4 @@ export const getWasteSummary = async (req, res, next) => {
     next(error);
   }
 };
+

@@ -107,3 +107,34 @@ export const updateUserStatus = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+// @desc    Update user details (role, hostel, mess, roomNumber, phone)
+// @route   PUT /api/v1/users/:id
+// @access  Admin
+export const updateUser = asyncHandler(async (req, res, next) => {
+  const allowed = ['firstName', 'lastName', 'role', 'hostel', 'mess', 'roomNumber', 'phone', 'dietaryPreference'];
+  const updates = {};
+  allowed.forEach((key) => {
+    if (req.body[key] !== undefined) {
+      updates[key] = req.body[key];
+    }
+  });
+
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    updates,
+    { new: true, runValidators: true }
+  ).populate('hostel', 'name code').populate('mess', 'name');
+
+  if (!user) {
+    return next(new AppError('User not found', 404, 'NOT_FOUND'));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'User account updated successfully',
+    data: {
+      user
+    }
+  });
+});

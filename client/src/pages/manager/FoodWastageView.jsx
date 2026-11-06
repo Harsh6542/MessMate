@@ -264,3 +264,4 @@ export const FoodWastageView = () => {
 };
 
 export default FoodWastageView;
+
