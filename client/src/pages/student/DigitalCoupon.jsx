@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { stopAllWebcamTracks } from '../../utils/cameraUtils';
 import {
   Wallet,
   QrCode,
@@ -93,15 +94,17 @@ export const DigitalCoupon = () => {
 
   // Initialize html5-qrcode scanner when scanner modal/view opens
   useEffect(() => {
+    let isCancelled = false;
+
     if (!isScanning) {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-        scannerRef.current = null;
-      }
+      stopAllWebcamTracks(scannerRef.current);
+      scannerRef.current = null;
       return;
     }
 
     const timer = setTimeout(() => {
+      if (isCancelled) return;
+
       try {
         const scanner = new Html5QrcodeScanner(
           'student-counter-reader',
@@ -131,19 +134,28 @@ export const DigitalCoupon = () => {
     }, 150);
 
     return () => {
+      isCancelled = true;
       clearTimeout(timer);
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-        scannerRef.current = null;
-      }
+      stopAllWebcamTracks(scannerRef.current);
+      scannerRef.current = null;
     };
   }, [isScanning]);
 
+  // Teardown camera on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      stopAllWebcamTracks(scannerRef.current);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      stopAllWebcamTracks(scannerRef.current);
+    };
+  }, []);
+
   const handleDetectedCounterQR = (qrString) => {
-    if (scannerRef.current) {
-      scannerRef.current.clear().catch(console.error);
-      scannerRef.current = null;
-    }
+    stopAllWebcamTracks(scannerRef.current);
+    scannerRef.current = null;
     setIsScanning(false);
     setScannedPayload(qrString);
   };
@@ -510,7 +522,10 @@ export const DigitalCoupon = () => {
                 Scan Mess Standee QR
               </div>
               <button
-                onClick={() => setIsScanning(false)}
+                onClick={() => {
+                  stopAllWebcamTracks(scannerRef.current);
+                  setIsScanning(false);
+                }}
                 className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl"
               >
                 <X className="w-4 h-4" />

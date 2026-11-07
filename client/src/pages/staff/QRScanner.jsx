@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import api from '../../services/api';
+import { stopAllWebcamTracks } from '../../utils/cameraUtils';
 import {
   ScanLine,
   CheckCircle2,
@@ -10,7 +12,10 @@ import {
   User,
   Utensils,
   Wallet,
-  Sparkles
+  Sparkles,
+  Camera,
+  CameraOff,
+  ArrowLeft
 } from 'lucide-react';
 
 const playSuccessBeep = () => {
@@ -37,54 +42,94 @@ export const QRScanner = () => {
   const [scanError, setScanError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [scannedCount, setScannedCount] = useState(0);
+  const [isCameraActive, setIsCameraActive] = useState(true);
   const scannerRef = useRef(null);
 
+  // Toggle camera active state with immediate hardware release
+  const handleToggleCamera = async () => {
+    if (isCameraActive) {
+      await stopAllWebcamTracks(scannerRef.current);
+      scannerRef.current = null;
+      setIsCameraActive(false);
+    } else {
+      setIsCameraActive(true);
+    }
+  };
+
   useEffect(() => {
-    // Initialize html5-qrcode scanner
-    const scanner = new Html5QrcodeScanner(
-      'qr-reader',
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
-        showTorchButtonIfSupported: true
-      },
-      false
-    );
+    let isCancelled = false;
 
-    scannerRef.current = scanner;
+    if (!isCameraActive) {
+      stopAllWebcamTracks(scannerRef.current);
+      scannerRef.current = null;
+      return;
+    }
 
-    const onScanSuccess = async (decodedText) => {
-      if (isProcessing) return;
+    const timer = setTimeout(() => {
+      if (isCancelled) return;
 
       try {
-        setIsProcessing(true);
-        setScanError('');
-        setScanResult(null);
+        const scanner = new Html5QrcodeScanner(
+          'qr-reader',
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+            showTorchButtonIfSupported: true
+          },
+          false
+        );
 
-        const res = await api.post('/coupons/verify', { qrPayload: decodedText });
-        if (res.success && res.data) {
-          playSuccessBeep();
-          setScanResult(res.data);
-          setScannedCount((prev) => prev + 1);
-        }
+        scannerRef.current = scanner;
+
+        const onScanSuccess = async (decodedText) => {
+          if (isProcessing) return;
+
+          try {
+            setIsProcessing(true);
+            setScanError('');
+            setScanResult(null);
+
+            const res = await api.post('/coupons/verify', { qrPayload: decodedText });
+            if (res.success && res.data) {
+              playSuccessBeep();
+              setScanResult(res.data);
+              setScannedCount((prev) => prev + 1);
+            }
+          } catch (err) {
+            setScanError(err.message || 'Verification failed');
+          } finally {
+            setIsProcessing(false);
+          }
+        };
+
+        const onScanFailure = () => {
+          // Routine frame scan failure, ignore
+        };
+
+        scanner.render(onScanSuccess, onScanFailure);
       } catch (err) {
-        setScanError(err.message || 'Verification failed');
-      } finally {
-        setIsProcessing(false);
+        console.error('Camera init error:', err);
       }
-    };
-
-    const onScanFailure = () => {
-      // Ignore routine frame read failures
-    };
-
-    scanner.render(onScanSuccess, onScanFailure);
+    }, 150);
 
     return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-      }
+      isCancelled = true;
+      clearTimeout(timer);
+      stopAllWebcamTracks(scannerRef.current);
+      scannerRef.current = null;
+    };
+  }, [isCameraActive]);
+
+  // Teardown camera on beforeunload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      stopAllWebcamTracks(scannerRef.current);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      stopAllWebcamTracks(scannerRef.current);
     };
   }, []);
 
@@ -97,16 +142,64 @@ export const QRScanner = () => {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Top Bar with Navigation and Camera Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 tracking-tight">QR Coupon Scanner</h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <div className="flex items-center gap-2 mb-1">
+            <Link
+              to="/staff/dashboard"
+              onClick={() => stopAllWebcamTracks(scannerRef.current)}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-200 transition"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Staff Dashboard
+            </Link>
+            <span className="text-slate-600">•</span>
+            {isCameraActive ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Camera Live
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                Camera Stopped
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl font-black text-slate-100 tracking-tight">QR Coupon Scanner</h1>
+          <p className="text-xs text-slate-400 mt-0.5">
             Scan student's unique Mess QR code or meal session token to verify attendance.
           </p>
         </div>
-        <div className="text-right">
-          <span className="text-[10px] uppercase font-bold text-slate-400 block">Verified Headcount</span>
-          <span className="text-2xl font-black text-emerald-400">{scannedCount}</span>
+
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          {/* Explicit Camera Hardware Toggle Button */}
+          <button
+            onClick={handleToggleCamera}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 border transition ${
+              isCameraActive
+                ? 'bg-rose-500/20 text-rose-300 border-rose-500/30 hover:bg-rose-500/30'
+                : 'bg-emerald-500 text-slate-950 border-emerald-500 hover:bg-emerald-400 font-black'
+            }`}
+          >
+            {isCameraActive ? (
+              <>
+                <CameraOff className="w-4 h-4" />
+                Stop Camera
+              </>
+            ) : (
+              <>
+                <Camera className="w-4 h-4" />
+                Start Camera
+              </>
+            )}
+          </button>
+
+          <div className="text-right pl-2 border-l border-slate-800">
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">Verified</span>
+            <span className="text-xl font-black text-emerald-400">{scannedCount}</span>
+          </div>
         </div>
       </div>
 
@@ -179,9 +272,30 @@ export const QRScanner = () => {
         </div>
       )}
 
-      {/* HTML5 QR Camera View Container */}
-      <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl overflow-hidden">
-        <div id="qr-reader" className="w-full rounded-2xl overflow-hidden text-slate-100"></div>
+      {/* HTML5 QR Camera View Container or Inactive State */}
+      <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl overflow-hidden min-h-[320px] flex flex-col items-center justify-center">
+        {isCameraActive ? (
+          <div id="qr-reader" className="w-full rounded-2xl overflow-hidden text-slate-100"></div>
+        ) : (
+          <div className="text-center py-12 space-y-4">
+            <div className="w-16 h-16 bg-slate-800 rounded-3xl flex items-center justify-center mx-auto text-slate-500 border border-slate-700">
+              <CameraOff className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-slate-200">Camera is Turned Off</h3>
+              <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                Webcam hardware has been released. Click below to re-activate the camera when ready to scan.
+              </p>
+            </div>
+            <button
+              onClick={handleToggleCamera}
+              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition shadow-lg shadow-emerald-500/20 inline-flex items-center gap-2"
+            >
+              <Camera className="w-4 h-4" />
+              Turn Camera On
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
