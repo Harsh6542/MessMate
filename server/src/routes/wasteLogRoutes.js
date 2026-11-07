@@ -16,13 +16,13 @@ router.post(
 
 router.get(
   '/',
-  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.ADMIN),
   getWasteLogs
 );
 
 router.get(
   '/summary',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   getWasteSummary
 );
 

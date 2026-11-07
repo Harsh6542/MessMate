@@ -281,60 +281,7 @@ const seed = async () => {
       phone: '9999900001'
     });
 
-    // 4. Create Hostel Wardens
-    const wardenKautilya = await User.create({
-      firstName: 'Dr. Ramesh',
-      lastName: 'Verma',
-      email: 'warden@messmate.edu',
-      password: 'Password@123',
-      role: ROLES.WARDEN,
-      gender: 'male',
-      phone: '9999900002',
-      hostel: kautilyaHostel._id
-    });
-    kautilyaHostel.warden = wardenKautilya._id;
-    await kautilyaHostel.save();
-
-    const wardenKadambini = await User.create({
-      firstName: 'Dr. Sunita',
-      lastName: 'Mishra',
-      email: 'warden.kadambini@messmate.edu',
-      password: 'Password@123',
-      role: ROLES.WARDEN,
-      gender: 'female',
-      phone: '9999900003',
-      hostel: kadambiniHostel._id
-    });
-    kadambiniHostel.warden = wardenKadambini._id;
-    await kadambiniHostel.save();
-
-    const wardenNagarjuna = await User.create({
-      firstName: 'Dr. Alok',
-      lastName: 'Srivastava',
-      email: 'warden.nagarjuna@messmate.edu',
-      password: 'Password@123',
-      role: ROLES.WARDEN,
-      gender: 'male',
-      phone: '9999900004',
-      hostel: nagarjunaHostel._id
-    });
-    nagarjunaHostel.warden = wardenNagarjuna._id;
-    await nagarjunaHostel.save();
-
-    const wardenAryabhatta = await User.create({
-      firstName: 'Dr. Bipin',
-      lastName: 'Bihari',
-      email: 'warden.aryabhatta@messmate.edu',
-      password: 'Password@123',
-      role: ROLES.WARDEN,
-      gender: 'male',
-      phone: '9999900005',
-      hostel: aryabhattaHostel._id
-    });
-    aryabhattaHostel.warden = wardenAryabhatta._id;
-    await aryabhattaHostel.save();
-
-    // 5. Create Mess Facilities & Managers for each hostel
+    // 4. Create Mess Facilities & Managers for each hostel
     // Kautilya Mess
     const managerKautilya = await User.create({
       firstName: 'Suresh',
@@ -722,14 +669,14 @@ const seed = async () => {
     }
     console.log('[Seed] Seeded sample complaints with SLA timers and confidential mode.');
 
-    // 13. Populate Pinned Announcements
+    // 12. Populate Pinned Announcements
     await Announcement.create({
       title: 'Special Feast on Friday Evening',
       content: 'A special dinner including Veg Biryani, Kadai Paneer, and Gulab Jamun will be served this Friday from 19:30 to 22:00. Advance opt-out cutoff is Friday 15:00.',
       priority: 'important',
       hostel: kautilyaHostel._id,
       mess: kautilyaMess._id,
-      publishedBy: wardenKautilya._id,
+      publishedBy: managerKautilya._id,
       targetRoles: [ROLES.STUDENT, ROLES.MESS_STAFF, ROLES.MESS_MANAGER]
     });
 
@@ -739,7 +686,7 @@ const seed = async () => {
       priority: 'normal',
       hostel: kadambiniHostel._id,
       mess: kadambiniMess._id,
-      publishedBy: wardenKadambini._id,
+      publishedBy: managerKadambini._id,
       targetRoles: [ROLES.STUDENT, ROLES.MESS_STAFF, ROLES.MESS_MANAGER]
     });
     console.log('[Seed] Pinned announcements created for Kautilya & Kadambini.');
@@ -755,11 +702,9 @@ const seed = async () => {
       { Hostel: 'Kadambini Hostel', Code: 'H-KADAMBINI', Type: 'Girls', Capacity: 400, Mess: 'Kadambini Dining Facility' }
     ]);
 
-    console.log('\nDemo Credentials for All Roles:');
+    console.log('\nDemo Credentials for Active Roles:');
     console.table([
       { Role: 'Super Admin', Email: 'admin@messmate.edu', Password: 'Password@123', Access: 'Platform-wide' },
-      { Role: 'Hostel Warden (Kautilya)', Email: 'warden@messmate.edu', Password: 'Password@123', Access: 'Kautilya Hostel (Boys)' },
-      { Role: 'Hostel Warden (Kadambini)', Email: 'warden.kadambini@messmate.edu', Password: 'Password@123', Access: 'Kadambini Hostel (Girls)' },
       { Role: 'Mess Manager (Kautilya)', Email: 'manager@messmate.edu', Password: 'Password@123', Access: 'Kautilya Central Mess' },
       { Role: 'Mess Manager (Kadambini)', Email: 'manager.kadambini@messmate.edu', Password: 'Password@123', Access: 'Kadambini Mess' },
       { Role: 'Mess Staff (Kautilya)', Email: 'staff@messmate.edu', Password: 'Password@123', Access: 'Kautilya Scanner & Scale' },

@@ -2,7 +2,6 @@ export const ROLES = {
   STUDENT: 'student',
   MESS_STAFF: 'mess_staff',
   MESS_MANAGER: 'mess_manager',
-  WARDEN: 'warden',
   ADMIN: 'admin'
 };
 
@@ -10,8 +9,7 @@ export const ROLE_HIERARCHY = {
   [ROLES.STUDENT]: 1,
   [ROLES.MESS_STAFF]: 2,
   [ROLES.MESS_MANAGER]: 3,
-  [ROLES.WARDEN]: 4,
-  [ROLES.ADMIN]: 5
+  [ROLES.ADMIN]: 4
 };
 
 export const MEAL_TYPES = {

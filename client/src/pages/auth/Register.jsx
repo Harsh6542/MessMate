@@ -97,7 +97,7 @@ export const Register = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
       <div>
         <h2 className="text-xl font-bold text-white tracking-tight text-center">
           Student Registration

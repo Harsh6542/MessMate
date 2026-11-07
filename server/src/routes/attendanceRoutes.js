@@ -14,7 +14,7 @@ router.use(authenticate);
 router.get('/my-history', authorize(ROLES.STUDENT), getMyAttendance);
 router.get(
   '/session/:sessionId',
-  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.ADMIN),
   getSessionAttendance
 );
 

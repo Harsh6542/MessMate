@@ -20,12 +20,12 @@ router.get('/', getComplaints);
 router.get('/:id', getComplaintById);
 router.post(
   '/:id/respond',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   respondToComplaint
 );
 router.put(
   '/:id/status',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   updateComplaintStatus
 );
 router.post('/:id/reopen', authorize(ROLES.STUDENT), reopenStudentComplaint);

@@ -63,7 +63,7 @@ export const ResetPassword = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-6">
       <div>
         <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto mb-3">
           <ShieldCheck className="w-5 h-5" />

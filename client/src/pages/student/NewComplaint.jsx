@@ -176,7 +176,7 @@ export const NewComplaint = () => {
               </label>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
                 Your name and roll number will be completely hidden from mess staff and contractors.
-                Only the authorized Hostel Warden will have access to your identity for verification.
+                Only authorized hostel administration will have access to your identity for verification.
               </p>
             </div>
           </div>

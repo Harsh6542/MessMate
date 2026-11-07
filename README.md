@@ -32,15 +32,13 @@ In traditional collegiate hostel mess operations, three systemic inefficiencies 
 
 ---
 
-## 🔑 Demo Credentials (All 5 Stakeholder Roles)
+## 🔑 Demo Credentials (Active Operational Roles)
 
-The automated seed script initializes complete accounts for all 5 roles across NIT Patna hostels:
+The automated seed script initializes complete accounts across NIT Patna hostels:
 
 | Role | Email | Password | Assigned Scope | Key Capabilities |
 |---|---|---|---|---|
-| **Super Admin** | `admin@messmate.edu` | `Password@123` | Platform-wide | Provision hostels, mess facilities, user role reassignment |
-| **Hostel Warden (Boys)** | `warden@messmate.edu` | `Password@123` | Kautilya Hostel | SLA compliance tracking, confidential grievance review, waste audits |
-| **Hostel Warden (Girls)**| `warden.kadambini@messmate.edu` | `Password@123` | Kadambini Hostel | Girls hostel oversight, grievance escalation & compliance tracking |
+| **Super Admin** | `admin@messmate.edu` | `Password@123` | Platform-wide | Multi-hostel provisioning, dining cutoff policies, account provisioning |
 | **Mess Manager (Boys)** | `manager@messmate.edu` | `Password@123` | Kautilya Central Mess | Demand forecasting, cooking quantity approval, stock inventory, menus |
 | **Mess Manager (Girls)**| `manager.kadambini@messmate.edu`| `Password@123` | Kadambini Dining Facility | Demand forecasting, menu curation, inventory receipts |
 | **Mess Staff** | `staff@messmate.edu` | `Password@123` | Kautilya Kitchen Floor | QR coupon camera scanner, manual roll search, scale waste logging |

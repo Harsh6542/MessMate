@@ -414,7 +414,6 @@ export const AdminDashboard = () => {
                 <option value="student">Student</option>
                 <option value="mess_staff">Mess Staff</option>
                 <option value="mess_manager">Mess Manager</option>
-                <option value="warden">Warden</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -462,8 +461,6 @@ export const AdminDashboard = () => {
                             className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
                               u.role === 'admin'
                                 ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                                : u.role === 'warden'
-                                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
                                 : u.role === 'mess_manager'
                                 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                                 : u.role === 'mess_staff'
@@ -568,7 +565,7 @@ export const AdminDashboard = () => {
               Provision New Account
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Create an administrative, staff, warden or student credential.
+              Create an administrative, staff, manager or student credential.
             </p>
 
             <form onSubmit={handleCreateUser} className="mt-4 space-y-3">
@@ -627,7 +624,6 @@ export const AdminDashboard = () => {
                     <option value="student">Student</option>
                     <option value="mess_staff">Mess Staff</option>
                     <option value="mess_manager">Mess Manager</option>
-                    <option value="warden">Hostel Warden</option>
                     <option value="admin">System Admin</option>
                   </select>
                 </div>
@@ -763,7 +759,6 @@ export const AdminDashboard = () => {
                   <option value="student">Student</option>
                   <option value="mess_staff">Mess Staff</option>
                   <option value="mess_manager">Mess Manager</option>
-                  <option value="warden">Hostel Warden</option>
                   <option value="admin">System Admin</option>
                 </select>
               </div>

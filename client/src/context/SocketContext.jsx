@@ -59,9 +59,9 @@ export const SocketProvider = ({ children }) => {
       });
     });
 
-    // Manager / Warden complaint alerts
+    // Manager complaint alerts
     socketInstance.on('complaint:new', (data) => {
-      if (user.role === 'mess_manager' || user.role === 'warden') {
+      if (user.role === 'mess_manager' || user.role === 'admin') {
         toast(`New Complaint #${data.complaintId}: ${data.subject}`, {
           icon: '⚠️',
           style: {

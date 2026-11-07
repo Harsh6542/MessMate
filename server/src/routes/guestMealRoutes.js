@@ -16,7 +16,7 @@ router.use(authenticate);
 
 router
   .route('/')
-  .get(authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN), getAllGuestRequests)
+  .get(authorize(ROLES.MESS_MANAGER, ROLES.ADMIN), getAllGuestRequests)
   .post(authorize(ROLES.STUDENT), createGuestMealRequest);
 
 router.get('/my', authorize(ROLES.STUDENT), getMyGuestRequests);

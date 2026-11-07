@@ -17,7 +17,7 @@ router.post('/', authorize(ROLES.STUDENT), submitFeedback);
 router.get('/my', authorize(ROLES.STUDENT), getMyFeedback);
 router.get(
   '/session/:sessionId',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   getSessionFeedback
 );
 router.post(

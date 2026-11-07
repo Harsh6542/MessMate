@@ -22,7 +22,6 @@ import ResetPassword from './pages/auth/ResetPassword';
 import StudentDashboard from './pages/student/StudentDashboard';
 import StaffDashboard from './pages/staff/StaffDashboard';
 import ManagerDashboard from './pages/manager/ManagerDashboard';
-import WardenDashboard from './pages/warden/WardenDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Profile from './pages/Profile';
 
@@ -137,16 +136,6 @@ export const App = () => {
                   <Route path="/manager/guest-meals" element={<GuestMealsManager />} />
                   <Route path="/manager/complaints" element={<ComplaintsQueue />} />
                   <Route path="/manager/announcements" element={<AnnouncementsManager />} />
-                </Route>
-
-                {/* Warden / Committee Role Routes */}
-                <Route element={<RoleRoute allowedRoles={['warden']} />}>
-                  <Route path="/warden/dashboard" element={<WardenDashboard />} />
-                  <Route path="/warden/demand" element={<DemandForecast />} />
-                  <Route path="/warden/wastage" element={<FoodWastageView />} />
-                  <Route path="/warden/guest-meals" element={<GuestMealsManager />} />
-                  <Route path="/warden/complaints" element={<ComplaintsQueue />} />
-                  <Route path="/warden/announcements" element={<AnnouncementsManager />} />
                 </Route>
 
                 {/* Super Admin Role Routes */}

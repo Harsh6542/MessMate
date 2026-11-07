@@ -18,23 +18,23 @@ router.use(authenticate);
 
 router
   .route('/')
-  .get(authorize(ROLES.MESS_MANAGER, ROLES.MESS_STAFF, ROLES.WARDEN, ROLES.ADMIN), getItems)
+  .get(authorize(ROLES.MESS_MANAGER, ROLES.MESS_STAFF, ROLES.ADMIN), getItems)
   .post(authorize(ROLES.MESS_MANAGER, ROLES.ADMIN), createItem);
 
 router.get(
   '/alerts',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   getAlerts
 );
 
 router
   .route('/transactions')
-  .get(authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN), getTransactions)
+  .get(authorize(ROLES.MESS_MANAGER, ROLES.ADMIN), getTransactions)
   .post(authorize(ROLES.MESS_MANAGER, ROLES.MESS_STAFF, ROLES.ADMIN), recordTransaction);
 
 router
   .route('/:id')
-  .get(authorize(ROLES.MESS_MANAGER, ROLES.MESS_STAFF, ROLES.WARDEN, ROLES.ADMIN), getItem)
+  .get(authorize(ROLES.MESS_MANAGER, ROLES.MESS_STAFF, ROLES.ADMIN), getItem)
   .put(authorize(ROLES.MESS_MANAGER, ROLES.ADMIN), updateItem);
 
 export default router;

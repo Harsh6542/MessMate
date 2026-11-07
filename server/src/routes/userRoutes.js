@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.get('/', authorize(ROLES.ADMIN, ROLES.WARDEN), getUsers);
+router.get('/', authorize(ROLES.ADMIN), getUsers);
 router.post('/', authorize(ROLES.ADMIN), createUser);
 router.put('/:id/status', authorize(ROLES.ADMIN), updateUserStatus);
 router.put('/:id', authorize(ROLES.ADMIN), updateUser);

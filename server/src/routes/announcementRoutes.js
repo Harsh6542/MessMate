@@ -15,12 +15,12 @@ router.use(authenticate);
 router.get('/', getAnnouncements);
 router.post(
   '/',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   createAnnouncement
 );
 router.delete(
   '/:id',
-  authorize(ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_MANAGER, ROLES.ADMIN),
   deactivateAnnouncement
 );
 

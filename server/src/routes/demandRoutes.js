@@ -10,13 +10,13 @@ router.use(authenticate);
 
 router.get(
   '/prep-sheet',
-  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.ADMIN),
   getKitchenPrepSheet
 );
 
 router.get(
   '/prediction/:sessionId',
-  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.WARDEN, ROLES.ADMIN),
+  authorize(ROLES.MESS_STAFF, ROLES.MESS_MANAGER, ROLES.ADMIN),
   getPrediction
 );
 

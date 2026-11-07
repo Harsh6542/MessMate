@@ -70,15 +70,6 @@ export const DashboardLayout = () => {
           { name: 'Complaints Queue', path: '/manager/complaints', icon: AlertCircle },
           { name: 'Announcements', path: '/manager/announcements', icon: Bell }
         ];
-      case 'warden':
-        return [
-          { name: 'Warden Dashboard', path: '/warden/dashboard', icon: LayoutDashboard },
-          { name: 'Demand Oversight', path: '/warden/demand', icon: FileSpreadsheet },
-          { name: 'Wastage Oversight', path: '/warden/wastage', icon: TrendingDown },
-          { name: 'Guest Meal Passes', path: '/warden/guest-meals', icon: Users },
-          { name: 'Complaints Oversight', path: '/warden/complaints', icon: AlertCircle },
-          { name: 'Broadcast Bulletins', path: '/warden/announcements', icon: Bell }
-        ];
       case 'admin':
         return [
           { name: 'Admin Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -142,8 +133,6 @@ export const DashboardLayout = () => {
         return 'Mess Staff';
       case 'mess_manager':
         return 'Mess Manager';
-      case 'warden':
-        return 'Hostel Warden';
       case 'admin':
         return 'Administrator';
       default:
