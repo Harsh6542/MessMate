@@ -12,11 +12,10 @@ In traditional collegiate hostel mess operations, three systemic inefficiencies 
 3. **Accountability Deficits:** Paper coupons and manual attendance consume valuable dining time, student quality feedback is unstructured, and hygiene grievances are difficult to escalate without fear of contractor friction.
 
 ### The MessMate Solution
-**MessMate** provides a centralized platform connecting all 5 hostel stakeholders:
-- **Hostel Residents (Students):** Advance meal-wise absence declarations before automated cutoffs, secure single-use QR coupons with countdown timers, attendance-gated 5-metric ratings, confidential grievance lodging with SLA deadlines, and guest meal passes.
-- **Mess Workers:** Camera-based browser QR verification, offline-safe manual roll search fallback, high-contrast tablet kitchen preparation sheets with bulk raw commodity multipliers, and physical scale waste logging.
-- **Mess Managers & Contractors:** Algorithmic meal demand prediction engine ($\text{Residents} - \text{OptOuts} + \text{Guests}$ with 30-day turnout factor & safety buffers), cooking quantity overrides, weekly menu publishing, raw inventory stockrooms with low-stock alerts, and guest pass management.
-- **Hostel Wardens & Mess Committees:** Institutional oversight portal, student satisfaction index trends, grievance SLA resolution compliance tracking (<12h critical hygiene, <24h normal), confidential grievance investigation, and monthly food waste financial audit.
+**MessMate** provides a centralized platform connecting all 4 collegiate hostel stakeholders:
+- **Hostel Residents (Students):** 100% free daily regular meals, flexible Digital Mess Coupon Wallet (₹6,000 semester allotment, ₹1,000 monthly allowance, ₹1 to ₹1,000 payment amounts via PhonePe-style QR scan & pay), permanent student mess QR, advance meal-wise absence declarations, verified ratings, confidential grievance lodging, and guest meal passes.
+- **Mess Workers:** Fast browser-based QR counter scanning (with dual modes: free meal verification and flexible wallet payments), instant webcam hardware release, manual roll search fallback, kitchen preparation sheets with bulk raw commodity multipliers, and digital scale waste logging.
+- **Mess Managers & Contractors:** Algorithmic meal demand prediction engine ($\text{Residents} - \text{OptOuts} + \text{Guests}$ with 30-day turnout factor & safety buffers), cooking quantity overrides, weekly menu publishing, raw inventory stockrooms with low-stock alerts, complaint SLA handling, and real-time counter payment monitoring.
 - **System Administrators:** Multi-hostel infrastructure provisioning, dining complex cutoff policies, role reassignment, and platform audit feeds.
 
 ---
@@ -200,10 +199,9 @@ MessMate enforces strict separation between:
 - `PUT /guest-meals/:id/decision` — Manager guest ticket approval
 
 ### High-Impact Dashboards (`/api/v1/dashboard`)
-- `GET /dashboard/student` — Next meal, today's dishes, coupon status, attendance rate
-- `GET /dashboard/staff` — Active meal shift stats, live serving progress, recent 12 scans
+- `GET /dashboard/student` — Next meal, today's dishes, coupon wallet status, attendance rate
+- `GET /dashboard/staff` — Active meal shift stats, live serving progress, real-time counter payments
 - `GET /dashboard/manager` — Recharts 7-day demand vs attendance, food waste trends, quality scorecard
-- `GET /dashboard/warden` — Satisfaction index trends, SLA compliance rate, confidential complaints
 - `GET /dashboard/admin` — System metrics, active residents, Node.js runtime health
 
 ---

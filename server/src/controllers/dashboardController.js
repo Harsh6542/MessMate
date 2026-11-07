@@ -45,19 +45,6 @@ export const getManagerDashboard = async (req, res, next) => {
   }
 };
 
-export const getWardenDashboard = async (req, res, next) => {
-  try {
-    const data = await dashboardService.getWardenDashboardData(req.user.hostel, req.user.mess);
-    res.status(200).json({
-      success: true,
-      status: 'success',
-      data
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getAdminDashboard = async (req, res, next) => {
   try {
     const data = await dashboardService.getAdminDashboardData();

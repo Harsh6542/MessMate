@@ -71,7 +71,7 @@ export const NewComplaint = () => {
       <div>
         <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Lodge a Mess Grievance</h1>
         <p className="text-xs text-slate-500 mt-1">
-          Complaints are assigned resolution deadlines (SLAs) and tracked by mess authorities and wardens.
+          Complaints are assigned resolution deadlines (SLAs) and tracked by mess authorities and administration.
         </p>
       </div>
 
