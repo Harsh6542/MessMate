@@ -5,9 +5,19 @@ import { User } from '../models/User.js';
 let io = null;
 
 export const initSocket = (httpServer) => {
+  const rawClientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const allowedOrigins = rawClientUrl.split(',').map((u) => u.trim().replace(/\/$/, ''));
+
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const cleanOrigin = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes('*')) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
       credentials: true
     }
   });
