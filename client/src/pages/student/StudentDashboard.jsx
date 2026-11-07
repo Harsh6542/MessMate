@@ -112,17 +112,17 @@ export const StudentDashboard = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
-                  Mess Wallet
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">
+                  Special Items Wallet
                 </span>
-                <span className="text-xs text-slate-400">Spring 2026 Semester</span>
+                <span className="text-xs text-slate-400">Regular Meals are Free</span>
               </div>
               <div className="flex items-baseline gap-2 mt-0.5">
                 <span className="text-2xl font-black text-white">
                   ₹{dashboardData.couponWallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
                 </span>
                 <span className="text-xs text-slate-400 font-semibold">
-                  • {dashboardData.couponWallet.couponsRemaining} / {dashboardData.couponWallet.totalCouponsAllocated} Coupons Left
+                  • {dashboardData.couponWallet.couponsRemaining} Special Coupons Left
                 </span>
               </div>
             </div>
@@ -130,9 +130,9 @@ export const StudentDashboard = () => {
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <span className="text-[11px] text-slate-400 block font-medium">Monthly Usage Limit</span>
+              <span className="text-[11px] text-slate-400 block font-medium">Monthly Special Limit</span>
               <span className="text-xs font-bold text-slate-200">
-                {dashboardData.couponWallet.currentMonthCouponsUsed} / {dashboardData.couponWallet.monthlyMaxCoupons || 2} used (Max ₹1,000/mo)
+                {dashboardData.couponWallet.currentMonthCouponsUsed} / {dashboardData.couponWallet.monthlyMaxCoupons || 2} coupons used (Max ₹1,000/mo)
               </span>
             </div>
 

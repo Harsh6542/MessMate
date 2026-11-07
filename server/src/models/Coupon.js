@@ -40,6 +40,15 @@ const couponSchema = new mongoose.Schema(
       enum: ['student_scan_counter', 'staff_scan_student', 'manual_verify'],
       default: 'student_scan_counter'
     },
+    itemType: {
+      type: String,
+      enum: ['special_item', 'regular_meal'],
+      default: 'special_item'
+    },
+    specialItemName: {
+      type: String,
+      default: 'Special Mess Item'
+    },
     semester: {
       type: String,
       default: '2026-SPRING'
@@ -74,8 +83,8 @@ const couponSchema = new mongoose.Schema(
   }
 );
 
-// Compound unique index: Exactly 1 coupon record per student per meal session
-couponSchema.index({ student: 1, mealSession: 1 }, { unique: true });
+// Indexes for fast history queries
+couponSchema.index({ student: 1, createdAt: -1 });
 
 export const Coupon = mongoose.model('Coupon', couponSchema);
 export default Coupon;

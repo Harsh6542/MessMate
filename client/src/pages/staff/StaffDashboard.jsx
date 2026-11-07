@@ -284,10 +284,13 @@ export const StaffDashboard = () => {
                     className="p-3.5 bg-slate-800/70 border border-slate-700/80 rounded-2xl flex items-center justify-between text-xs"
                   >
                     <div>
-                      <p className="font-bold text-slate-100">
+                      <p className="font-bold text-slate-100 text-xs text-amber-300">
+                        {pay.specialItemName || 'Special Food Add-on'}
+                      </p>
+                      <p className="text-[11px] text-slate-200 font-bold">
                         {pay.student?.name || `${pay.student?.firstName || ''} ${pay.student?.lastName || ''}`.trim() || 'Student'}
                       </p>
-                      <p className="text-[11px] text-slate-400 font-mono">
+                      <p className="text-[10px] text-slate-400 font-mono">
                         Roll: {pay.student?.rollNumber || 'N/A'} • Room: {pay.student?.roomNumber || '—'}
                       </p>
                       <span className="text-[10px] text-slate-500">
@@ -422,7 +425,7 @@ export const StaffDashboard = () => {
                 {messInfo?.name || 'Mess Dining Counter'}
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Scan & Pay 1 Coupon (₹500) with MessMate App
+                Scan & Pay for Special Food Items (Chicken, Egg, Dahi, Paneer)
               </p>
             </div>
 
@@ -437,9 +440,12 @@ export const StaffDashboard = () => {
             </div>
 
             <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs text-slate-300 space-y-1">
-              <p className="font-bold text-emerald-400">Fixed Rate: ₹500 / Meal Coupon</p>
-              <p className="text-[11px] text-slate-400">
-                Allotted: 12 Coupons (₹6,000/sem) • Monthly Limit: 2 Coupons (₹1,000)
+              <p className="font-bold text-amber-300">Special Items: ₹500 (1 Coupon)</p>
+              <p className="text-[11px] text-emerald-400 font-semibold">
+                Regular daily meals are 100% Free (Covered by hostel fee)
+              </p>
+              <p className="text-[10px] text-slate-400">
+                Allotted: ₹6,000 / sem (12 coupons) • Monthly Limit: 2 coupons (₹1,000)
               </p>
             </div>
 

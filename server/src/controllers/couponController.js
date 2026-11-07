@@ -22,20 +22,22 @@ export const getWallet = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Student PhonePe / UPI-style Scan & Pay at Mess Counter Standee
+// @desc    Student PhonePe / UPI-style Scan & Pay for Special Mess Items (Chicken, Egg, Dahi, Paneer)
 // @route   POST /api/v1/coupons/pay-counter
 // @access  Student
 export const payCounter = asyncHandler(async (req, res) => {
-  const { counterQR } = req.body;
+  const { counterQR, specialItemId, specialItemName } = req.body;
 
   const result = await payCounterQR({
     studentId: req.user._id,
-    counterQR
+    counterQR,
+    specialItemId,
+    specialItemName
   });
 
   res.status(200).json({
     success: true,
-    message: 'Meal Coupon Paid & Attendance Verified Successfully',
+    message: `Special Item Paid Successfully: ${result.specialItemName}`,
     data: result
   });
 });
@@ -57,20 +59,23 @@ export const generateCoupon = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Staff scan & redeem coupon
+// @desc    Staff scan & redeem (Regular Meal ₹0 or Special Item ₹500)
 // @route   POST /api/v1/coupons/verify
 // @access  Mess Staff, Manager, Admin
 export const verifyCoupon = asyncHandler(async (req, res) => {
-  const { qrPayload } = req.body;
+  const { qrPayload, isSpecialItem, specialItemId, specialItemName } = req.body;
 
   const result = await redeemCoupon({
     qrData: qrPayload,
-    staffId: req.user._id
+    staffId: req.user._id,
+    isSpecialItem: !!isSpecialItem,
+    specialItemId,
+    specialItemName
   });
 
   res.status(200).json({
     success: true,
-    message: 'Meal Verified & Redeemed Successfully',
+    message: result.message || 'Verification Successful',
     data: result
   });
 });

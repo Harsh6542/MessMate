@@ -42,3 +42,4 @@ export const stopAllWebcamTracks = async (scannerInstance) => {
     console.warn('[CameraUtils] Error stopping DOM video tracks:', err);
   }
 };
+

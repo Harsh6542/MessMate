@@ -21,7 +21,10 @@ import {
   CreditCard,
   Building2,
   X,
-  ChevronRight
+  ChevronRight,
+  Info,
+  Flame,
+  Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -50,16 +53,69 @@ const playPaymentSuccessChime = () => {
 
     osc.start(now);
     osc.stop(now + 0.7);
-  } catch {
-    // Non-fatal if browser blocks audio autoplay
-  }
+  } catch {}
 };
+
+// Default catalog of special items if not yet loaded from backend
+const DEFAULT_SPECIAL_ITEMS = [
+  {
+    id: 'chicken_curry',
+    name: 'Special Chicken Curry / Roast',
+    category: 'Non-Veg Special',
+    price: 500,
+    icon: '🍗',
+    description: 'Tender chicken pieces cooked in rich spices / roast'
+  },
+  {
+    id: 'egg_curry_dahi',
+    name: 'Double Egg Curry & Sweet Curd (Dahi)',
+    category: 'Egg & Dairy Add-on',
+    price: 500,
+    icon: '🥚',
+    description: 'Two boiled eggs in curry paired with chilled sweet dahi'
+  },
+  {
+    id: 'paneer_special',
+    name: 'Shahi Paneer / Kadai Paneer Special',
+    category: 'Veg Feast Special',
+    price: 500,
+    icon: '🧀',
+    description: 'Rich cottage cheese cubes in buttery creamy tomato gravy'
+  },
+  {
+    id: 'sweet_dahi_dessert',
+    name: 'Sweet Yogurt (Dahi) & Dessert Treat',
+    category: 'Dairy & Dessert',
+    price: 500,
+    icon: '🥣',
+    description: 'Sweet sweetened dahi/curd cup paired with Gulab Jamun / Kheer'
+  },
+  {
+    id: 'weekend_special',
+    name: 'Weekend Treat (Fish Fry / Mutton Curry)',
+    category: 'Weekend Special',
+    price: 500,
+    icon: '🐟',
+    description: 'Crispy seasonal fish fry or homestyle mutton curry'
+  },
+  {
+    id: 'custom_special',
+    name: 'General Special Mess Food Item',
+    category: 'Special Extra',
+    price: 500,
+    icon: '⭐',
+    description: 'Valid for any chef special add-on dish at the dining counter'
+  }
+];
 
 export const DigitalCoupon = () => {
   const { user } = useAuth();
   const [walletData, setWalletData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('scan_pay'); // 'scan_pay' | 'my_qr' | 'history'
+
+  // Special item selection
+  const [selectedSpecialItem, setSelectedSpecialItem] = useState(DEFAULT_SPECIAL_ITEMS[0]);
 
   // Scanner & Payment state
   const [isScanning, setIsScanning] = useState(false);
@@ -123,9 +179,7 @@ export const DigitalCoupon = () => {
           handleDetectedCounterQR(decodedText);
         };
 
-        const onScanFailure = () => {
-          // Frame read fail, ignore
-        };
+        const onScanFailure = () => {};
 
         scanner.render(onScanSuccess, onScanFailure);
       } catch (err) {
@@ -160,12 +214,14 @@ export const DigitalCoupon = () => {
     setScannedPayload(qrString);
   };
 
-  // Perform Payment
+  // Perform Payment for Selected Special Item
   const executePayment = async (counterQRToPay) => {
     try {
       setIsPaying(true);
       const res = await api.post('/coupons/pay-counter', {
-        counterQR: counterQRToPay || scannedPayload
+        counterQR: counterQRToPay || scannedPayload,
+        specialItemId: selectedSpecialItem?.id,
+        specialItemName: selectedSpecialItem?.name
       });
 
       const receipt = res?.data || res;
@@ -173,11 +229,11 @@ export const DigitalCoupon = () => {
         playPaymentSuccessChime();
         setPaymentSuccessData(receipt);
         setScannedPayload(null);
-        toast.success('Payment of ₹500 Coupon Successful!');
-        fetchWallet(); // Refresh balance and passbook
+        toast.success(`₹500 Paid for ${receipt.specialItemName || selectedSpecialItem?.name}!`);
+        fetchWallet();
       }
     } catch (err) {
-      toast.error(err.message || 'Payment failed. Please check coupon limits.');
+      toast.error(err.message || 'Payment failed. Please check your monthly or semester coupon limits.');
     } finally {
       setIsPaying(false);
     }
@@ -202,6 +258,7 @@ export const DigitalCoupon = () => {
     monthlyCouponsRemaining: 2
   };
 
+  const specialItemsList = walletData?.specialItems || DEFAULT_SPECIAL_ITEMS;
   const isMonthlyLimitReached = wallet.currentMonthCouponsUsed >= (wallet.monthlyMaxCoupons || 2);
   const isSemesterLimitReached = wallet.couponsRemaining <= 0 || wallet.balanceAmount < 500;
 
@@ -212,10 +269,10 @@ export const DigitalCoupon = () => {
         <div>
           <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
             <Wallet className="w-6 h-6 text-emerald-400" />
-            Mess Coupon Wallet & Pay
+            Special Items Coupon Wallet & Pay
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Total Semester Allotment: ₹6,000 (12 Coupons @ ₹500 each) • Monthly Limit: 2 Coupons (₹1,000)
+            Total Semester Allotment: ₹6,000 for Special Items (Chicken, Egg, Dahi, Paneer) • Max ₹1,000/month
           </p>
         </div>
         <button
@@ -227,7 +284,16 @@ export const DigitalCoupon = () => {
         </button>
       </div>
 
-      {/* ── PHONEPE STYLE SEMESTER WALLET CARD ── */}
+      {/* ── IMPORTANT POLICY NOTICE: REGULAR MEALS ARE FREE ── */}
+      <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 flex items-start gap-3">
+        <Info className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+        <div className="text-xs text-slate-300 leading-relaxed">
+          <span className="font-bold text-emerald-300">Regular Mess Meals are Included: </span>
+          Your daily Breakfast, Lunch, and Dinner are <b className="text-white">100% covered by your standard hostel mess fee</b> with NO deduction from your wallet. This ₹6,000 wallet is an allotted allowance strictly for purchasing <b className="text-emerald-300">Special Food Items</b> (Chicken, Egg Curry, Sweet Dahi/Yogurt, Paneer, Desserts).
+        </div>
+      </div>
+
+      {/* ── PHONEPE STYLE SPECIAL FOOD ITEMS WALLET CARD ── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 shadow-2xl p-6 sm:p-7 text-white">
         {/* Decorative background glows */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -238,13 +304,13 @@ export const DigitalCoupon = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg">
-                MessMate UPI Wallet
+                Special Items UPI Wallet
               </span>
               <span className="text-xs text-slate-400 font-medium">Spring 2026 Semester</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/20">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Active Allotment
+              Allotted ₹6,000
             </div>
           </div>
 
@@ -252,40 +318,40 @@ export const DigitalCoupon = () => {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-1">
             <div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
-                Available Semester Balance
+                Special Items Balance Available
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                   ₹{wallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
                 </span>
                 <span className="text-xs text-slate-400 font-medium">
-                  / ₹{wallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Total
+                  / ₹{wallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Allotted
                 </span>
               </div>
             </div>
 
             <div className="text-left sm:text-right">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
-                Coupons Remaining
+                Special Coupons Left
               </span>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/90 rounded-xl border border-slate-700/80">
                 <Sparkles className="w-4 h-4 text-amber-400" />
                 <span className="text-base font-black text-amber-300">
-                  {wallet.couponsRemaining} / {wallet.totalCouponsAllocated} Coupons
+                  {wallet.couponsRemaining} / {wallet.totalCouponsAllocated} Coupons (₹500 ea)
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Monthly Quota Meter (Max 2 coupons / ₹1000 per month) */}
+          {/* Monthly Quota Meter (Max 2 coupons / ₹1,000 per month on Special Items) */}
           <div className="pt-3 border-t border-slate-800/80 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-300 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                Monthly Quota (Max 2 coupons / ₹1,000 per month)
+                Monthly Limit on Special Items: ₹1,000 max (2 Coupons)
               </span>
               <span className="font-bold text-slate-200">
-                {wallet.currentMonthCouponsUsed} / {wallet.monthlyMaxCoupons || 2} Used this month
+                {wallet.currentMonthCouponsUsed} / {wallet.monthlyMaxCoupons || 2} Used this month (₹{wallet.currentMonthCouponsUsed * 500})
               </span>
             </div>
 
@@ -308,13 +374,13 @@ export const DigitalCoupon = () => {
             {isMonthlyLimitReached && (
               <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
-                Monthly limit reached (2 coupons used). Next quota unlocks on 1st of next month.
+                Monthly limit reached (2 special coupons / ₹1,000 used). Regular meals remain unlimited! Special quota unlocks on 1st of next month.
               </p>
             )}
             {isSemesterLimitReached && (
               <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
-                Semester quota exhausted! All 12 coupons (₹6,000) have been redeemed.
+                Semester special quota exhausted! You have used all 12 special coupons (₹6,000). Regular meals are still available for free.
               </p>
             )}
           </div>
@@ -332,7 +398,7 @@ export const DigitalCoupon = () => {
           }`}
         >
           <ScanLine className="w-4 h-4" />
-          Scan & Pay (PhonePe)
+          Pay Special Item (PhonePe)
         </button>
 
         <button
@@ -344,7 +410,7 @@ export const DigitalCoupon = () => {
           }`}
         >
           <QrCode className="w-4 h-4" />
-          My Unique QR Code
+          My Mess QR Code
         </button>
 
         <button
@@ -360,18 +426,67 @@ export const DigitalCoupon = () => {
         </button>
       </div>
 
-      {/* ── TAB 1: SCAN & PAY (PHONEPE FLOW) ── */}
+      {/* ── TAB 1: SCAN & PAY SPECIAL ITEM (PHONEPE FLOW) ── */}
       {activeTab === 'scan_pay' && (
-        <div className="space-y-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center space-y-5">
-            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-              <ScanLine className="w-8 h-8" />
+        <div className="space-y-5">
+          {/* Special Items Selection Menu */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-black text-slate-100 flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-amber-400" />
+                  Select Special Item to Redeem (₹500 / Coupon)
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Choose which special mess add-on you want to pay for from your semester wallet.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                ₹500 ea
+              </span>
             </div>
 
-            <div className="max-w-md mx-auto space-y-1.5">
-              <h2 className="text-lg font-black text-slate-100">Pay at Mess Counter Standee</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {specialItemsList.map((item) => {
+                const isSelected = selectedSpecialItem?.id === item.id;
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => setSelectedSpecialItem(item)}
+                    className={`p-3.5 rounded-2xl border cursor-pointer transition flex items-start gap-3 relative ${
+                      isSelected
+                        ? 'bg-emerald-950/40 border-emerald-500 shadow-lg shadow-emerald-500/10'
+                        : 'bg-slate-800/60 border-slate-700/80 hover:bg-slate-800 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="text-2xl shrink-0 mt-0.5">{item.icon}</div>
+                    <div className="space-y-0.5 flex-1 pr-6">
+                      <p className="font-bold text-xs text-slate-100">{item.name}</p>
+                      <p className="text-[11px] text-slate-400 leading-snug">{item.description}</p>
+                      <span className="text-[10px] font-semibold text-emerald-400 block pt-1">
+                        1 Coupon (₹500)
+                      </span>
+                    </div>
+
+                    {isSelected && (
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-slate-950 shadow-md">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Action Trigger Card */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 text-center space-y-4">
+            <div className="max-w-md mx-auto space-y-1">
+              <h3 className="text-base font-black text-slate-100">
+                Pay ₹500 for: {selectedSpecialItem?.name}
+              </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Scan the Standee QR placed at your hostel mess counter. 1 Coupon (₹500) will be deducted from your semester balance.
+                Scan the Standee QR on the mess counter to approve 1 coupon (₹500). Regular meal is completely free.
               </p>
             </div>
 
@@ -383,7 +498,7 @@ export const DigitalCoupon = () => {
                 className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition active:scale-98"
               >
                 <ScanLine className="w-4 h-4" />
-                Open Camera Scanner
+                Scan Mess Standee QR
               </button>
 
               <button
@@ -396,14 +511,9 @@ export const DigitalCoupon = () => {
               </button>
             </div>
 
-            {/* Rules reminder pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-full border border-slate-700/60 text-[11px] text-slate-400">
-              <span>₹500 / Meal</span>
-              <span>•</span>
-              <span>Max 2 meals / month</span>
-              <span>•</span>
-              <span>12 meals / semester</span>
-            </div>
+            <p className="text-[11px] text-slate-500">
+              Only special food items require coupons • Max ₹1,000 / month • ₹6,000 total
+            </p>
           </div>
         </div>
       )}
@@ -412,9 +522,9 @@ export const DigitalCoupon = () => {
       {activeTab === 'my_qr' && (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-center">
           <div>
-            <h2 className="text-lg font-black text-slate-100">My Permanent Student Mess QR</h2>
+            <h2 className="text-lg font-black text-slate-100">Permanent Student Mess QR</h2>
             <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              Mess staff can scan this unique cryptographic QR code on their counter scanner to verify your identity and redeem your meal coupon.
+              Show this QR code at the dining hall counter for both regular meals and special food items.
             </p>
           </div>
 
@@ -426,6 +536,29 @@ export const DigitalCoupon = () => {
               level="H"
               includeMargin={true}
             />
+          </div>
+
+          {/* Dual Usage Clarification */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto text-left text-xs">
+            <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-1">
+              <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Regular Meal Entry
+              </span>
+              <p className="text-slate-400 text-[11px]">
+                Everyday breakfast, lunch & dinner. <b>100% Free / ₹0 deducted</b> from wallet.
+              </p>
+            </div>
+
+            <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-1">
+              <span className="font-bold text-amber-300 flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-400" />
+                Special Items Counter
+              </span>
+              <p className="text-slate-400 text-[11px]">
+                Staff can scan this to serve your Chicken / Egg / Dahi and deduct 1 coupon (₹500).
+              </p>
+            </div>
           </div>
 
           {/* Student Profile Card */}
@@ -448,10 +581,6 @@ export const DigitalCoupon = () => {
               <p className="text-slate-400 text-[11px]">Room: {walletData?.student?.roomNumber || 'N/A'}</p>
             </div>
           </div>
-
-          <p className="text-[11px] text-slate-500">
-            Linked to Semester Wallet: ₹{wallet.balanceAmount} ({wallet.couponsRemaining} coupons remaining)
-          </p>
         </div>
       )}
 
@@ -461,7 +590,7 @@ export const DigitalCoupon = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <Receipt className="w-4 h-4 text-emerald-400" />
-              Wallet Passbook & Redeemed Coupons
+              Special Items Wallet Passbook
             </h2>
             <span className="text-xs font-semibold text-slate-400">
               {recentTransactions.length} Transactions
@@ -469,8 +598,9 @@ export const DigitalCoupon = () => {
           </div>
 
           {recentTransactions.length === 0 ? (
-            <div className="text-center py-10 text-slate-500 text-xs">
-              No coupons redeemed yet. Your semester allowance of ₹6,000 (12 coupons) is fully intact!
+            <div className="text-center py-10 text-slate-500 text-xs space-y-1">
+              <p>No special item coupons redeemed yet.</p>
+              <p className="text-[11px]">Your allotted ₹6,000 (12 coupons) is fully available for special food treats!</p>
             </div>
           ) : (
             <div className="space-y-2.5">
@@ -480,19 +610,28 @@ export const DigitalCoupon = () => {
                   className="p-3.5 bg-slate-800/60 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold shrink-0">
-                      <Utensils className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold shrink-0 text-lg">
+                      {tx.specialItemName?.includes('Chicken')
+                        ? '🍗'
+                        : tx.specialItemName?.includes('Egg')
+                        ? '🥚'
+                        : tx.specialItemName?.includes('Paneer')
+                        ? '🧀'
+                        : tx.specialItemName?.includes('Dahi') || tx.specialItemName?.includes('Yogurt')
+                        ? '🥣'
+                        : '⭐'}
                     </div>
                     <div>
-                      <p className="font-bold text-slate-200 uppercase">
-                        {tx.mealType} Coupon
+                      <p className="font-bold text-slate-100">
+                        {tx.specialItemName || 'Special Mess Item'}
                       </p>
                       <p className="text-[11px] text-slate-400 font-mono">
                         {tx.transactionId}
                       </p>
                       <p className="text-[10px] text-slate-500">
                         {new Date(tx.redeemedAt).toLocaleDateString()} at{' '}
-                        {new Date(tx.redeemedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(tx.redeemedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} •{' '}
+                        <span className="uppercase">{tx.mealType}</span>
                       </p>
                     </div>
                   </div>
@@ -502,7 +641,7 @@ export const DigitalCoupon = () => {
                       -₹{tx.amount || 500}
                     </span>
                     <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                      Paid
+                      Redeemed
                     </span>
                   </div>
                 </div>
@@ -519,7 +658,7 @@ export const DigitalCoupon = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-slate-200 font-bold text-sm">
                 <ScanLine className="w-4 h-4 text-emerald-400" />
-                Scan Mess Standee QR
+                Scan Mess Standee for: {selectedSpecialItem?.name}
               </div>
               <button
                 onClick={() => {
@@ -549,7 +688,7 @@ export const DigitalCoupon = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full space-y-5 shadow-2xl animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                Payment Confirmation
+                Confirm Special Food Item
               </span>
               <button
                 onClick={() => setScannedPayload(null)}
@@ -560,22 +699,24 @@ export const DigitalCoupon = () => {
             </div>
 
             <div className="text-center space-y-1">
-              <span className="text-xs text-slate-400">Paying To Mess Counter</span>
+              <div className="text-3xl mx-auto mb-1">{selectedSpecialItem?.icon || '🍗'}</div>
               <h3 className="text-xl font-black text-white">
-                {walletData?.student?.mess || 'Hostel Dining Hall'}
+                {selectedSpecialItem?.name}
               </h3>
-              <p className="text-xs text-indigo-400 font-medium">1 Meal Coupon</p>
+              <p className="text-xs text-slate-400">
+                Mess Counter: {walletData?.student?.mess || 'Hostel Dining Hall'}
+              </p>
             </div>
 
             {/* Price Box */}
             <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Coupon Value</span>
-                <span className="text-lg font-black text-white">₹500.00</span>
+                <span className="text-slate-400">Special Item Price</span>
+                <span className="text-lg font-black text-white">₹500.00 (1 Coupon)</span>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/60">
                 <span>Debited From</span>
-                <span className="font-semibold text-slate-200">Mess Semester Wallet</span>
+                <span className="font-semibold text-slate-200">Special Items Semester Wallet</span>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>Balance After Payment</span>
@@ -586,7 +727,7 @@ export const DigitalCoupon = () => {
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>Monthly Quota After</span>
                 <span className="font-semibold text-amber-300">
-                  {wallet.currentMonthCouponsUsed + 1} / {wallet.monthlyMaxCoupons || 2} Used
+                  {wallet.currentMonthCouponsUsed + 1} / {wallet.monthlyMaxCoupons || 2} Used this month (Max ₹1,000)
                 </span>
               </div>
             </div>
@@ -600,12 +741,12 @@ export const DigitalCoupon = () => {
               {isPaying ? (
                 <>
                   <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
-                  Processing Payment...
+                  Authorizing Payment...
                 </>
               ) : (
                 <>
                   <CreditCard className="w-4 h-4" />
-                  Pay ₹500 from Mess Wallet
+                  Pay ₹500 for {selectedSpecialItem?.name}
                 </>
               )}
             </button>
@@ -627,9 +768,12 @@ export const DigitalCoupon = () => {
 
             <div className="space-y-1">
               <h2 className="text-2xl font-black text-white tracking-tight">₹500.00 Paid</h2>
-              <p className="text-xs font-semibold text-emerald-400">Payment & Meal Attendance Verified</p>
+              <p className="text-xs font-semibold text-emerald-400">Special Item Token Generated</p>
+              <p className="text-base font-bold text-slate-100">
+                {paymentSuccessData.specialItemName || selectedSpecialItem?.name}
+              </p>
               <p className="text-xs text-slate-400">
-                Paid to {paymentSuccessData.messName || 'Mess Counter'}
+                Mess: {paymentSuccessData.messName || 'Dining Hall'}
               </p>
             </div>
 
@@ -642,9 +786,9 @@ export const DigitalCoupon = () => {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Meal Session</span>
-                <span className="font-semibold text-slate-200 uppercase">
-                  {paymentSuccessData.mealType}
+                <span className="text-slate-400">Special Item</span>
+                <span className="font-semibold text-emerald-400">
+                  {paymentSuccessData.specialItemName || selectedSpecialItem?.name}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -661,6 +805,10 @@ export const DigitalCoupon = () => {
                 </span>
               </div>
             </div>
+
+            <p className="text-[11px] text-slate-400">
+              Show this screen to the counter staff to collect your special dish.
+            </p>
 
             <button
               onClick={() => {

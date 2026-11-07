@@ -27,7 +27,7 @@ const attendanceSchema = new mongoose.Schema(
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'Staff member identifier is required']
+      default: null
     },
     manualReason: {
       type: String,

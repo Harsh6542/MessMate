@@ -11,6 +11,67 @@ import { COUPON_STATUS, DECLARATION_STATUS } from '../config/constants.js';
 import { emitToRoom } from '../sockets/index.js';
 
 /**
+ * Standard Catalog of Special Mess Items (Available via ₹500 Coupon Wallet)
+ * Regular daily meals (Breakfast, Lunch, Dinner) are 100% covered by hostel fees at ₹0.
+ */
+export const SPECIAL_MESS_ITEMS = [
+  {
+    id: 'chicken_curry',
+    name: 'Special Chicken Curry / Roast',
+    category: 'Non-Veg Special',
+    price: 500,
+    couponsRequired: 1,
+    icon: '🍗',
+    description: 'Tender chicken pieces in aromatic masala gravy or tandoori roast'
+  },
+  {
+    id: 'egg_curry_dahi',
+    name: 'Double Egg Curry & Sweet Curd (Dahi)',
+    category: 'Egg & Dairy Add-on',
+    price: 500,
+    couponsRequired: 1,
+    icon: '🥚',
+    description: 'Two boiled eggs in curry paired with a cup of sweetened fresh dahi'
+  },
+  {
+    id: 'paneer_special',
+    name: 'Shahi Paneer / Kadai Paneer Special',
+    category: 'Veg Feast Special',
+    price: 500,
+    couponsRequired: 1,
+    icon: '🧀',
+    description: 'Rich cottage cheese cubes cooked in rich buttery tomato cream sauce'
+  },
+  {
+    id: 'sweet_dahi_dessert',
+    name: 'Sweet Yogurt (Mishti Dahi) & Dessert Treat',
+    category: 'Dairy & Dessert',
+    price: 500,
+    couponsRequired: 1,
+    icon: '🥣',
+    description: 'Chilled Sweet Mishti Dahi cup paired with hot Gulab Jamun / Kheer'
+  },
+  {
+    id: 'weekend_special',
+    name: 'Chef Weekend Treat (Fish Fry / Mutton Curry)',
+    category: 'Weekend Special',
+    price: 500,
+    couponsRequired: 1,
+    icon: '🐟',
+    description: 'Crispy seasonal fish fry or homestyle mutton curry on available days'
+  },
+  {
+    id: 'custom_special',
+    name: 'General Special Mess Item Add-on',
+    category: 'Special Extra',
+    price: 500,
+    couponsRequired: 1,
+    icon: '⭐',
+    description: 'Valid for any chef special counter extra of the day'
+  }
+];
+
+/**
  * Helper: Ensure student wallet defaults and synchronize calendar month quota
  */
 export const checkAndSyncMonthlyWallet = async (student) => {
@@ -50,7 +111,7 @@ export const checkAndSyncMonthlyWallet = async (student) => {
 };
 
 /**
- * Helper: Validate student semester and monthly coupon limits
+ * Helper: Validate student semester and monthly coupon limits for Special Items
  */
 export const validateWalletQuota = (student) => {
   const wallet = student.couponWallet;
@@ -58,7 +119,7 @@ export const validateWalletQuota = (student) => {
   // 1. Total semester quota check (12 coupons / ₹6,000)
   if (wallet.couponsUsed >= wallet.totalCouponsAllocated || wallet.balanceAmount < wallet.couponValue) {
     throw new AppError(
-      `Semester quota exhausted! You have utilized all ${wallet.totalCouponsAllocated} coupons (₹${wallet.semesterTotalAmount}) for this semester.`,
+      `Special Items Semester Quota Exhausted! You have redeemed all ${wallet.totalCouponsAllocated} special coupons (₹${wallet.semesterTotalAmount}) for this semester.`,
       403,
       'SEMESTER_LIMIT_REACHED'
     );
@@ -67,7 +128,7 @@ export const validateWalletQuota = (student) => {
   // 2. Monthly limit check (Max 2 coupons / ₹1,000 per month)
   if (wallet.currentMonthCouponsUsed >= wallet.monthlyMaxCoupons) {
     throw new AppError(
-      `Monthly limit reached! You can only use up to ${wallet.monthlyMaxCoupons} coupons (₹${wallet.monthlyMaxAmount}) per month. You have already redeemed ${wallet.currentMonthCouponsUsed} coupons this month.`,
+      `Monthly Special Items limit reached! You can spend up to ${wallet.monthlyMaxCoupons} coupons (₹${wallet.monthlyMaxAmount}) per calendar month on special items. You have already redeemed ${wallet.currentMonthCouponsUsed} coupons this month.`,
       403,
       'MONTHLY_LIMIT_REACHED'
     );
@@ -75,7 +136,7 @@ export const validateWalletQuota = (student) => {
 };
 
 /**
- * Retrieve student's coupon wallet, remaining balance, and recent transaction history
+ * Retrieve student's coupon wallet, available special items catalog, and passbook
  */
 export const getStudentWallet = async (studentId) => {
   const student = await User.findById(studentId).populate('hostel mess');
@@ -86,14 +147,14 @@ export const getStudentWallet = async (studentId) => {
   await checkAndSyncMonthlyWallet(student);
   await student.save();
 
-  // Fetch recent redeemed coupon transactions for this student
+  // Fetch recent redeemed special coupon transactions for this student
   const recentTransactions = await Coupon.find({
     student: studentId,
     status: COUPON_STATUS.REDEEMED
   })
     .populate('mealSession')
     .sort({ redeemedAt: -1, createdAt: -1 })
-    .limit(15);
+    .limit(20);
 
   const wallet = student.couponWallet;
   const couponsRemaining = Math.max(0, wallet.totalCouponsAllocated - wallet.couponsUsed);
@@ -111,9 +172,11 @@ export const getStudentWallet = async (studentId) => {
       monthlyCouponsRemaining,
       monthlyMaxCoupons: wallet.monthlyMaxCoupons,
       monthlyMaxAmount: wallet.monthlyMaxAmount,
-      lastRedemptionMonth: wallet.lastRedemptionMonth
+      lastRedemptionMonth: wallet.lastRedemptionMonth,
+      policyNote: 'Regular meals are 100% free / included in hostel fee. Wallet is exclusively for Special Items (Chicken, Egg, Dahi, Paneer, etc.).'
     },
     uniqueStudentQR: student.uniqueStudentQR,
+    specialItems: SPECIAL_MESS_ITEMS,
     student: {
       id: student._id,
       name: `${student.firstName} ${student.lastName}`,
@@ -128,6 +191,8 @@ export const getStudentWallet = async (studentId) => {
       id: tx._id,
       transactionId: tx.transactionId || `TXN-${tx._id.toString().slice(-8).toUpperCase()}`,
       amount: tx.amount || 500,
+      specialItemName: tx.specialItemName || 'Special Mess Item',
+      itemType: tx.itemType || 'special_item',
       paymentMethod: tx.paymentMethod || 'student_scan_counter',
       mealType: tx.mealSession?.mealType || 'Meal',
       sessionDate: tx.mealSession?.date,
@@ -138,9 +203,10 @@ export const getStudentWallet = async (studentId) => {
 };
 
 /**
- * PhonePe / UPI-style Scan & Pay: Student scans Mess Counter Standee QR
+ * PhonePe / UPI-style Scan & Pay: Student pays for a Special Mess Item
+ * (Chicken, Egg, Dahi, Paneer, Dessert) from their ₹6,000 semester wallet.
  */
-export const payCounterQR = async ({ studentId, counterQR }) => {
+export const payCounterQR = async ({ studentId, counterQR, specialItemId, specialItemName }) => {
   if (!counterQR) {
     throw new AppError('Mess Counter QR code is required.', 400, 'MISSING_QR');
   }
@@ -183,43 +249,15 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
     throw new AppError('No active or upcoming meal session available at this mess right now.', 404, 'NO_SESSION');
   }
 
-  const normalizedSessionDate = normalizeDate(session.date);
+  // 3. Resolve Special Item details
+  const matchedItem = SPECIAL_MESS_ITEMS.find((it) => it.id === specialItemId);
+  const resolvedSpecialItemName = specialItemName || matchedItem?.name || 'Special Food Item (Chicken / Egg / Dahi / Paneer)';
 
-  // 3. Absence declaration check
-  const declaration = await MealDeclaration.findOne({
-    student: studentId,
-    date: normalizedSessionDate,
-    mealType: session.mealType,
-    status: DECLARATION_STATUS.DECLARED
-  });
-
-  if (declaration) {
-    throw new AppError(
-      `You declared absence for ${session.mealType} on ${normalizedSessionDate.toDateString()}. Coupon redemption is not permitted.`,
-      403,
-      'OPTED_OUT'
-    );
-  }
-
-  // 4. Double-serving check for this meal session
-  const existingAttendance = await Attendance.findOne({
-    student: studentId,
-    mealSession: session._id
-  });
-
-  if (existingAttendance) {
-    throw new AppError(
-      `You have already paid for and attended ${session.mealType} today at ${existingAttendance.timestamp.toLocaleTimeString()}.`,
-      400,
-      'ALREADY_ATTENDED'
-    );
-  }
-
-  // 5. Synchronize wallet & validate limits (12 per semester, 2 per month)
+  // 4. Synchronize wallet & validate limits (12 per semester, 2 per month)
   await checkAndSyncMonthlyWallet(student);
   validateWalletQuota(student);
 
-  // 6. Deduct wallet coupon atomically
+  // 5. Deduct 1 coupon (₹500) from wallet
   const couponAmount = student.couponWallet.couponValue || 500;
   student.couponWallet.couponsUsed += 1;
   student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
@@ -227,51 +265,45 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
   student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
   await student.save();
 
-  // 7. Create unique transaction record
+  // 6. Create unique Special Item Coupon transaction record
   const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
   const now = new Date();
   const rawToken = generateSecureToken(24);
   const tokenHash = hashToken(rawToken);
 
-  let coupon = await Coupon.findOne({ student: studentId, mealSession: session._id });
-  if (!coupon) {
-    coupon = await Coupon.create({
-      student: studentId,
-      mealSession: session._id,
-      tokenHash,
-      qrPayload: counterQR,
-      amount: couponAmount,
-      transactionId,
-      paymentMethod: 'student_scan_counter',
-      status: COUPON_STATUS.REDEEMED,
-      redeemedAt: now,
-      expiresAt: session.endTime
-    });
-  } else {
-    coupon.status = COUPON_STATUS.REDEEMED;
-    coupon.redeemedAt = now;
-    coupon.amount = couponAmount;
-    coupon.transactionId = transactionId;
-    coupon.paymentMethod = 'student_scan_counter';
-    await coupon.save();
-  }
-
-  // 8. Record attendance
-  const attendance = await Attendance.create({
+  const coupon = await Coupon.create({
     student: studentId,
     mealSession: session._id,
-    coupon: coupon._id,
-    verificationMethod: 'qr_scan',
-    verifiedBy: null,
-    timestamp: now
+    tokenHash,
+    qrPayload: counterQR,
+    amount: couponAmount,
+    transactionId,
+    itemType: 'special_item',
+    specialItemName: resolvedSpecialItemName,
+    paymentMethod: 'student_scan_counter',
+    status: COUPON_STATUS.REDEEMED,
+    redeemedAt: now,
+    expiresAt: session.endTime
   });
 
-  // 9. Increment actual served count
-  await MealSession.findByIdAndUpdate(session._id, {
-    $inc: { actualServedCount: 1 }
-  });
+  // 7. Record Attendance if not already attended for this session
+  let attendance = await Attendance.findOne({ student: studentId, mealSession: session._id });
+  if (!attendance) {
+    attendance = await Attendance.create({
+      student: studentId,
+      mealSession: session._id,
+      coupon: coupon._id,
+      verificationMethod: 'qr_scan',
+      verifiedBy: null,
+      timestamp: now
+    });
 
-  // 10. Emit real-time payment feed to Staff Mess Room
+    await MealSession.findByIdAndUpdate(session._id, {
+      $inc: { actualServedCount: 1 }
+    });
+  }
+
+  // 8. Emit real-time payment feed to Staff Mess Counter Room
   emitToRoom(`mess:${messFacility._id.toString()}`, 'counter:payment', {
     transactionId,
     student: {
@@ -281,6 +313,7 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
       roomNumber: student.roomNumber,
       hostel: student.hostel?.name || ''
     },
+    specialItemName: resolvedSpecialItemName,
     mealType: session.mealType,
     amount: couponAmount,
     timestamp: now
@@ -290,6 +323,7 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
     success: true,
     transactionId,
     amount: couponAmount,
+    specialItemName: resolvedSpecialItemName,
     paidAt: now,
     mealType: session.mealType,
     sessionDate: session.date,
@@ -313,7 +347,6 @@ export const generateOrGetCoupon = async (studentId, messId) => {
   }
 
   await checkAndSyncMonthlyWallet(student);
-  validateWalletQuota(student);
 
   // Determine current active or upcoming meal session
   const targetMessId = messId || student.mess?._id || student.hostel?.mess;
@@ -338,7 +371,7 @@ export const generateOrGetCoupon = async (studentId, messId) => {
 
   if (declaration) {
     throw new AppError(
-      `You have declared absence for ${session.mealType} on ${normalizedSessionDate.toDateString()}. Coupon generation is disabled.`,
+      `You have declared absence for ${session.mealType} on ${normalizedSessionDate.toDateString()}.`,
       403,
       'OPTED_OUT'
     );
@@ -352,7 +385,7 @@ export const generateOrGetCoupon = async (studentId, messId) => {
 
   if (existingAttendance) {
     throw new AppError(
-      `You have already redeemed your coupon and attended ${session.mealType} today at ${existingAttendance.timestamp.toLocaleTimeString()}.`,
+      `You have already attended ${session.mealType} today at ${existingAttendance.timestamp.toLocaleTimeString()}.`,
       400,
       'ALREADY_ATTENDED'
     );
@@ -361,7 +394,8 @@ export const generateOrGetCoupon = async (studentId, messId) => {
   // 3. Check if coupon already generated for this session
   let coupon = await Coupon.findOne({
     student: studentId,
-    mealSession: session._id
+    mealSession: session._id,
+    itemType: 'regular_meal'
   }).populate('mealSession');
 
   if (coupon) {
@@ -371,7 +405,7 @@ export const generateOrGetCoupon = async (studentId, messId) => {
     return { coupon, session, isNew: false, wallet: student.couponWallet };
   }
 
-  // 4. Generate new secure coupon
+  // 4. Generate new regular meal pass (FREE / Covered by hostel fee, amount = 0)
   const rawToken = generateSecureToken(32);
   const tokenHash = hashToken(rawToken);
 
@@ -389,7 +423,9 @@ export const generateOrGetCoupon = async (studentId, messId) => {
     mealSession: session._id,
     tokenHash,
     qrPayload,
-    amount: student.couponWallet.couponValue || 500,
+    amount: 0,
+    itemType: 'regular_meal',
+    specialItemName: 'Regular Mess Meal (Included in Fees)',
     status: COUPON_STATUS.ACTIVE,
     expiresAt: session.endTime
   });
@@ -409,12 +445,12 @@ export const generateOrGetCoupon = async (studentId, messId) => {
 };
 
 /**
- * Verify and redeem QR coupon at staff counter
- * Supports BOTH:
- *  1) Student's unique permanent QR (MESSMATE:STUDENT:<id>:<roll>)
- *  2) Cryptographic session QR payload
+ * Verify and redeem QR at staff counter
+ * Supports:
+ *  A) Regular Meal Entry: Student permanent QR scanned for regular daily meal (₹0, covered by fees)
+ *  B) Special Item Redemption: Staff redeems a Special Food Item (₹500 deducted from wallet)
  */
-export const redeemCoupon = async ({ qrData, staffId }) => {
+export const redeemCoupon = async ({ qrData, staffId, isSpecialItem = false, specialItemId, specialItemName }) => {
   const staff = await User.findById(staffId).populate('mess');
   if (!staff) {
     throw new AppError('Staff user not found.', 404, 'STAFF_NOT_FOUND');
@@ -422,7 +458,7 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
 
   const rawData = typeof qrData === 'string' ? qrData.trim() : '';
 
-  // ── BRANCH A: Permanent Unique Student QR Code ──
+  // ── BRANCH A: Permanent Unique Student QR Code (MESSMATE:STUDENT:...) ──
   if (rawData.startsWith('MESSMATE:STUDENT:')) {
     const parts = rawData.split(':');
     const studentId = parts[2];
@@ -448,7 +484,57 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
 
     const normalizedSessionDate = normalizeDate(session.date);
 
-    // Absence check
+    // If STAFF IS REDEEMING A SPECIAL ITEM (Chicken, Egg, Dahi, Paneer):
+    if (isSpecialItem) {
+      await checkAndSyncMonthlyWallet(student);
+      validateWalletQuota(student);
+
+      const matchedItem = SPECIAL_MESS_ITEMS.find((it) => it.id === specialItemId);
+      const resolvedItemName = specialItemName || matchedItem?.name || 'Special Food Item (Chicken / Egg / Dahi / Paneer)';
+
+      // Deduct 1 coupon (₹500)
+      const couponAmount = student.couponWallet.couponValue || 500;
+      student.couponWallet.couponsUsed += 1;
+      student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
+      student.couponWallet.currentMonthCouponsUsed += 1;
+      student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
+      await student.save();
+
+      const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+      const now = new Date();
+      const rawToken = generateSecureToken(24);
+      const tokenHash = hashToken(rawToken);
+
+      const coupon = await Coupon.create({
+        student: student._id,
+        mealSession: session._id,
+        tokenHash,
+        qrPayload: rawData,
+        amount: couponAmount,
+        transactionId,
+        itemType: 'special_item',
+        specialItemName: resolvedItemName,
+        paymentMethod: 'staff_scan_student',
+        status: COUPON_STATUS.REDEEMED,
+        redeemedAt: now,
+        redeemedBy: staffId,
+        expiresAt: session.endTime
+      });
+
+      return {
+        success: true,
+        isSpecialItem: true,
+        message: `Special Item Redeemed: ${resolvedItemName} (-₹500)`,
+        specialItemName: resolvedItemName,
+        amount: couponAmount,
+        student,
+        mealSession: session,
+        wallet: student.couponWallet
+      };
+    }
+
+    // DEFAULT: REGULAR DAILY MEAL ENTRY (FREE / Included in hostel fee)
+    // Check if opted out
     const declaration = await MealDeclaration.findOne({
       student: student._id,
       date: normalizedSessionDate,
@@ -460,7 +546,7 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
       throw new AppError(`Student declared absence for ${session.mealType} today.`, 403, 'STUDENT_OPTED_OUT');
     }
 
-    // Double serving check
+    // Check if already served regular meal for this session
     const existingAttendance = await Attendance.findOne({
       student: student._id,
       mealSession: session._id
@@ -468,69 +554,32 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
 
     if (existingAttendance) {
       throw new AppError(
-        `DUPLICATE SCAN: Student already served ${session.mealType} at ${existingAttendance.timestamp.toLocaleTimeString()}.`,
+        `DUPLICATE SCAN: Student already served regular ${session.mealType} at ${existingAttendance.timestamp.toLocaleTimeString()}.`,
         400,
         'ALREADY_SERVED'
       );
     }
 
-    // Check & deduct wallet
-    await checkAndSyncMonthlyWallet(student);
-    validateWalletQuota(student);
-
-    const couponAmount = student.couponWallet.couponValue || 500;
-    student.couponWallet.couponsUsed += 1;
-    student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
-    student.couponWallet.currentMonthCouponsUsed += 1;
-    student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
-    await student.save();
-
-    const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-    const now = new Date();
-
-    const rawToken = generateSecureToken(24);
-    const tokenHash = hashToken(rawToken);
-
-    let coupon = await Coupon.findOne({ student: student._id, mealSession: session._id });
-    if (!coupon) {
-      coupon = await Coupon.create({
-        student: student._id,
-        mealSession: session._id,
-        tokenHash,
-        qrPayload: rawData,
-        amount: couponAmount,
-        transactionId,
-        paymentMethod: 'staff_scan_student',
-        status: COUPON_STATUS.REDEEMED,
-        redeemedAt: now,
-        redeemedBy: staffId,
-        expiresAt: session.endTime
-      });
-    } else {
-      coupon.status = COUPON_STATUS.REDEEMED;
-      coupon.redeemedAt = now;
-      coupon.redeemedBy = staffId;
-      coupon.amount = couponAmount;
-      coupon.transactionId = transactionId;
-      coupon.paymentMethod = 'staff_scan_student';
-      await coupon.save();
-    }
-
+    // Create Attendance record (₹0 deducted from wallet)
     const attendance = await Attendance.create({
       student: student._id,
       mealSession: session._id,
-      coupon: coupon._id,
+      coupon: null,
       verificationMethod: 'qr_scan',
       verifiedBy: staffId,
-      timestamp: now
+      timestamp: new Date()
     });
 
     await MealSession.findByIdAndUpdate(session._id, {
       $inc: { actualServedCount: 1 }
     });
 
+    await checkAndSyncMonthlyWallet(student);
+
     return {
       success: true,
+      isSpecialItem: false,
+      message: 'Regular Meal Verified (Included in Fees - ₹0 Debited)',
       student,
       mealSession: session,
       attendance,
@@ -554,7 +603,6 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
   const hashedToken = hashToken(token);
   const now = new Date();
 
-  // Find the unexpired coupon
   const activeCoupon = await Coupon.findOne({
     tokenHash: hashedToken,
     status: COUPON_STATUS.ACTIVE,
@@ -576,26 +624,10 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
     throw new AppError('Coupon is no longer valid.', 400, 'INVALID_COUPON');
   }
 
-  // Deduct student wallet
   const student = await User.findById(activeCoupon.student._id);
-  await checkAndSyncMonthlyWallet(student);
-  validateWalletQuota(student);
-
-  const couponAmount = student.couponWallet.couponValue || 500;
-  student.couponWallet.couponsUsed += 1;
-  student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
-  student.couponWallet.currentMonthCouponsUsed += 1;
-  student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
-  await student.save();
-
-  const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-
   activeCoupon.status = COUPON_STATUS.REDEEMED;
   activeCoupon.redeemedAt = now;
   activeCoupon.redeemedBy = staffId;
-  activeCoupon.amount = couponAmount;
-  activeCoupon.transactionId = transactionId;
-  activeCoupon.paymentMethod = 'staff_scan_student';
   await activeCoupon.save();
 
   const attendance = await Attendance.create({
@@ -613,6 +645,8 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
 
   return {
     success: true,
+    isSpecialItem: false,
+    message: 'Regular Meal Verified Successfully',
     student: activeCoupon.student,
     mealSession: activeCoupon.mealSession,
     attendance,
@@ -621,7 +655,7 @@ export const redeemCoupon = async ({ qrData, staffId }) => {
 };
 
 /**
- * Fallback Manual Roll Number Verification by Staff
+ * Fallback Manual Roll Number Verification by Staff (Regular Meal - ₹0)
  */
 export const manualVerifyStudent = async ({ rollNumber, staffId, reason }) => {
   const staff = await User.findById(staffId).populate('mess');
@@ -671,34 +705,22 @@ export const manualVerifyStudent = async ({ rollNumber, staffId, reason }) => {
     );
   }
 
-  // Check & deduct wallet
-  await checkAndSyncMonthlyWallet(student);
-  validateWalletQuota(student);
-
-  const couponAmount = student.couponWallet.couponValue || 500;
-  student.couponWallet.couponsUsed += 1;
-  student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
-  student.couponWallet.currentMonthCouponsUsed += 1;
-  student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
-  await student.save();
-
-  const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-
-  // Create manual attendance entry
+  // Regular meal is FREE - NO wallet deduction
   const attendance = await Attendance.create({
     student: student._id,
     mealSession: session._id,
     coupon: null,
     verificationMethod: 'manual_roll_lookup',
     verifiedBy: staffId,
-    manualReason: reason || 'Manual verification at staff counter',
+    manualReason: reason || 'Manual verification at staff counter (Regular Meal)',
     timestamp: new Date()
   });
 
-  // Increment served count
   await MealSession.findByIdAndUpdate(session._id, {
     $inc: { actualServedCount: 1 }
   });
+
+  await checkAndSyncMonthlyWallet(student);
 
   return {
     student,
@@ -754,7 +776,6 @@ export const getMessCounterPayments = async (userId) => {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
-  // Find all coupons redeemed today for sessions of this mess
   const sessions = await MealSession.find({ mess: user.mess._id, date: { $gte: startOfDay } });
   const sessionIds = sessions.map((s) => s._id);
 
