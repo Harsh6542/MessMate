@@ -86,14 +86,13 @@ const userSchema = new mongoose.Schema(
     },
     couponWallet: {
       semesterTotalAmount: { type: Number, default: 6000 },
+      balanceAmount: { type: Number, default: 6000 },
+      monthlyMaxAmount: { type: Number, default: 1000 },
+      currentMonthAmountSpent: { type: Number, default: 0 },
+      lastRedemptionMonth: { type: String, default: '' },
       couponValue: { type: Number, default: 500 },
       totalCouponsAllocated: { type: Number, default: 12 },
-      couponsUsed: { type: Number, default: 0 },
-      balanceAmount: { type: Number, default: 6000 },
-      currentMonthCouponsUsed: { type: Number, default: 0 },
-      lastRedemptionMonth: { type: String, default: '' },
-      monthlyMaxCoupons: { type: Number, default: 2 },
-      monthlyMaxAmount: { type: Number, default: 1000 }
+      couponsUsed: { type: Number, default: 0 }
     },
     isActive: {
       type: Boolean,
@@ -140,14 +139,13 @@ userSchema.pre('save', async function (next) {
     if (!this.couponWallet || typeof this.couponWallet.balanceAmount !== 'number') {
       this.couponWallet = {
         semesterTotalAmount: 6000,
+        balanceAmount: 6000,
+        monthlyMaxAmount: 1000,
+        currentMonthAmountSpent: 0,
+        lastRedemptionMonth: new Date().toISOString().slice(0, 7),
         couponValue: 500,
         totalCouponsAllocated: 12,
-        couponsUsed: 0,
-        balanceAmount: 6000,
-        currentMonthCouponsUsed: 0,
-        lastRedemptionMonth: new Date().toISOString().slice(0, 7),
-        monthlyMaxCoupons: 2,
-        monthlyMaxAmount: 1000
+        couponsUsed: 0
       };
     }
   }

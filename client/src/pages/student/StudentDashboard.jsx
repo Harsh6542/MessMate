@@ -112,8 +112,8 @@ export const StudentDashboard = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">
-                  Coupon Wallet
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                  Mess Wallet
                 </span>
                 <span className="text-xs text-slate-400">Regular Meals are Free</span>
               </div>
@@ -122,7 +122,7 @@ export const StudentDashboard = () => {
                   ₹{dashboardData.couponWallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
                 </span>
                 <span className="text-xs text-slate-400 font-semibold">
-                  • {dashboardData.couponWallet.couponsRemaining} Coupons Left (₹500 ea)
+                  / ₹{dashboardData.couponWallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Semester Balance
                 </span>
               </div>
             </div>
@@ -130,9 +130,11 @@ export const StudentDashboard = () => {
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <span className="text-[11px] text-slate-400 block font-medium">Monthly Coupon Limit</span>
-              <span className="text-xs font-bold text-slate-200">
-                {dashboardData.couponWallet.currentMonthCouponsUsed} / {dashboardData.couponWallet.monthlyMaxCoupons || 2} coupons used (Max ₹1,000/mo)
+              <span className="text-[11px] text-slate-400 block font-medium">Monthly Allowance</span>
+              <span className={`text-xs font-bold ${
+                (dashboardData.couponWallet.monthlyRemaining ?? 1000) <= 0 ? 'text-rose-400' : 'text-emerald-400'
+              }`}>
+                ₹{(dashboardData.couponWallet.monthlyRemaining ?? 1000).toLocaleString('en-IN')} / ₹1,000 remaining
               </span>
             </div>
 

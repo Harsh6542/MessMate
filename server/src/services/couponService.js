@@ -11,7 +11,8 @@ import { COUPON_STATUS, DECLARATION_STATUS } from '../config/constants.js';
 import { emitToRoom } from '../sockets/index.js';
 
 /**
- * Helper: Ensure student wallet defaults and synchronize calendar month quota
+ * Helper: Ensure student wallet defaults and synchronize calendar month allowance.
+ * Every new calendar month, the student's ₹1,000 monthly allowance resets!
  */
 export const checkAndSyncMonthlyWallet = async (student) => {
   const currentMonth = new Date().toISOString().slice(0, 7); // e.g. "2026-11"
@@ -19,27 +20,22 @@ export const checkAndSyncMonthlyWallet = async (student) => {
   if (!student.couponWallet || typeof student.couponWallet.balanceAmount !== 'number') {
     student.couponWallet = {
       semesterTotalAmount: 6000,
-      couponValue: 500,
-      totalCouponsAllocated: 12,
-      couponsUsed: 0,
       balanceAmount: 6000,
-      currentMonthCouponsUsed: 0,
-      lastRedemptionMonth: currentMonth,
-      monthlyMaxCoupons: 2,
-      monthlyMaxAmount: 1000
+      monthlyMaxAmount: 1000,
+      currentMonthAmountSpent: 0,
+      lastRedemptionMonth: currentMonth
     };
   } else {
-    // Reset monthly quota if calendar month changed
+    // Reset monthly allowance when calendar month changes
     if (student.couponWallet.lastRedemptionMonth !== currentMonth) {
-      student.couponWallet.currentMonthCouponsUsed = 0;
+      student.couponWallet.currentMonthAmountSpent = 0;
       student.couponWallet.lastRedemptionMonth = currentMonth;
     }
-    // Ensure defaults for any missing fields
-    if (!student.couponWallet.semesterTotalAmount) student.couponWallet.semesterTotalAmount = 6000;
-    if (!student.couponWallet.couponValue) student.couponWallet.couponValue = 500;
-    if (!student.couponWallet.totalCouponsAllocated) student.couponWallet.totalCouponsAllocated = 12;
-    if (!student.couponWallet.monthlyMaxCoupons) student.couponWallet.monthlyMaxCoupons = 2;
-    if (!student.couponWallet.monthlyMaxAmount) student.couponWallet.monthlyMaxAmount = 1000;
+
+    if (typeof student.couponWallet.semesterTotalAmount !== 'number') student.couponWallet.semesterTotalAmount = 6000;
+    if (typeof student.couponWallet.balanceAmount !== 'number') student.couponWallet.balanceAmount = 6000;
+    if (typeof student.couponWallet.monthlyMaxAmount !== 'number') student.couponWallet.monthlyMaxAmount = 1000;
+    if (typeof student.couponWallet.currentMonthAmountSpent !== 'number') student.couponWallet.currentMonthAmountSpent = 0;
   }
 
   if (!student.uniqueStudentQR) {
@@ -50,32 +46,61 @@ export const checkAndSyncMonthlyWallet = async (student) => {
 };
 
 /**
- * Helper: Validate student semester and monthly coupon limits
+ * Helper: Validate student semester and monthly limits for flexible payment amount (₹1 - ₹1,000)
  */
-export const validateWalletQuota = (student) => {
+export const validateWalletAllowance = (student, requestedAmount) => {
   const wallet = student.couponWallet;
+  const payAmount = Number(requestedAmount);
 
-  // 1. Total semester quota check (12 coupons / ₹6,000)
-  if (wallet.couponsUsed >= wallet.totalCouponsAllocated || wallet.balanceAmount < wallet.couponValue) {
+  if (!payAmount || isNaN(payAmount) || payAmount < 1) {
+    throw new AppError('Payment amount must be at least ₹1.', 400, 'INVALID_AMOUNT');
+  }
+
+  if (payAmount > 1000) {
+    throw new AppError('Single payment amount cannot exceed ₹1,000.', 400, 'EXCEEDS_MAX_PAYMENT');
+  }
+
+  // 1. Monthly Limit Check (Max ₹1,000 per month)
+  const monthlyMax = wallet.monthlyMaxAmount || 1000;
+  const currentSpent = wallet.currentMonthAmountSpent || 0;
+  const monthlyRemaining = Math.max(0, monthlyMax - currentSpent);
+
+  if (monthlyRemaining <= 0) {
     throw new AppError(
-      `Semester Quota Exhausted! You have used all ${wallet.totalCouponsAllocated} coupons (₹${wallet.semesterTotalAmount}) for this semester.`,
+      'Your monthly balance of ₹1,000 has been completely used up (₹0 remaining this month). You cannot make any more payments within this month. Next month ₹1,000 will be redeemed again into your wallet.',
       403,
-      'SEMESTER_LIMIT_REACHED'
+      'MONTHLY_LIMIT_EXHAUSTED'
     );
   }
 
-  // 2. Monthly limit check (Max 2 coupons / ₹1,000 per month)
-  if (wallet.currentMonthCouponsUsed >= wallet.monthlyMaxCoupons) {
+  if (payAmount > monthlyRemaining) {
     throw new AppError(
-      `Monthly limit reached! You can spend up to ${wallet.monthlyMaxCoupons} coupons (₹${wallet.monthlyMaxAmount}) per month. You have already redeemed ${wallet.currentMonthCouponsUsed} coupons this month.`,
+      `Payment of ₹${payAmount} exceeds your remaining monthly allowance of ₹${monthlyRemaining}. You can pay up to ₹${monthlyRemaining} more this month.`,
       403,
-      'MONTHLY_LIMIT_REACHED'
+      'EXCEEDS_MONTHLY_ALLOWANCE'
+    );
+  }
+
+  // 2. Overall Semester Balance Check (Total ₹6,000)
+  if (wallet.balanceAmount <= 0) {
+    throw new AppError(
+      'Your total semester wallet balance (₹6,000) is completely exhausted.',
+      403,
+      'SEMESTER_BALANCE_EXHAUSTED'
+    );
+  }
+
+  if (payAmount > wallet.balanceAmount) {
+    throw new AppError(
+      `Payment of ₹${payAmount} exceeds your available semester balance of ₹${wallet.balanceAmount}.`,
+      403,
+      'EXCEEDS_SEMESTER_BALANCE'
     );
   }
 };
 
 /**
- * Retrieve student's coupon wallet and transaction history
+ * Retrieve student's coupon wallet with real-time monthly remaining and passbook
  */
 export const getStudentWallet = async (studentId) => {
   const student = await User.findById(studentId).populate('hostel mess');
@@ -93,26 +118,25 @@ export const getStudentWallet = async (studentId) => {
   })
     .populate('mealSession')
     .sort({ redeemedAt: -1, createdAt: -1 })
-    .limit(20);
+    .limit(25);
 
   const wallet = student.couponWallet;
-  const couponsRemaining = Math.max(0, wallet.totalCouponsAllocated - wallet.couponsUsed);
-  const monthlyCouponsRemaining = Math.max(0, wallet.monthlyMaxCoupons - wallet.currentMonthCouponsUsed);
+  const monthlyMax = wallet.monthlyMaxAmount || 1000;
+  const currentSpent = wallet.currentMonthAmountSpent || 0;
+  const monthlyRemaining = Math.max(0, monthlyMax - currentSpent);
+  const effectiveAvailableThisMonth = Math.min(monthlyRemaining, wallet.balanceAmount);
 
   return {
     wallet: {
-      semesterTotalAmount: wallet.semesterTotalAmount,
-      couponValue: wallet.couponValue,
-      totalCouponsAllocated: wallet.totalCouponsAllocated,
-      couponsUsed: wallet.couponsUsed,
-      couponsRemaining,
+      semesterTotalAmount: wallet.semesterTotalAmount || 6000,
       balanceAmount: wallet.balanceAmount,
-      currentMonthCouponsUsed: wallet.currentMonthCouponsUsed,
-      monthlyCouponsRemaining,
-      monthlyMaxCoupons: wallet.monthlyMaxCoupons,
-      monthlyMaxAmount: wallet.monthlyMaxAmount,
+      monthlyMaxAmount: monthlyMax,
+      currentMonthAmountSpent: currentSpent,
+      monthlyRemaining,
+      effectiveAvailableThisMonth,
+      isMonthlyExhausted: monthlyRemaining <= 0,
       lastRedemptionMonth: wallet.lastRedemptionMonth,
-      policyNote: 'Regular meals are 100% free (included in hostel fee). Coupon wallet (₹500/coupon, max 2/month) is used to pay for extra mess food.'
+      policyNote: 'Regular meals are 100% free (included in hostel fee). You can spend from ₹1 up to ₹1,000 per month from your ₹6,000 semester allocation.'
     },
     uniqueStudentQR: student.uniqueStudentQR,
     student: {
@@ -139,11 +163,16 @@ export const getStudentWallet = async (studentId) => {
 };
 
 /**
- * PhonePe / UPI-style Scan & Pay: Student pays 1 Coupon (₹500) from their wallet
+ * PhonePe / UPI-style Scan & Pay: Student pays any flexible amount (₹1 to ₹1,000)
  */
-export const payCounterQR = async ({ studentId, counterQR }) => {
+export const payCounterQR = async ({ studentId, counterQR, amount }) => {
   if (!counterQR) {
     throw new AppError('Mess Counter QR code is required.', 400, 'MISSING_QR');
+  }
+
+  const payAmount = Math.round(Number(amount));
+  if (!payAmount || isNaN(payAmount) || payAmount < 1) {
+    throw new AppError('Please enter a valid payment amount between ₹1 and ₹1,000.', 400, 'INVALID_AMOUNT');
   }
 
   // 1. Parse Mess Facility ID from Counter QR
@@ -184,19 +213,17 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
     throw new AppError('No active or upcoming meal session available at this mess right now.', 404, 'NO_SESSION');
   }
 
-  // 3. Synchronize wallet & validate limits (12 per semester, 2 per month)
+  // 3. Synchronize monthly wallet and validate allowances
   await checkAndSyncMonthlyWallet(student);
-  validateWalletQuota(student);
+  validateWalletAllowance(student, payAmount);
 
-  // 4. Deduct 1 coupon (₹500) from wallet
-  const couponAmount = student.couponWallet.couponValue || 500;
-  student.couponWallet.couponsUsed += 1;
-  student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
-  student.couponWallet.currentMonthCouponsUsed += 1;
+  // 4. Deduct payment amount from wallet
+  student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - payAmount);
+  student.couponWallet.currentMonthAmountSpent = (student.couponWallet.currentMonthAmountSpent || 0) + payAmount;
   student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
   await student.save();
 
-  // 5. Create unique Coupon transaction record
+  // 5. Create unique transaction record
   const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
   const now = new Date();
   const rawToken = generateSecureToken(24);
@@ -207,10 +234,10 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
     mealSession: session._id,
     tokenHash,
     qrPayload: counterQR,
-    amount: couponAmount,
+    amount: payAmount,
     transactionId,
     itemType: 'special_item',
-    specialItemName: 'Mess Coupon (₹500)',
+    specialItemName: `Mess Payment (₹${payAmount})`,
     paymentMethod: 'student_scan_counter',
     status: COUPON_STATUS.REDEEMED,
     redeemedAt: now,
@@ -245,14 +272,16 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
       hostel: student.hostel?.name || ''
     },
     mealType: session.mealType,
-    amount: couponAmount,
+    amount: payAmount,
     timestamp: now
   });
+
+  const monthlyRemaining = Math.max(0, (student.couponWallet.monthlyMaxAmount || 1000) - student.couponWallet.currentMonthAmountSpent);
 
   return {
     success: true,
     transactionId,
-    amount: couponAmount,
+    amount: payAmount,
     paidAt: now,
     mealType: session.mealType,
     sessionDate: session.date,
@@ -260,8 +289,7 @@ export const payCounterQR = async ({ studentId, counterQR }) => {
     studentName: `${student.firstName} ${student.lastName}`,
     rollNumber: student.rollNumber,
     walletBalance: student.couponWallet.balanceAmount,
-    couponsRemaining: Math.max(0, student.couponWallet.totalCouponsAllocated - student.couponWallet.couponsUsed),
-    monthlyCouponsRemaining: Math.max(0, student.couponWallet.monthlyMaxCoupons - student.couponWallet.currentMonthCouponsUsed),
+    monthlyRemaining,
     attendance
   };
 };
@@ -377,9 +405,9 @@ export const generateOrGetCoupon = async (studentId, messId) => {
  * Verify and redeem QR at staff counter
  * Supports:
  *  A) Regular Meal Entry: Student permanent QR scanned for regular daily meal (₹0, covered by fees)
- *  B) Coupon Redemption: Staff redeems 1 Coupon (₹500 deducted from wallet)
+ *  B) Wallet Payment: Staff enters amount (₹1 - ₹1,000) and redeems from student's wallet
  */
-export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
+export const redeemCoupon = async ({ qrData, staffId, isCoupon = false, amount = 500 }) => {
   const staff = await User.findById(staffId).populate('mess');
   if (!staff) {
     throw new AppError('Staff user not found.', 404, 'STAFF_NOT_FOUND');
@@ -413,16 +441,15 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
 
     const normalizedSessionDate = normalizeDate(session.date);
 
-    // If STAFF IS REDEEMING A ₹500 COUPON:
+    // If STAFF IS REDEEMING A WALLET PAYMENT:
     if (isCoupon) {
+      const payAmount = Math.round(Number(amount) || 500);
       await checkAndSyncMonthlyWallet(student);
-      validateWalletQuota(student);
+      validateWalletAllowance(student, payAmount);
 
-      // Deduct 1 coupon (₹500)
-      const couponAmount = student.couponWallet.couponValue || 500;
-      student.couponWallet.couponsUsed += 1;
-      student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - couponAmount);
-      student.couponWallet.currentMonthCouponsUsed += 1;
+      // Deduct payment amount
+      student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - payAmount);
+      student.couponWallet.currentMonthAmountSpent = (student.couponWallet.currentMonthAmountSpent || 0) + payAmount;
       student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
       await student.save();
 
@@ -436,10 +463,10 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
         mealSession: session._id,
         tokenHash,
         qrPayload: rawData,
-        amount: couponAmount,
+        amount: payAmount,
         transactionId,
         itemType: 'special_item',
-        specialItemName: 'Mess Coupon (₹500)',
+        specialItemName: `Mess Payment (₹${payAmount})`,
         paymentMethod: 'staff_scan_student',
         status: COUPON_STATUS.REDEEMED,
         redeemedAt: now,
@@ -447,14 +474,19 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
         expiresAt: session.endTime
       });
 
+      const monthlyRemaining = Math.max(0, (student.couponWallet.monthlyMaxAmount || 1000) - student.couponWallet.currentMonthAmountSpent);
+
       return {
         success: true,
         isCoupon: true,
-        message: 'Mess Coupon Redeemed Successfully (-₹500)',
-        amount: couponAmount,
+        message: `Mess Payment of ₹${payAmount} Redeemed Successfully`,
+        amount: payAmount,
         student,
         mealSession: session,
-        wallet: student.couponWallet
+        wallet: {
+          ...student.couponWallet.toObject(),
+          monthlyRemaining
+        }
       };
     }
 
@@ -500,6 +532,7 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
     });
 
     await checkAndSyncMonthlyWallet(student);
+    const monthlyRemaining = Math.max(0, (student.couponWallet.monthlyMaxAmount || 1000) - (student.couponWallet.currentMonthAmountSpent || 0));
 
     return {
       success: true,
@@ -508,7 +541,10 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
       student,
       mealSession: session,
       attendance,
-      wallet: student.couponWallet
+      wallet: {
+        ...student.couponWallet.toObject(),
+        monthlyRemaining
+      }
     };
   }
 
@@ -568,6 +604,8 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
     $inc: { actualServedCount: 1 }
   });
 
+  const monthlyRemaining = Math.max(0, (student.couponWallet.monthlyMaxAmount || 1000) - (student.couponWallet.currentMonthAmountSpent || 0));
+
   return {
     success: true,
     isCoupon: false,
@@ -575,7 +613,10 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false }) => {
     student: activeCoupon.student,
     mealSession: activeCoupon.mealSession,
     attendance,
-    wallet: student.couponWallet
+    wallet: {
+      ...student.couponWallet.toObject(),
+      monthlyRemaining
+    }
   };
 };
 
@@ -646,12 +687,16 @@ export const manualVerifyStudent = async ({ rollNumber, staffId, reason }) => {
   });
 
   await checkAndSyncMonthlyWallet(student);
+  const monthlyRemaining = Math.max(0, (student.couponWallet.monthlyMaxAmount || 1000) - (student.couponWallet.currentMonthAmountSpent || 0));
 
   return {
     student,
     session,
     attendance,
-    wallet: student.couponWallet
+    wallet: {
+      ...student.couponWallet.toObject(),
+      monthlyRemaining
+    }
   };
 };
 

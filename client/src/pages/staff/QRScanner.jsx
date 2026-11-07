@@ -44,8 +44,9 @@ export const QRScanner = () => {
   const [scannedCount, setScannedCount] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(true);
 
-  // Scanner Mode: 'regular' (Free entry) or 'coupon' (₹500 coupon deduction)
+  // Scanner Mode: 'regular' (Free entry) or 'coupon' (Flexible ₹1 - ₹1,000 deduction)
   const [scanMode, setScanMode] = useState('regular'); // 'regular' | 'coupon'
+  const [redeemAmount, setRedeemAmount] = useState(50);
 
   const scannerRef = useRef(null);
 
@@ -95,9 +96,11 @@ export const QRScanner = () => {
             setScanResult(null);
 
             const isCouponMode = scanMode === 'coupon';
+            const payAmount = isCouponMode ? Math.max(1, Math.min(1000, Number(redeemAmount) || 50)) : 0;
             const res = await api.post('/coupons/verify', {
               qrPayload: decodedText,
-              isCoupon: isCouponMode
+              isCoupon: isCouponMode,
+              amount: payAmount
             });
 
             if (res.success && res.data) {
@@ -126,7 +129,7 @@ export const QRScanner = () => {
       stopAllWebcamTracks(scannerRef.current);
       scannerRef.current = null;
     };
-  }, [isCameraActive, scanMode]);
+  }, [isCameraActive, scanMode, redeemAmount]);
 
   // Teardown camera on beforeunload
   useEffect(() => {
@@ -211,11 +214,11 @@ export const QRScanner = () => {
       </div>
 
       {/* ── COUNTER MODE SWITCHER ── */}
-      <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+      <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
         <div className="flex items-center justify-between text-xs font-bold text-slate-300">
           <span>Verification Mode:</span>
           <span className="text-[11px] text-slate-400">
-            {scanMode === 'regular' ? 'Standard Free Meals' : 'Redeem Mess Coupon'}
+            {scanMode === 'regular' ? 'Standard Free Meals (Included in Hostel Fee)' : 'Redeem Wallet Payment'}
           </span>
         </div>
 
@@ -241,9 +244,49 @@ export const QRScanner = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            Redeem Coupon (₹500)
+            Wallet Payment (₹{redeemAmount})
           </button>
         </div>
+
+        {/* Amount Input for Wallet Payment Mode */}
+        {scanMode === 'coupon' && (
+          <div className="pt-2 border-t border-slate-800 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-semibold">Enter Amount to Deduct (₹1 - ₹1,000):</span>
+              <span className="font-bold text-amber-300">₹{redeemAmount}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={redeemAmount}
+                  onChange={(e) => setRedeemAmount(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-white font-bold text-sm focus:outline-none focus:border-amber-400"
+                  placeholder="Amount"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                {[20, 50, 100, 200, 500].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setRedeemAmount(preset)}
+                    className={`px-2.5 py-2 text-xs font-bold rounded-xl border transition ${
+                      redeemAmount === preset
+                        ? 'bg-amber-400 text-slate-950 border-amber-400'
+                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                    }`}
+                  >
+                    ₹{preset}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Verification Result Notification Card */}
@@ -263,8 +306,8 @@ export const QRScanner = () => {
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider bg-slate-950/20 px-2 py-0.5 rounded-md">
                   {scanResult.isCoupon
-                    ? 'Mess Coupon Redeemed (-₹500)'
-                    : 'Regular Meal Verified (Included in Fees)'}
+                    ? `Mess Payment Redeemed (-₹${scanResult.amount})`
+                    : 'Regular Meal Verified (Included in Fees / ₹0)'}
                 </span>
                 <h2 className="text-xl font-black mt-1 leading-tight">
                   {scanResult.student?.firstName} {scanResult.student?.lastName}
@@ -290,10 +333,10 @@ export const QRScanner = () => {
             <div className="pt-2 border-t border-slate-950/15 flex items-center justify-between text-xs font-bold text-slate-950">
               <span className="flex items-center gap-1.5">
                 <Wallet className="w-3.5 h-3.5" />
-                Remaining Balance: ₹{wallet.balanceAmount} ({Math.max(0, wallet.totalCouponsAllocated - wallet.couponsUsed)} coupons left)
+                Remaining Semester Balance: ₹{wallet.balanceAmount}
               </span>
               <span className="bg-slate-950/20 px-2 py-0.5 rounded-lg text-[11px]">
-                Month: {wallet.currentMonthCouponsUsed} / {wallet.monthlyMaxCoupons || 2} (Max ₹1,000/mo)
+                Month Remaining: ₹{wallet.monthlyRemaining ?? Math.max(0, 1000 - (wallet.currentMonthAmountSpent || 0))} / ₹1,000
               </span>
             </div>
           )}

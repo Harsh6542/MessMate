@@ -22,20 +22,21 @@ export const getWallet = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Student PhonePe / UPI-style Scan & Pay with Mess Coupon (₹500)
+// @desc    Student PhonePe / UPI-style Scan & Pay with flexible amount (₹1 to ₹1,000)
 // @route   POST /api/v1/coupons/pay-counter
 // @access  Student
 export const payCounter = asyncHandler(async (req, res) => {
-  const { counterQR } = req.body;
+  const { counterQR, amount } = req.body;
 
   const result = await payCounterQR({
     studentId: req.user._id,
-    counterQR
+    counterQR,
+    amount
   });
 
   res.status(200).json({
     success: true,
-    message: 'Mess Coupon (₹500) Paid Successfully',
+    message: `Mess Payment (₹${result.amount}) Paid Successfully`,
     data: result
   });
 });
@@ -57,16 +58,17 @@ export const generateCoupon = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Staff scan & redeem (Regular Meal Free or ₹500 Coupon)
+// @desc    Staff scan & redeem (Regular Meal Free or flexible ₹1 - ₹1,000 Wallet Payment)
 // @route   POST /api/v1/coupons/verify
 // @access  Mess Staff, Manager, Admin
 export const verifyCoupon = asyncHandler(async (req, res) => {
-  const { qrPayload, isCoupon } = req.body;
+  const { qrPayload, isCoupon, amount } = req.body;
 
   const result = await redeemCoupon({
     qrData: qrPayload,
     staffId: req.user._id,
-    isCoupon: !!isCoupon
+    isCoupon: !!isCoupon,
+    amount
   });
 
   res.status(200).json({

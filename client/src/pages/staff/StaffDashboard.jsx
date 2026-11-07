@@ -285,7 +285,7 @@ export const StaffDashboard = () => {
                   >
                     <div>
                       <p className="font-bold text-slate-100 text-xs text-amber-300">
-                        {pay.specialItemName || 'Mess Coupon (₹500)'}
+                        {pay.specialItemName || `Mess Payment (₹${pay.amount || 500})`}
                       </p>
                       <p className="text-[11px] text-slate-200 font-bold">
                         {pay.student?.name || `${pay.student?.firstName || ''} ${pay.student?.lastName || ''}`.trim() || 'Student'}
@@ -303,7 +303,7 @@ export const StaffDashboard = () => {
                         +₹{pay.amount || 500}
                       </span>
                       <span className="text-[9px] uppercase font-bold text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded">
-                        1 Coupon
+                        Paid
                       </span>
                     </div>
                   </div>

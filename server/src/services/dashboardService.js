@@ -13,12 +13,14 @@ import { InventoryItem } from '../models/InventoryItem.js';
 import { GuestMealRequest } from '../models/GuestMealRequest.js';
 import { Menu } from '../models/Menu.js';
 import { getCurrentOrNextMealSession, normalizeDate, ensureDailySessions } from './mealSessionService.js';
+import { checkAndSyncMonthlyWallet } from './couponService.js';
 import { ROLES, DECLARATION_STATUS, COUPON_STATUS } from '../config/constants.js';
 
 /**
  * 1. STUDENT DASHBOARD
  */
 export const getStudentDashboardData = async (user) => {
+  await checkAndSyncMonthlyWallet(user);
   const messId = user.mess;
   const hostelId = user.hostel;
 
@@ -130,13 +132,14 @@ export const getStudentDashboardData = async (user) => {
     couponWallet: {
       semesterTotalAmount: user.couponWallet?.semesterTotalAmount || 6000,
       balanceAmount: typeof user.couponWallet?.balanceAmount === 'number' ? user.couponWallet.balanceAmount : 6000,
-      couponsUsed: user.couponWallet?.couponsUsed || 0,
-      totalCouponsAllocated: user.couponWallet?.totalCouponsAllocated || 12,
-      couponsRemaining: Math.max(0, (user.couponWallet?.totalCouponsAllocated || 12) - (user.couponWallet?.couponsUsed || 0)),
-      currentMonthCouponsUsed: user.couponWallet?.currentMonthCouponsUsed || 0,
-      monthlyCouponsRemaining: Math.max(0, (user.couponWallet?.monthlyMaxCoupons || 2) - (user.couponWallet?.currentMonthCouponsUsed || 0)),
-      monthlyMaxCoupons: user.couponWallet?.monthlyMaxCoupons || 2,
-      couponValue: user.couponWallet?.couponValue || 500
+      monthlyMaxAmount: user.couponWallet?.monthlyMaxAmount || 1000,
+      currentMonthAmountSpent: user.couponWallet?.currentMonthAmountSpent || 0,
+      monthlyRemaining: Math.max(0, (user.couponWallet?.monthlyMaxAmount || 1000) - (user.couponWallet?.currentMonthAmountSpent || 0)),
+      effectiveAvailableThisMonth: Math.min(
+        typeof user.couponWallet?.balanceAmount === 'number' ? user.couponWallet.balanceAmount : 6000,
+        Math.max(0, (user.couponWallet?.monthlyMaxAmount || 1000) - (user.couponWallet?.currentMonthAmountSpent || 0))
+      ),
+      isMonthlyExhausted: Math.max(0, (user.couponWallet?.monthlyMaxAmount || 1000) - (user.couponWallet?.currentMonthAmountSpent || 0)) <= 0
     },
     uniqueStudentQR: user.uniqueStudentQR || `MESSMATE:STUDENT:${user._id}:${user.rollNumber || 'STU'}`
   };

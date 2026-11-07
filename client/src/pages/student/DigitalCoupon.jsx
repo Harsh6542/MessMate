@@ -59,6 +59,7 @@ export const DigitalCoupon = () => {
   // Scanner & Payment state
   const [isScanning, setIsScanning] = useState(false);
   const [scannedPayload, setScannedPayload] = useState(null);
+  const [payAmount, setPayAmount] = useState(50);
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccessData, setPaymentSuccessData] = useState(null);
   const [recentTransactions, setRecentTransactions] = useState([]);
@@ -153,12 +154,63 @@ export const DigitalCoupon = () => {
     setScannedPayload(qrString);
   };
 
+  const rawWallet = walletData?.wallet || {};
+  const wallet = {
+    balanceAmount: typeof rawWallet.balanceAmount === 'number' ? rawWallet.balanceAmount : 6000,
+    semesterTotalAmount: rawWallet.semesterTotalAmount || 6000,
+    monthlyMaxAmount: rawWallet.monthlyMaxAmount || 1000,
+    currentMonthAmountSpent: rawWallet.currentMonthAmountSpent || 0,
+    monthlyRemaining: typeof rawWallet.monthlyRemaining === 'number'
+      ? rawWallet.monthlyRemaining
+      : Math.max(0, 1000 - (rawWallet.currentMonthAmountSpent || 0))
+  };
+
+  const isMonthlyLimitReached = wallet.monthlyRemaining <= 0;
+  const isSemesterLimitReached = wallet.balanceAmount <= 0;
+
+  const numPayAmount = Number(payAmount) || 0;
+  const isAmountValid =
+    numPayAmount >= 1 &&
+    numPayAmount <= 1000 &&
+    numPayAmount <= wallet.monthlyRemaining &&
+    numPayAmount <= wallet.balanceAmount;
+
+  let validationError = '';
+  if (isMonthlyLimitReached) {
+    validationError = 'Monthly limit reached (₹0 remaining). Next month ₹1,000 will be added again.';
+  } else if (isSemesterLimitReached) {
+    validationError = 'Semester balance is ₹0. All ₹6,000 has been used.';
+  } else if (!numPayAmount || numPayAmount < 1) {
+    validationError = 'Please enter an amount of at least ₹1.';
+  } else if (numPayAmount > 1000) {
+    validationError = 'Single payment cannot exceed ₹1,000.';
+  } else if (numPayAmount > wallet.monthlyRemaining) {
+    validationError = `Amount exceeds monthly remaining balance of ₹${wallet.monthlyRemaining}.`;
+  } else if (numPayAmount > wallet.balanceAmount) {
+    validationError = `Amount exceeds available semester balance of ₹${wallet.balanceAmount}.`;
+  }
+
   // Perform Payment
   const executePayment = async (counterQRToPay) => {
+    const finalAmount = Math.round(Number(payAmount) || 0);
+    if (finalAmount < 1 || finalAmount > 1000) {
+      toast.error('Payment amount must be between ₹1 and ₹1,000');
+      return;
+    }
+    if (finalAmount > wallet.monthlyRemaining) {
+      toast.error(`Exceeds monthly limit. Only ₹${wallet.monthlyRemaining} left this month.`);
+      return;
+    }
+    if (finalAmount > wallet.balanceAmount) {
+      toast.error(`Exceeds semester balance of ₹${wallet.balanceAmount}.`);
+      return;
+    }
+
     try {
       setIsPaying(true);
       const res = await api.post('/coupons/pay-counter', {
-        counterQR: counterQRToPay || scannedPayload
+        counterQR: counterQRToPay || scannedPayload,
+        amount: finalAmount
       });
 
       const receipt = res?.data || res;
@@ -166,7 +218,7 @@ export const DigitalCoupon = () => {
         playPaymentSuccessChime();
         setPaymentSuccessData(receipt);
         setScannedPayload(null);
-        toast.success('₹500 Coupon Paid Successfully!');
+        toast.success(`₹${finalAmount} Paid Successfully!`);
         fetchWallet();
       }
     } catch (err) {
@@ -184,20 +236,6 @@ export const DigitalCoupon = () => {
     setScannedPayload(defaultMessQR);
   };
 
-  const wallet = walletData?.wallet || {
-    balanceAmount: 6000,
-    semesterTotalAmount: 6000,
-    totalCouponsAllocated: 12,
-    couponsUsed: 0,
-    couponsRemaining: 12,
-    currentMonthCouponsUsed: 0,
-    monthlyMaxCoupons: 2,
-    monthlyCouponsRemaining: 2
-  };
-
-  const isMonthlyLimitReached = wallet.currentMonthCouponsUsed >= (wallet.monthlyMaxCoupons || 2);
-  const isSemesterLimitReached = wallet.couponsRemaining <= 0 || wallet.balanceAmount < 500;
-
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-12">
       {/* Page Title & Refresh */}
@@ -205,10 +243,10 @@ export const DigitalCoupon = () => {
         <div>
           <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
             <Wallet className="w-6 h-6 text-emerald-400" />
-            Mess Coupon Wallet & Pay
+            Mess Wallet & Pay
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Total Semester Allotment: ₹6,000 (12 Coupons @ ₹500 each) • Monthly Limit: 2 Coupons (₹1,000)
+            Total Semester Allotment: ₹6,000 • Monthly Limit: Up to ₹1,000 (Flexible ₹1 - ₹1,000)
           </p>
         </div>
         <button
@@ -225,7 +263,7 @@ export const DigitalCoupon = () => {
         <Info className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-300 leading-relaxed">
           <span className="font-bold text-emerald-300">Regular Meals are Free: </span>
-          Your usual daily meals (Breakfast, Lunch, Dinner) are <b className="text-white">100% included in your hostel fee</b> with no wallet deduction. You can spend your wallet coupons (₹500 per coupon, up to ₹1,000/month) at the counter whenever you want to eat special mess items.
+          Your usual daily meals (Breakfast, Lunch, Dinner) are <b className="text-white">100% included in your hostel fee</b> with no wallet deduction. You can make any payment from <b className="text-white">₹1 to ₹1,000</b> at the counter from your allotted ₹6,000 semester wallet whenever you want extra mess items. Up to ₹1,000 can be spent per month; if monthly balance reaches ₹0, payments pause until next month when ₹1,000 will be added again.
         </div>
       </div>
 
@@ -239,7 +277,7 @@ export const DigitalCoupon = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg">
-                Mess Coupon Wallet
+                Mess Digital Wallet
               </span>
               <span className="text-xs text-slate-400 font-medium">Spring 2026 Semester</span>
             </div>
@@ -260,33 +298,33 @@ export const DigitalCoupon = () => {
                   ₹{wallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
                 </span>
                 <span className="text-xs text-slate-400 font-medium">
-                  / ₹{wallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Total
+                  / ₹{wallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Semester Allotment
                 </span>
               </div>
             </div>
 
             <div className="text-left sm:text-right">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
-                Coupons Remaining
+                Monthly Allowance Left
               </span>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/90 rounded-xl border border-slate-700/80">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span className="text-base font-black text-amber-300">
-                  {wallet.couponsRemaining} / {wallet.totalCouponsAllocated} Coupons (₹500 ea)
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <span className={`text-base font-black ${isMonthlyLimitReached ? 'text-rose-400' : 'text-emerald-300'}`}>
+                  ₹{wallet.monthlyRemaining?.toLocaleString('en-IN')} / ₹1,000
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Monthly Quota Meter (Max 2 coupons / ₹1,000 per month) */}
+          {/* Monthly Quota Meter (Max ₹1,000 per month) */}
           <div className="pt-3 border-t border-slate-800/80 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-300 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                Monthly Limit: Up to ₹1,000 (2 Coupons only)
+                Monthly Limit: Up to ₹1,000 per month
               </span>
               <span className="font-bold text-slate-200">
-                {wallet.currentMonthCouponsUsed} / {wallet.monthlyMaxCoupons || 2} Used this month (₹{wallet.currentMonthCouponsUsed * 500})
+                ₹{wallet.currentMonthAmountSpent?.toLocaleString('en-IN')} Spent • ₹{wallet.monthlyRemaining?.toLocaleString('en-IN')} Remaining
               </span>
             </div>
 
@@ -296,26 +334,26 @@ export const DigitalCoupon = () => {
                 className={`h-full rounded-full transition-all duration-500 ${
                   isMonthlyLimitReached
                     ? 'bg-rose-500'
-                    : wallet.currentMonthCouponsUsed === 1
+                    : wallet.currentMonthAmountSpent > 700
                     ? 'bg-amber-400'
                     : 'bg-emerald-400'
                 }`}
                 style={{
-                  width: `${Math.min(100, ((wallet.currentMonthCouponsUsed || 0) / (wallet.monthlyMaxCoupons || 2)) * 100)}%`
+                  width: `${Math.min(100, ((wallet.currentMonthAmountSpent || 0) / (wallet.monthlyMaxAmount || 1000)) * 100)}%`
                 }}
               />
             </div>
 
             {isMonthlyLimitReached && (
               <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" />
-                Monthly limit reached (2 coupons / ₹1,000 used). Regular meals remain free! Coupon quota resets next month.
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                Monthly limit reached (₹0 remaining this month). You cannot make any payment this month. Next month ₹1,000 will be added again. Regular meals remain free!
               </p>
             )}
             {isSemesterLimitReached && (
               <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" />
-                Semester quota exhausted! All 12 coupons (₹6,000) have been redeemed. Regular meals remain free.
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                Semester balance exhausted (₹0 remaining of ₹6,000). Regular meals remain 100% free!
               </p>
             )}
           </div>
@@ -371,9 +409,18 @@ export const DigitalCoupon = () => {
           <div className="max-w-md mx-auto space-y-1.5">
             <h2 className="text-lg font-black text-slate-100">Pay at Mess Counter Standee</h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Scan the Standee QR placed at the mess counter to spend 1 Coupon (₹500) from your semester wallet.
+              Scan the Standee QR placed at the mess counter or use Quick Pay to pay any flexible amount from ₹1 to ₹1,000 from your semester wallet.
             </p>
           </div>
+
+          {isMonthlyLimitReached && (
+            <div className="max-w-md mx-auto p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-xs font-semibold flex items-center gap-2 text-left">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+              <span>
+                Monthly limit reached (₹0 remaining this month). Payments are paused. Next month ₹1,000 will be added again into your wallet.
+              </span>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -397,11 +444,11 @@ export const DigitalCoupon = () => {
           </div>
 
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-full border border-slate-700/60 text-[11px] text-slate-400">
-            <span>₹500 / Coupon</span>
+            <span>Flexible ₹1 – ₹1,000</span>
             <span>•</span>
-            <span>Max 2 coupons / month</span>
+            <span>Max ₹1,000 / month</span>
             <span>•</span>
-            <span>12 coupons / semester</span>
+            <span>₹6,000 / semester</span>
           </div>
         </div>
       )}
@@ -412,7 +459,7 @@ export const DigitalCoupon = () => {
           <div>
             <h2 className="text-lg font-black text-slate-100">Permanent Student Mess QR</h2>
             <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              Show this QR code at the mess counter for regular meals or for staff to scan and redeem your coupon.
+              Show this QR code at the mess counter for regular meals or for staff to scan and deduct wallet payments.
             </p>
           </div>
 
@@ -441,10 +488,10 @@ export const DigitalCoupon = () => {
             <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-1">
               <span className="font-bold text-amber-300 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                Mess Coupon (₹500)
+                Mess Wallet Payment
               </span>
               <p className="text-slate-400 text-[11px]">
-                Staff can scan this to redeem 1 coupon (₹500) from your semester wallet.
+                Staff can scan this to deduct any payment amount (₹1 to ₹1,000) from your semester wallet.
               </p>
             </div>
           </div>
@@ -478,7 +525,7 @@ export const DigitalCoupon = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <Receipt className="w-4 h-4 text-emerald-400" />
-              Mess Coupon Wallet Passbook
+              Mess Wallet Passbook
             </h2>
             <span className="text-xs font-semibold text-slate-400">
               {recentTransactions.length} Transactions
@@ -487,8 +534,8 @@ export const DigitalCoupon = () => {
 
           {recentTransactions.length === 0 ? (
             <div className="text-center py-10 text-slate-500 text-xs space-y-1">
-              <p>No coupons redeemed yet.</p>
-              <p className="text-[11px]">Your allotted ₹6,000 (12 coupons) is fully available!</p>
+              <p>No mess payments yet.</p>
+              <p className="text-[11px]">Your allotted ₹6,000 semester balance is fully available!</p>
             </div>
           ) : (
             <div className="space-y-2.5">
@@ -503,7 +550,7 @@ export const DigitalCoupon = () => {
                     </div>
                     <div>
                       <p className="font-bold text-slate-100 uppercase">
-                        Mess Coupon
+                        Mess Payment
                       </p>
                       <p className="text-[11px] text-slate-400 font-mono">
                         {tx.transactionId}
@@ -568,7 +615,7 @@ export const DigitalCoupon = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full space-y-5 shadow-2xl animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                Confirm Mess Coupon
+                Confirm Mess Payment
               </span>
               <button
                 onClick={() => setScannedPayload(null)}
@@ -580,42 +627,91 @@ export const DigitalCoupon = () => {
 
             <div className="text-center space-y-1">
               <h3 className="text-xl font-black text-white">
-                Pay 1 Mess Coupon
+                Pay at Mess Counter
               </h3>
               <p className="text-xs text-slate-400">
-                Mess Counter: {walletData?.student?.mess || 'Hostel Dining Hall'}
+                Facility: {walletData?.student?.mess || 'Hostel Dining Hall'}
               </p>
             </div>
 
-            {/* Price Box */}
-            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-3">
+            {/* Flexible Amount Input (₹1 to ₹1,000) */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-300 block">
+                Enter Payment Amount (₹1 to ₹1,000)
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black text-emerald-400">
+                  ₹
+                </span>
+                <input
+                  type="number"
+                  min="1"
+                  max={Math.min(1000, wallet.monthlyRemaining)}
+                  value={payAmount}
+                  onChange={(e) => setPayAmount(e.target.value)}
+                  className="w-full bg-slate-800/90 border border-slate-700 focus:border-emerald-500 rounded-2xl pl-11 pr-4 py-3 text-2xl font-black text-white focus:outline-none"
+                  placeholder="50"
+                />
+              </div>
+
+              {/* Quick Preset Buttons */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                {[20, 50, 100, 200, 500, 1000].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setPayAmount(preset)}
+                    className={`px-3 py-1 text-xs font-bold rounded-xl border transition ${
+                      Number(payAmount) === preset
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-md'
+                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                    }`}
+                  >
+                    ₹{preset}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Validation Message */}
+            {validationError && (
+              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{validationError}</span>
+              </div>
+            )}
+
+            {/* Price Breakdown Box */}
+            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Coupon Value</span>
-                <span className="text-lg font-black text-white">₹500.00</span>
+                <span className="text-slate-400">Amount to Deduct</span>
+                <span className="text-lg font-black text-white">₹{numPayAmount.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/60">
                 <span>Debited From</span>
                 <span className="font-semibold text-slate-200">Mess Semester Wallet</span>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>Balance After Payment</span>
-                <span className="font-semibold text-emerald-400">
-                  ₹{Math.max(0, (wallet.balanceAmount || 6000) - 500)} ({wallet.couponsRemaining - 1} left)
+                <span>Monthly Allowance After</span>
+                <span className={`font-semibold ${
+                  wallet.monthlyRemaining - numPayAmount <= 0 ? 'text-amber-400' : 'text-emerald-400'
+                }`}>
+                  ₹{Math.max(0, wallet.monthlyRemaining - numPayAmount)} remaining of ₹1,000
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>Monthly Quota After</span>
-                <span className="font-semibold text-amber-300">
-                  {wallet.currentMonthCouponsUsed + 1} / {wallet.monthlyMaxCoupons || 2} Used this month (Max ₹1,000)
+                <span>Semester Balance After</span>
+                <span className="font-semibold text-emerald-400">
+                  ₹{Math.max(0, wallet.balanceAmount - numPayAmount)} remaining of ₹6,000
                 </span>
               </div>
             </div>
 
             {/* Pay Button */}
             <button
-              disabled={isPaying}
+              disabled={isPaying || !isAmountValid}
               onClick={() => executePayment(scannedPayload)}
-              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 transition active:scale-98 disabled:opacity-50"
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 transition active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isPaying ? (
                 <>
@@ -625,7 +721,7 @@ export const DigitalCoupon = () => {
               ) : (
                 <>
                   <CreditCard className="w-4 h-4" />
-                  Pay ₹500 from Mess Wallet
+                  Pay ₹{numPayAmount || 0} from Mess Wallet
                 </>
               )}
             </button>
@@ -646,8 +742,8 @@ export const DigitalCoupon = () => {
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-white tracking-tight">₹500.00 Paid</h2>
-              <p className="text-xs font-semibold text-emerald-400">Mess Coupon Token Generated</p>
+              <h2 className="text-2xl font-black text-white tracking-tight">₹{paymentSuccessData.amount}.00 Paid</h2>
+              <p className="text-xs font-semibold text-emerald-400">Payment Successful</p>
               <p className="text-xs text-slate-400">
                 Mess: {paymentSuccessData.messName || 'Dining Hall'}
               </p>
@@ -662,9 +758,9 @@ export const DigitalCoupon = () => {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Amount</span>
+                <span className="text-slate-400">Amount Paid</span>
                 <span className="font-semibold text-emerald-400">
-                  ₹500.00 (1 Coupon)
+                  ₹{paymentSuccessData.amount}.00
                 </span>
               </div>
               <div className="flex justify-between">
@@ -675,9 +771,15 @@ export const DigitalCoupon = () => {
                 </span>
               </div>
               <div className="flex justify-between pt-2 border-t border-slate-700/60">
-                <span className="text-slate-400">Remaining Wallet Balance</span>
+                <span className="text-slate-400">Remaining Monthly Allowance</span>
+                <span className="font-bold text-amber-300">
+                  ₹{paymentSuccessData.monthlyRemaining} / ₹1,000
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Remaining Semester Balance</span>
                 <span className="font-bold text-emerald-400">
-                  ₹{paymentSuccessData.walletBalance} ({paymentSuccessData.couponsRemaining} coupons left)
+                  ₹{paymentSuccessData.walletBalance} / ₹6,000
                 </span>
               </div>
             </div>
