@@ -6,7 +6,11 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 // @route   GET /api/v1/hostels
 // @access  Public / Authenticated
 export const getHostels = asyncHandler(async (req, res) => {
-  const hostels = await Hostel.find({ isActive: true }).populate('warden', 'firstName lastName email');
+  const query = { isActive: true };
+  if (req.query.type) {
+    query.type = req.query.type;
+  }
+  const hostels = await Hostel.find(query).populate('warden', 'firstName lastName email');
 
   res.status(200).json({
     success: true,
@@ -38,7 +42,7 @@ export const getHostelById = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/hostels
 // @access  Admin
 export const createHostel = asyncHandler(async (req, res, next) => {
-  const { name, code, address, capacity, warden } = req.body;
+  const { name, code, address, capacity, warden, type } = req.body;
 
   const existingCode = await Hostel.findOne({ code: code.toUpperCase() });
   if (existingCode) {
@@ -50,7 +54,8 @@ export const createHostel = asyncHandler(async (req, res, next) => {
     code: code.toUpperCase(),
     address,
     capacity,
-    warden: warden || null
+    warden: warden || null,
+    type: type || 'boys'
   });
 
   res.status(201).json({

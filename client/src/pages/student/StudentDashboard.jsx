@@ -58,7 +58,7 @@ export const StudentDashboard = () => {
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              NIT Patna Hostel Resident
+              {user?.hostel?.name || 'NIT Patna Hostel Resident'}
             </span>
             <span className="text-xs text-slate-400 font-semibold">
               Roll: {user?.rollNumber || 'N/A'} • Room: {user?.roomNumber || 'N/A'}

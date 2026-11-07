@@ -52,6 +52,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: ''
     },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      default: 'male',
+      index: true
+    },
+    roomNumber: {
+      type: String,
+      trim: true,
+      default: ''
+    },
     avatarUrl: {
       type: String,
       default: null

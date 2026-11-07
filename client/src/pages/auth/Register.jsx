@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
-import { UserPlus, Lock, Mail, User, Building, Hash, Phone, AlertCircle } from 'lucide-react';
+import { UserPlus, Lock, Mail, User, Building, Hash, Phone, AlertCircle, Home } from 'lucide-react';
 
 export const Register = () => {
   const { register: registerAuth } = useAuth();
@@ -16,6 +16,8 @@ export const Register = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -24,10 +26,15 @@ export const Register = () => {
       email: '',
       rollNumber: '',
       phone: '',
+      gender: 'male',
+      roomNumber: '',
       hostel: '',
       password: ''
     }
   });
+
+  const selectedGender = watch('gender');
+  const selectedHostel = watch('hostel');
 
   // Fetch active hostels list for dropdown
   useEffect(() => {
@@ -43,6 +50,36 @@ export const Register = () => {
     };
     fetchHostels();
   }, []);
+
+  // Filter hostels based on selected gender
+  // Boys: Kautilya Hostel, Nagarjuna Hostel, Aryabhatta Hostel
+  // Girls: Kadambini Hostel
+  const filteredHostels = hostels.filter((h) => {
+    if (!h.type) {
+      // Fallback matching by name if type is not populated yet
+      const lowerName = (h.name || '').toLowerCase();
+      if (selectedGender === 'female') {
+        return lowerName.includes('kadambini');
+      } else {
+        return lowerName.includes('kautilya') || lowerName.includes('nagarjuna') || lowerName.includes('aryabhatta') || lowerName.includes('kosi') || lowerName.includes('ganga');
+      }
+    }
+    return selectedGender === 'male' ? h.type === 'boys' : h.type === 'girls';
+  });
+
+  // When gender switches, auto-select if single choice (e.g. Kadambini) or reset invalid hostel
+  useEffect(() => {
+    if (filteredHostels.length > 0) {
+      const isCurrentValid = filteredHostels.some((h) => h._id === selectedHostel);
+      if (!isCurrentValid) {
+        if (selectedGender === 'female' && filteredHostels.length === 1) {
+          setValue('hostel', filteredHostels[0]._id);
+        } else {
+          setValue('hostel', '');
+        }
+      }
+    }
+  }, [selectedGender, filteredHostels, selectedHostel, setValue]);
 
   const onSubmit = async (data) => {
     try {
@@ -60,7 +97,7 @@ export const Register = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
         <h2 className="text-xl font-bold text-white tracking-tight text-center">
           Student Registration
@@ -78,10 +115,11 @@ export const Register = () => {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
+        {/* Name Fields */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              First Name
+              First Name <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -101,7 +139,7 @@ export const Register = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Last Name
+              Last Name <span className="text-rose-400">*</span>
             </label>
             <input
               type="text"
@@ -115,9 +153,10 @@ export const Register = () => {
           </div>
         </div>
 
+        {/* Email Field */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1">
-            College / Personal Email
+            College / Personal Email <span className="text-rose-400">*</span>
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -138,10 +177,11 @@ export const Register = () => {
           )}
         </div>
 
+        {/* Roll Number & Phone Number */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Roll Number
+              Roll Number <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -177,31 +217,93 @@ export const Register = () => {
           </div>
         </div>
 
+        {/* Gender Selection */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">
-            Hostel Assignment
+          <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            Gender <span className="text-rose-400">*</span>
           </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-              <Building className="w-3.5 h-3.5" />
-            </div>
-            <select
-              {...register('hostel')}
-              className="w-full pl-8 pr-3 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => setValue('gender', 'male', { shouldValidate: true })}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                selectedGender === 'male'
+                  ? 'bg-emerald-500/15 border-emerald-500/60 text-emerald-300 shadow-sm shadow-emerald-500/10'
+                  : 'bg-slate-900/60 border-slate-700/80 text-slate-400 hover:text-slate-200 hover:border-slate-600'
+              }`}
             >
-              <option value="">Select Hostel (Optional)</option>
-              {hostels.map((h) => (
-                <option key={h._id} value={h._id}>
-                  {h.name} ({h.code})
-                </option>
-              ))}
-            </select>
+              <span className={`w-2 h-2 rounded-full ${selectedGender === 'male' ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+              <span>Male (Boys Hostel)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setValue('gender', 'female', { shouldValidate: true })}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                selectedGender === 'female'
+                  ? 'bg-pink-500/15 border-pink-500/60 text-pink-300 shadow-sm shadow-pink-500/10'
+                  : 'bg-slate-900/60 border-slate-700/80 text-slate-400 hover:text-slate-200 hover:border-slate-600'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${selectedGender === 'female' ? 'bg-pink-400' : 'bg-slate-500'}`} />
+              <span>Female (Girls Hostel)</span>
+            </button>
+          </div>
+          <input type="hidden" {...register('gender', { required: 'Gender is required' })} />
+        </div>
+
+        {/* Hostel Assignment & Room Number */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              Hostel Assignment <span className="text-rose-400">*</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Building className="w-3.5 h-3.5" />
+              </div>
+              <select
+                {...register('hostel', { required: 'Please select your hostel' })}
+                className="w-full pl-8 pr-2.5 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              >
+                <option value="">Select Hostel</option>
+                {filteredHostels.map((h) => (
+                  <option key={h._id} value={h._id}>
+                    {h.name} {h.code ? `(${h.code})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.hostel && (
+              <p className="mt-1 text-[11px] text-rose-400">{errors.hostel.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              Room Number <span className="text-rose-400">*</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Home className="w-3.5 h-3.5" />
+              </div>
+              <input
+                type="text"
+                {...register('roomNumber', { required: 'Room number is required' })}
+                placeholder={selectedGender === 'female' ? 'KD-104' : 'K-204'}
+                className="w-full pl-8 pr-2.5 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs text-white uppercase placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              />
+            </div>
+            {errors.roomNumber && (
+              <p className="mt-1 text-[11px] text-rose-400">{errors.roomNumber.message}</p>
+            )}
           </div>
         </div>
 
+        {/* Password */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1">
-            Set Password
+            Set Password <span className="text-rose-400">*</span>
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -225,7 +327,7 @@ export const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 px-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 text-xs font-semibold rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
+          className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 px-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 text-xs font-semibold rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
         >
           {loading ? (
             <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
@@ -254,4 +356,3 @@ export const Register = () => {
 };
 
 export default Register;
-

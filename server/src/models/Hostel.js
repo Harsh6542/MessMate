@@ -25,6 +25,12 @@ const hostelSchema = new mongoose.Schema(
       required: [true, 'Hostel capacity is required'],
       min: [1, 'Capacity must be at least 1 resident']
     },
+    type: {
+      type: String,
+      enum: ['boys', 'girls', 'coed'],
+      default: 'boys',
+      index: true
+    },
     warden: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

@@ -53,7 +53,7 @@ export const getUsers = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/users
 // @access  Admin
 export const createUser = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password, role, hostel, mess, phone } = req.body;
+  const { firstName, lastName, email, password, role, hostel, mess, phone, gender, roomNumber } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -68,7 +68,9 @@ export const createUser = asyncHandler(async (req, res, next) => {
     role: role || ROLES.STUDENT,
     hostel: hostel || null,
     mess: mess || null,
-    phone
+    phone,
+    gender: gender || 'male',
+    roomNumber: roomNumber || ''
   });
 
   user.password = undefined;
@@ -112,7 +114,7 @@ export const updateUserStatus = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/users/:id
 // @access  Admin
 export const updateUser = asyncHandler(async (req, res, next) => {
-  const allowed = ['firstName', 'lastName', 'role', 'hostel', 'mess', 'roomNumber', 'phone', 'dietaryPreference'];
+  const allowed = ['firstName', 'lastName', 'role', 'hostel', 'mess', 'roomNumber', 'phone', 'gender', 'dietaryPreference'];
   const updates = {};
   allowed.forEach((key) => {
     if (req.body[key] !== undefined) {

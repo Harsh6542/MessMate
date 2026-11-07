@@ -169,7 +169,7 @@ export const DigitalCoupon = () => {
             </div>
             <div className="text-right">
               <span className="text-[11px] text-slate-500 font-medium block">
-                {user?.hostel?.name || 'Kosi Hostel'}
+                {user?.hostel?.name || 'Hostel Resident'}
               </span>
               <span className="text-[10px] text-emerald-600 font-semibold flex items-center justify-end gap-1">
                 <ShieldCheck className="w-3 h-3" /> Eligible

@@ -34,17 +34,24 @@ In traditional collegiate hostel mess operations, three systemic inefficiencies 
 
 ## 🔑 Demo Credentials (All 5 Stakeholder Roles)
 
-The automated seed script initializes complete accounts for all 5 roles:
+The automated seed script initializes complete accounts for all 5 roles across NIT Patna hostels:
 
 | Role | Email | Password | Assigned Scope | Key Capabilities |
 |---|---|---|---|---|
-| **Super Admin** | `admin@messmate.edu` | `Password@123` | Institutional Platform | Provision hostels, mess facilities, user role reassignment |
-| **Hostel Warden** | `warden@messmate.edu` | `Password@123` | Kosi Hostel | SLA compliance tracking, confidential grievance review, waste audits |
-| **Warden (Ganga)** | `warden.ganga@messmate.edu` | `Password@123` | Ganga Hall | Multi-hostel comparative scorecards |
-| **Mess Manager** | `manager@messmate.edu` | `Password@123` | Kosi Central Mess | Demand forecasting, cooking quantity approval, stock inventory, menus |
-| **Mess Staff** | `staff@messmate.edu` | `Password@123` | Kosi Mess Floor | QR coupon camera scanner, manual roll search, scale waste logging |
-| **Student 1** | `student@messmate.edu` | `Password@123` | Roll: `2201045` (K-105) | Live QR coupon, absence declarations, guest meal bookings, feedback |
-| **Student 2** | `priya.kumari18@nitp.ac.in`| `Password@123` | Roll: `2201019` (G-119) | Secondary student account for multi-resident testing |
+| **Super Admin** | `admin@messmate.edu` | `Password@123` | Platform-wide | Provision hostels, mess facilities, user role reassignment |
+| **Hostel Warden (Boys)** | `warden@messmate.edu` | `Password@123` | Kautilya Hostel | SLA compliance tracking, confidential grievance review, waste audits |
+| **Hostel Warden (Girls)**| `warden.kadambini@messmate.edu` | `Password@123` | Kadambini Hostel | Girls hostel oversight, grievance escalation & compliance tracking |
+| **Mess Manager (Boys)** | `manager@messmate.edu` | `Password@123` | Kautilya Central Mess | Demand forecasting, cooking quantity approval, stock inventory, menus |
+| **Mess Manager (Girls)**| `manager.kadambini@messmate.edu`| `Password@123` | Kadambini Dining Facility | Demand forecasting, menu curation, inventory receipts |
+| **Mess Staff** | `staff@messmate.edu` | `Password@123` | Kautilya Kitchen Floor | QR coupon camera scanner, manual roll search, scale waste logging |
+| **Student (Male - Boys)** | `student@messmate.edu` | `Password@123` | Kautilya (K-103) | Live QR coupon, absence declarations, guest meal bookings, feedback |
+| **Student (Female - Girls)**| `priya.kumari@messmate.edu` | `Password@123` | Kadambini (KD-108) | Girls hostel resident testing, QR scans, meal feedback |
+
+### 🏢 Configured Hostels & Messes
+- **Kautilya Hostel (Boys)**: `H-KAUTILYA` • Kautilya Central Mess Block
+- **Nagarjuna Hostel (Boys)**: `H-NAGARJUNA` • Nagarjuna Dining Hall
+- **Aryabhatta Hostel (Boys)**: `H-ARYABHATTA` • Aryabhatta Food Court
+- **Kadambini Hostel (Girls)**: `H-KADAMBINI` • Kadambini Dining Facility
 
 ---
 
@@ -85,7 +92,7 @@ VITE_SOCKET_URL=http://localhost:5000
 ```
 
 ### 3. Database Seeding
-Populate 2 Hostels, 2 Mess Facilities, complete 7-day menus (42 slots), 30 students, 7 days of historical attendance and waste scale logs, and 10 inventory items:
+Populate 4 Hostels (Kautilya, Nagarjuna, Aryabhatta, Kadambini), 4 Mess Facilities, complete 7-day menus (84 slots), 30 students (18 boys, 12 girls), 7 days of historical attendance and waste scale logs, and 10 inventory commodities:
 ```bash
 cd server
 npm run seed

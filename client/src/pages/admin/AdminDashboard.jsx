@@ -54,6 +54,7 @@ export const AdminDashboard = () => {
     email: '',
     password: '',
     role: 'student',
+    gender: 'male',
     rollNumber: '',
     roomNumber: '',
     phone: '',
@@ -149,6 +150,7 @@ export const AdminDashboard = () => {
           email: '',
           password: '',
           role: 'student',
+          gender: 'male',
           rollNumber: '',
           roomNumber: '',
           phone: '',
@@ -182,6 +184,7 @@ export const AdminDashboard = () => {
         firstName: editingUser.firstName,
         lastName: editingUser.lastName,
         role: editingUser.role,
+        gender: editingUser.gender,
         hostel: editingUser.hostel || null,
         mess: editingUser.mess || null,
         roomNumber: editingUser.roomNumber,
@@ -632,6 +635,31 @@ export const AdminDashboard = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Gender</label>
+                  <select
+                    value={newUserData.gender || 'male'}
+                    onChange={(e) => setNewUserData({ ...newUserData, gender: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                  >
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Room Number</label>
+                  <input
+                    type="text"
+                    value={newUserData.roomNumber}
+                    onChange={(e) => setNewUserData({ ...newUserData, roomNumber: e.target.value })}
+                    placeholder="e.g. K-104, KD-201"
+                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">Hostel</label>
                   <select
                     value={newUserData.hostel}
@@ -738,6 +766,30 @@ export const AdminDashboard = () => {
                   <option value="warden">Hostel Warden</option>
                   <option value="admin">System Admin</option>
                 </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Gender</label>
+                  <select
+                    value={editingUser.gender || 'male'}
+                    onChange={(e) => setEditingUser({ ...editingUser, gender: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                  >
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Room Number</label>
+                  <input
+                    type="text"
+                    value={editingUser.roomNumber || ''}
+                    onChange={(e) => setEditingUser({ ...editingUser, roomNumber: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 uppercase"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

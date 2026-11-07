@@ -1,4 +1,5 @@
 import { User } from '../models/User.js';
+import { MessFacility } from '../models/MessFacility.js';
 import { AppError } from '../utils/AppError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ROLES } from '../config/constants.js';
@@ -35,7 +36,7 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
 // @route   POST /api/v1/auth/register
 // @access  Public
 export const register = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password, rollNumber, phone, hostel } = req.body;
+  const { firstName, lastName, email, password, rollNumber, phone, hostel, gender, roomNumber } = req.body;
 
   // Check if email already in use
   const existingUser = await User.findOne({ email });
@@ -55,6 +56,15 @@ export const register = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Automatically link student to the corresponding Mess Facility of their chosen hostel
+  let messId = null;
+  if (hostel) {
+    const messFacility = await MessFacility.findOne({ hostel, isActive: true });
+    if (messFacility) {
+      messId = messFacility._id;
+    }
+  }
+
   // Students are the default self-registration role
   const user = await User.create({
     firstName,
@@ -64,7 +74,10 @@ export const register = asyncHandler(async (req, res, next) => {
     role: ROLES.STUDENT,
     rollNumber: rollNumber ? rollNumber.toUpperCase() : undefined,
     phone,
+    gender: ['male', 'female', 'other'].includes(gender?.toLowerCase()) ? gender.toLowerCase() : 'male',
+    roomNumber: roomNumber ? roomNumber.trim() : '',
     hostel: hostel || null,
+    mess: messId,
     lastLogin: new Date()
   });
 
@@ -137,7 +150,7 @@ export const getMe = asyncHandler(async (req, res) => {
 // @route   PUT /api/v1/auth/profile
 // @access  Authenticated
 export const updateProfile = asyncHandler(async (req, res) => {
-  const { firstName, lastName, phone, avatarUrl } = req.body;
+  const { firstName, lastName, phone, avatarUrl, gender, roomNumber } = req.body;
 
   const user = await User.findById(req.user._id);
 
@@ -145,6 +158,10 @@ export const updateProfile = asyncHandler(async (req, res) => {
   if (lastName) user.lastName = lastName.trim();
   if (phone !== undefined) user.phone = phone.trim();
   if (avatarUrl !== undefined) user.avatarUrl = avatarUrl;
+  if (gender && ['male', 'female', 'other'].includes(gender.toLowerCase())) {
+    user.gender = gender.toLowerCase();
+  }
+  if (roomNumber !== undefined) user.roomNumber = roomNumber.trim();
 
   await user.save();
 

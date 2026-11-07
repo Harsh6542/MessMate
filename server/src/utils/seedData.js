@@ -166,37 +166,41 @@ const sampleWeeklyMenu = [
   }
 ];
 
-const studentNames = [
-  { first: 'Aarav', last: 'Sharma' },
-  { first: 'Aditi', last: 'Verma' },
-  { first: 'Akash', last: 'Gupta' },
-  { first: 'Ananya', last: 'Mishra' },
-  { first: 'Ayush', last: 'Singh' },
-  { first: 'Bhavna', last: 'Patel' },
-  { first: 'Chirag', last: 'Jha' },
-  { first: 'Deepak', last: 'Choudhary' },
-  { first: 'Divya', last: 'Sinha' },
-  { first: 'Gaurav', last: 'Kumar' },
-  { first: 'Harsh', last: 'Pandey' },
-  { first: 'Ishita', last: 'Roy' },
-  { first: 'Kunal', last: 'Yadav' },
-  { first: 'Manish', last: 'Tiwari' },
-  { first: 'Neha', last: 'Kashyap' },
-  { first: 'Nikhil', last: 'Rao' },
-  { first: 'Pooja', last: 'Kumari' },
-  { first: 'Prateek', last: 'Saxena' },
-  { first: 'Priya', last: 'Kumari' },
-  { first: 'Rahul', last: 'Tripathi' },
-  { first: 'Rhea', last: 'Menon' },
-  { first: 'Rishabh', last: 'Chauhan' },
-  { first: 'Rohan', last: 'Bose' },
-  { first: 'Sakshi', last: 'Agrawal' },
-  { first: 'Sameer', last: 'Khan' },
-  { first: 'Saurav', last: 'Chatterjee' },
-  { first: 'Shreya', last: 'Ghosh' },
-  { first: 'Sneha', last: 'Reddy' },
-  { first: 'Tanmay', last: 'Das' },
-  { first: 'Utkarsh', last: 'Dubey' }
+// 30 Students with designated gender
+const studentsSeedList = [
+  // Boys (18)
+  { first: 'Aarav', last: 'Sharma', gender: 'male' },
+  { first: 'Akash', last: 'Gupta', gender: 'male' },
+  { first: 'Ayush', last: 'Singh', gender: 'male' }, // Default student demo
+  { first: 'Chirag', last: 'Jha', gender: 'male' },
+  { first: 'Deepak', last: 'Choudhary', gender: 'male' },
+  { first: 'Gaurav', last: 'Kumar', gender: 'male' },
+  { first: 'Harsh', last: 'Pandey', gender: 'male' },
+  { first: 'Kunal', last: 'Yadav', gender: 'male' },
+  { first: 'Manish', last: 'Tiwari', gender: 'male' },
+  { first: 'Nikhil', last: 'Rao', gender: 'male' },
+  { first: 'Prateek', last: 'Saxena', gender: 'male' },
+  { first: 'Rahul', last: 'Tripathi', gender: 'male' },
+  { first: 'Rishabh', last: 'Chauhan', gender: 'male' },
+  { first: 'Rohan', last: 'Bose', gender: 'male' },
+  { first: 'Sameer', last: 'Khan', gender: 'male' },
+  { first: 'Saurav', last: 'Chatterjee', gender: 'male' },
+  { first: 'Tanmay', last: 'Das', gender: 'male' },
+  { first: 'Utkarsh', last: 'Dubey', gender: 'male' },
+
+  // Girls (12)
+  { first: 'Aditi', last: 'Verma', gender: 'female' },
+  { first: 'Ananya', last: 'Mishra', gender: 'female' },
+  { first: 'Bhavna', last: 'Patel', gender: 'female' },
+  { first: 'Divya', last: 'Sinha', gender: 'female' },
+  { first: 'Ishita', last: 'Roy', gender: 'female' },
+  { first: 'Neha', last: 'Kashyap', gender: 'female' },
+  { first: 'Pooja', last: 'Kumari', gender: 'female' },
+  { first: 'Priya', last: 'Kumari', gender: 'female' }, // Default female student demo
+  { first: 'Rhea', last: 'Menon', gender: 'female' },
+  { first: 'Sakshi', last: 'Agrawal', gender: 'female' },
+  { first: 'Shreya', last: 'Ghosh', gender: 'female' },
+  { first: 'Sneha', last: 'Reddy', gender: 'female' }
 ];
 
 const seed = async () => {
@@ -225,23 +229,46 @@ const seed = async () => {
     ]);
     console.log('[Seed] Database collections purged cleanly.');
 
-    // 2. Create 2 Hostels
-    const kosiHostel = await Hostel.create({
-      name: 'Kosi Hostel',
-      code: 'H-KOSI',
-      address: 'North Campus, NIT Patna',
+    // 2. Create the 4 Hostels: 3 Boys Hostels + 1 Girls Hostel
+    // Boys Hostels: Kautilya Hostel, Nagarjuna Hostel, Aryabhatta Hostel
+    const kautilyaHostel = await Hostel.create({
+      name: 'Kautilya Hostel',
+      code: 'H-KAUTILYA',
+      type: 'boys',
+      address: 'East Campus, NIT Patna',
       capacity: 450,
       isActive: true
     });
 
-    const gangaHostel = await Hostel.create({
-      name: 'Ganga Hall of Residence',
-      code: 'H-GANGA',
-      address: 'Main Campus, NIT Patna',
-      capacity: 550,
+    const nagarjunaHostel = await Hostel.create({
+      name: 'Nagarjuna Hostel',
+      code: 'H-NAGARJUNA',
+      type: 'boys',
+      address: 'West Campus, NIT Patna',
+      capacity: 450,
       isActive: true
     });
-    console.log('[Seed] Hostels created: Kosi Hostel & Ganga Hall of Residence.');
+
+    const aryabhattaHostel = await Hostel.create({
+      name: 'Aryabhatta Hostel',
+      code: 'H-ARYABHATTA',
+      type: 'boys',
+      address: 'Main Academic Campus, NIT Patna',
+      capacity: 500,
+      isActive: true
+    });
+
+    // Girls Hostel: Kadambini Hostel
+    const kadambiniHostel = await Hostel.create({
+      name: 'Kadambini Hostel',
+      code: 'H-KADAMBINI',
+      type: 'girls',
+      address: 'Girls Enclave, NIT Patna',
+      capacity: 400,
+      isActive: true
+    });
+
+    console.log('[Seed] Hostels created: Kautilya, Nagarjuna, Aryabhatta (Boys) & Kadambini (Girls).');
 
     // 3. Create Super Admin
     const admin = await User.create({
@@ -250,49 +277,80 @@ const seed = async () => {
       email: 'admin@messmate.edu',
       password: 'Password@123',
       role: ROLES.ADMIN,
+      gender: 'male',
       phone: '9999900001'
     });
 
-    // 4. Create 2 Hostels Wardens
-    const wardenKosi = await User.create({
+    // 4. Create Hostel Wardens
+    const wardenKautilya = await User.create({
       firstName: 'Dr. Ramesh',
       lastName: 'Verma',
       email: 'warden@messmate.edu',
       password: 'Password@123',
       role: ROLES.WARDEN,
+      gender: 'male',
       phone: '9999900002',
-      hostel: kosiHostel._id
+      hostel: kautilyaHostel._id
     });
-    kosiHostel.warden = wardenKosi._id;
-    await kosiHostel.save();
+    kautilyaHostel.warden = wardenKautilya._id;
+    await kautilyaHostel.save();
 
-    const wardenGanga = await User.create({
-      firstName: 'Dr. Alok',
-      lastName: 'Srivastava',
-      email: 'warden.ganga@messmate.edu',
+    const wardenKadambini = await User.create({
+      firstName: 'Dr. Sunita',
+      lastName: 'Mishra',
+      email: 'warden.kadambini@messmate.edu',
       password: 'Password@123',
       role: ROLES.WARDEN,
+      gender: 'female',
       phone: '9999900003',
-      hostel: gangaHostel._id
+      hostel: kadambiniHostel._id
     });
-    gangaHostel.warden = wardenGanga._id;
-    await gangaHostel.save();
+    kadambiniHostel.warden = wardenKadambini._id;
+    await kadambiniHostel.save();
 
-    // 5. Create 2 Mess Facilities & Managers
-    const managerKosi = await User.create({
+    const wardenNagarjuna = await User.create({
+      firstName: 'Dr. Alok',
+      lastName: 'Srivastava',
+      email: 'warden.nagarjuna@messmate.edu',
+      password: 'Password@123',
+      role: ROLES.WARDEN,
+      gender: 'male',
+      phone: '9999900004',
+      hostel: nagarjunaHostel._id
+    });
+    nagarjunaHostel.warden = wardenNagarjuna._id;
+    await nagarjunaHostel.save();
+
+    const wardenAryabhatta = await User.create({
+      firstName: 'Dr. Bipin',
+      lastName: 'Bihari',
+      email: 'warden.aryabhatta@messmate.edu',
+      password: 'Password@123',
+      role: ROLES.WARDEN,
+      gender: 'male',
+      phone: '9999900005',
+      hostel: aryabhattaHostel._id
+    });
+    aryabhattaHostel.warden = wardenAryabhatta._id;
+    await aryabhattaHostel.save();
+
+    // 5. Create Mess Facilities & Managers for each hostel
+    // Kautilya Mess
+    const managerKautilya = await User.create({
       firstName: 'Suresh',
       lastName: 'Sharma',
       email: 'manager@messmate.edu',
       password: 'Password@123',
       role: ROLES.MESS_MANAGER,
-      phone: '9999900004',
-      hostel: kosiHostel._id
+      gender: 'male',
+      phone: '9999900010',
+      hostel: kautilyaHostel._id
     });
 
-    const kosiMess = await MessFacility.create({
-      name: 'Kosi Central Mess Block',
-      hostel: kosiHostel._id,
-      manager: managerKosi._id,
+    const kautilyaMess = await MessFacility.create({
+      name: 'Kautilya Central Mess Block',
+      hostel: kautilyaHostel._id,
+      manager: managerKautilya._id,
       mealTimings: {
         breakfast: { start: '07:30', end: '09:30' },
         lunch: { start: '12:30', end: '14:30' },
@@ -305,23 +363,56 @@ const seed = async () => {
       },
       billingPolicy: BILLING_POLICIES.FIXED_MONTHLY
     });
-    managerKosi.mess = kosiMess._id;
-    await managerKosi.save();
+    managerKautilya.mess = kautilyaMess._id;
+    await managerKautilya.save();
 
-    const managerGanga = await User.create({
-      firstName: 'Mahesh',
-      lastName: 'Prasad',
-      email: 'manager.ganga@messmate.edu',
+    // Kadambini Mess
+    const managerKadambini = await User.create({
+      firstName: 'Meenakshi',
+      lastName: 'Rao',
+      email: 'manager.kadambini@messmate.edu',
       password: 'Password@123',
       role: ROLES.MESS_MANAGER,
-      phone: '9999900005',
-      hostel: gangaHostel._id
+      gender: 'female',
+      phone: '9999900011',
+      hostel: kadambiniHostel._id
     });
 
-    const gangaMess = await MessFacility.create({
-      name: 'Ganga Dining Complex',
-      hostel: gangaHostel._id,
-      manager: managerGanga._id,
+    const kadambiniMess = await MessFacility.create({
+      name: 'Kadambini Dining Facility',
+      hostel: kadambiniHostel._id,
+      manager: managerKadambini._id,
+      mealTimings: {
+        breakfast: { start: '07:30', end: '09:30' },
+        lunch: { start: '12:30', end: '14:30' },
+        dinner: { start: '19:30', end: '21:30' }
+      },
+      declarationCutoffs: {
+        breakfast: '21:00',
+        lunch: '09:00',
+        dinner: '15:00'
+      },
+      billingPolicy: BILLING_POLICIES.FIXED_MONTHLY
+    });
+    managerKadambini.mess = kadambiniMess._id;
+    await managerKadambini.save();
+
+    // Nagarjuna Mess
+    const managerNagarjuna = await User.create({
+      firstName: 'Mahesh',
+      lastName: 'Prasad',
+      email: 'manager.nagarjuna@messmate.edu',
+      password: 'Password@123',
+      role: ROLES.MESS_MANAGER,
+      gender: 'male',
+      phone: '9999900012',
+      hostel: nagarjunaHostel._id
+    });
+
+    const nagarjunaMess = await MessFacility.create({
+      name: 'Nagarjuna Dining Hall',
+      hostel: nagarjunaHostel._id,
+      manager: managerNagarjuna._id,
       mealTimings: {
         breakfast: { start: '07:30', end: '09:30' },
         lunch: { start: '12:30', end: '14:30' },
@@ -334,15 +425,49 @@ const seed = async () => {
       },
       billingPolicy: BILLING_POLICIES.PER_MEAL
     });
-    managerGanga.mess = gangaMess._id;
-    await managerGanga.save();
+    managerNagarjuna.mess = nagarjunaMess._id;
+    await managerNagarjuna.save();
 
-    // 6. Create 4 Mess Staff Members
+    // Aryabhatta Mess
+    const managerAryabhatta = await User.create({
+      firstName: 'Dharmendra',
+      lastName: 'Singh',
+      email: 'manager.aryabhatta@messmate.edu',
+      password: 'Password@123',
+      role: ROLES.MESS_MANAGER,
+      gender: 'male',
+      phone: '9999900013',
+      hostel: aryabhattaHostel._id
+    });
+
+    const aryabhattaMess = await MessFacility.create({
+      name: 'Aryabhatta Food Court',
+      hostel: aryabhattaHostel._id,
+      manager: managerAryabhatta._id,
+      mealTimings: {
+        breakfast: { start: '07:30', end: '09:30' },
+        lunch: { start: '12:30', end: '14:30' },
+        dinner: { start: '19:30', end: '21:30' }
+      },
+      declarationCutoffs: {
+        breakfast: '21:00',
+        lunch: '09:00',
+        dinner: '15:00'
+      },
+      billingPolicy: BILLING_POLICIES.FIXED_MONTHLY
+    });
+    managerAryabhatta.mess = aryabhattaMess._id;
+    await managerAryabhatta.save();
+
+    console.log('[Seed] Mess facilities & managers created for all 4 hostels.');
+
+    // 6. Create Mess Staff Members
     const staffMembers = [
-      { firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', phone: '9999900006', hostel: kosiHostel._id, mess: kosiMess._id },
-      { firstName: 'Vikram', lastName: 'Yadav', email: 'staff2@messmate.edu', phone: '9999900007', hostel: kosiHostel._id, mess: kosiMess._id },
-      { firstName: 'Sunil', lastName: 'Paswan', email: 'staff.ganga1@messmate.edu', phone: '9999900008', hostel: gangaHostel._id, mess: gangaMess._id },
-      { firstName: 'Santosh', lastName: 'Thakur', email: 'staff.ganga2@messmate.edu', phone: '9999900009', hostel: gangaHostel._id, mess: gangaMess._id }
+      { firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', phone: '9999900020', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
+      { firstName: 'Vikram', lastName: 'Yadav', email: 'staff2@messmate.edu', phone: '9999900021', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
+      { firstName: 'Sunita', lastName: 'Devi', email: 'staff.kadambini@messmate.edu', phone: '9999900022', hostel: kadambiniHostel._id, mess: kadambiniMess._id, gender: 'female' },
+      { firstName: 'Sunil', lastName: 'Paswan', email: 'staff.nagarjuna@messmate.edu', phone: '9999900023', hostel: nagarjunaHostel._id, mess: nagarjunaMess._id, gender: 'male' },
+      { firstName: 'Santosh', lastName: 'Thakur', email: 'staff.aryabhatta@messmate.edu', phone: '9999900024', hostel: aryabhattaHostel._id, mess: aryabhattaMess._id, gender: 'male' }
     ];
 
     const staffDocs = [];
@@ -352,21 +477,58 @@ const seed = async () => {
     }
 
     // 7. Create 30 Students (Roll 2201001 - 2201030)
+    // Male students are distributed among Kautilya (8), Nagarjuna (5), Aryabhatta (5)
+    // Female students (12) are all assigned to Kadambini Hostel
     const studentDocs = [];
-    for (let i = 0; i < studentNames.length; i++) {
+    let boysCount = 0;
+    let girlsCount = 0;
+
+    for (let i = 0; i < studentsSeedList.length; i++) {
+      const s = studentsSeedList[i];
       const rollNum = (2201001 + i).toString();
-      const isKosi = i < 18;
-      const hId = isKosi ? kosiHostel._id : gangaHostel._id;
-      const mId = isKosi ? kosiMess._id : gangaMess._id;
-      const room = `${isKosi ? 'K' : 'G'}-${101 + (i % 25)}`;
+      let hId, mId, room;
+
+      if (s.gender === 'female') {
+        girlsCount++;
+        hId = kadambiniHostel._id;
+        mId = kadambiniMess._id;
+        room = `KD-${100 + girlsCount}`;
+      } else {
+        boysCount++;
+        if (boysCount <= 8) {
+          hId = kautilyaHostel._id;
+          mId = kautilyaMess._id;
+          room = `K-${100 + boysCount}`;
+        } else if (boysCount <= 13) {
+          hId = nagarjunaHostel._id;
+          mId = nagarjunaMess._id;
+          room = `N-${200 + (boysCount - 8)}`;
+        } else {
+          hId = aryabhattaHostel._id;
+          mId = aryabhattaMess._id;
+          room = `A-${300 + (boysCount - 13)}`;
+        }
+      }
+
+      // Default male student demo: Ayush Singh (i === 2) -> student@messmate.edu
+      // Default female student demo: Priya Kumari -> priya.kumari@messmate.edu
+      let email;
+      if (s.first === 'Ayush' && s.last === 'Singh') {
+        email = 'student@messmate.edu';
+      } else if (s.first === 'Priya' && s.last === 'Kumari') {
+        email = 'priya.kumari@messmate.edu';
+      } else {
+        email = `${s.first.toLowerCase()}.${s.last.toLowerCase()}${i}@nitp.ac.in`;
+      }
 
       const st = await User.create({
-        firstName: studentNames[i].first,
-        lastName: studentNames[i].last,
-        email: i === 4 ? 'student@messmate.edu' : `${studentNames[i].first.toLowerCase()}.${studentNames[i].last.toLowerCase()}${i}@nitp.ac.in`,
+        firstName: s.first,
+        lastName: s.last,
+        email,
         password: 'Password@123',
         role: ROLES.STUDENT,
         rollNumber: rollNum,
+        gender: s.gender,
         roomNumber: room,
         phone: `98765${(10000 + i).toString()}`,
         hostel: hId,
@@ -374,88 +536,95 @@ const seed = async () => {
       });
       studentDocs.push(st);
     }
-    console.log(`[Seed] Created 30 Student accounts (Rolls 2201001 to 2201030).`);
+    console.log(`[Seed] Created 30 Student accounts: 18 Boys (Kautilya, Nagarjuna, Aryabhatta) & 12 Girls (Kadambini).`);
 
-    // 8. Populate Menus for both messes
+    // 8. Populate Menus for all 4 mess facilities
+    const allMesses = [kautilyaMess._id, kadambiniMess._id, nagarjunaMess._id, aryabhattaMess._id];
     for (const item of sampleWeeklyMenu) {
-      for (const mId of [kosiMess._id, gangaMess._id]) {
+      for (const mId of allMesses) {
         for (const type of [MEAL_TYPES.BREAKFAST, MEAL_TYPES.LUNCH, MEAL_TYPES.DINNER]) {
           await Menu.create({
             mess: mId,
             dayOfWeek: item.day,
             mealType: type,
             dishes: item[type],
-            createdBy: managerKosi._id
+            createdBy: managerKautilya._id
           });
         }
       }
     }
-    console.log('[Seed] Populated complete 7-day weekly menu for both mess facilities (42 slots).');
+    console.log('[Seed] Populated complete 7-day weekly menu for all 4 mess facilities (84 slots).');
 
-    // 9. Generate Daily Sessions for Today + Past 6 Days (with realistic attendance & waste)
+    // 9. Generate Daily Sessions for Today + Past 6 Days for Kautilya Mess & Kadambini Mess
     const today = normalizeDate(new Date());
 
-    for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
-      const sessionDate = new Date(today);
-      sessionDate.setUTCDate(sessionDate.getUTCDate() - dayOffset);
+    for (const activeMess of [kautilyaMess._id, kadambiniMess._id]) {
+      const isKautilya = activeMess.toString() === kautilyaMess._id.toString();
+      const messStaff = isKautilya ? staffDocs[0]._id : staffDocs[2]._id;
+      const eligibleStudents = studentDocs.filter(
+        (st) => st.mess.toString() === activeMess.toString()
+      );
 
-      const sessions = await ensureDailySessions(kosiMess._id, sessionDate);
+      for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
+        const sessionDate = new Date(today);
+        sessionDate.setUTCDate(sessionDate.getUTCDate() - dayOffset);
 
-      for (const sess of sessions) {
-        // Compute realistic attendance
-        const eligibleCount = 18; // Kosi students
-        let optOuts = 0;
-        let actualServed = 0;
+        const sessions = await ensureDailySessions(activeMess, sessionDate);
 
-        if (dayOffset > 0) {
-          sess.status = MEAL_SESSION_STATUS.COMPLETED;
-          // Randomly create opt-outs for 2-3 students
-          optOuts = Math.floor(Math.random() * 3) + 1;
-          actualServed = Math.max(12, eligibleCount - optOuts);
-          sess.optOutCount = optOuts;
-          sess.declaredDemand = eligibleCount - optOuts;
-          sess.managerAdjustedQuantity = sess.declaredDemand;
-          sess.actualServedCount = actualServed;
-          await sess.save();
+        for (const sess of sessions) {
+          const eligibleCount = eligibleStudents.length || 8;
+          let optOuts = 0;
+          let actualServed = 0;
 
-          // Create Attendance records for served students in batch for fast execution
-          const attendanceBatch = [];
-          for (let sIdx = 0; sIdx < actualServed; sIdx++) {
-            attendanceBatch.push({
-              student: studentDocs[sIdx]._id,
+          if (dayOffset > 0) {
+            sess.status = MEAL_SESSION_STATUS.COMPLETED;
+            optOuts = Math.min(2, Math.floor(Math.random() * 2));
+            actualServed = Math.max(1, eligibleCount - optOuts);
+            sess.optOutCount = optOuts;
+            sess.declaredDemand = eligibleCount - optOuts;
+            sess.managerAdjustedQuantity = sess.declaredDemand;
+            sess.actualServedCount = actualServed;
+            await sess.save();
+
+            // Create Attendance records
+            const attendanceBatch = [];
+            for (let sIdx = 0; sIdx < actualServed && sIdx < eligibleStudents.length; sIdx++) {
+              attendanceBatch.push({
+                student: eligibleStudents[sIdx]._id,
+                mealSession: sess._id,
+                verifiedBy: messStaff,
+                verificationMethod: sIdx % 4 === 0 ? 'admin_override' : 'qr_scan',
+                timestamp: new Date(sess.startTime.getTime() + sIdx * 60000)
+              });
+            }
+            if (attendanceBatch.length > 0) {
+              await Attendance.insertMany(attendanceBatch);
+            }
+
+            // Create Waste Log
+            const surplusKg = Math.round((Math.random() * 3 + 1) * 10) / 10;
+            const plateKg = Math.round((Math.random() * 2 + 0.5) * 10) / 10;
+            const costLost = Math.round(surplusKg * 50 + plateKg * 35);
+
+            await WasteLog.create({
               mealSession: sess._id,
-              verifiedBy: staffDocs[0]._id,
-              verificationMethod: sIdx % 4 === 0 ? 'admin_override' : 'qr_scan',
-              timestamp: new Date(sess.startTime.getTime() + sIdx * 60000)
+              mess: activeMess,
+              totalPreparedServings: sess.managerAdjustedQuantity,
+              totalActualServed: actualServed,
+              unservedSurplusWeightKg: surplusKg,
+              plateWasteWeightKg: plateKg,
+              estimatedCostLostINR: costLost,
+              disposalMethod: surplusKg > 3 ? 'biogas' : 'compost',
+              remarks: 'Standard session weight measurement verified on kitchen digital scale.',
+              recordedBy: messStaff
             });
           }
-          if (attendanceBatch.length > 0) {
-            await Attendance.insertMany(attendanceBatch);
-          }
-
-          // Create Waste Log
-          const surplusKg = Math.round((Math.random() * 4 + 1) * 10) / 10;
-          const plateKg = Math.round((Math.random() * 3 + 0.8) * 10) / 10;
-          const costLost = Math.round(surplusKg * 50 + plateKg * 35);
-
-          await WasteLog.create({
-            mealSession: sess._id,
-            mess: kosiMess._id,
-            totalPreparedServings: sess.managerAdjustedQuantity,
-            totalActualServed: actualServed,
-            unservedSurplusWeightKg: surplusKg,
-            plateWasteWeightKg: plateKg,
-            estimatedCostLostINR: costLost,
-            disposalMethod: surplusKg > 3 ? 'biogas' : 'compost',
-            remarks: 'Standard session weight measurement verified on kitchen digital scale.',
-            recordedBy: staffDocs[0]._id
-          });
         }
       }
     }
     console.log('[Seed] Populated 7 days of historical MealSessions, Attendance scans, and WasteLogs.');
 
-    // 10. Populate Raw Inventory Items & Initial Purchases
+    // 10. Populate Raw Inventory Items & Initial Purchases for Kautilya Mess
     const inventoryList = [
       { name: 'Basmati Rice (Grade A)', category: 'grain', unit: 'kg', currentStock: 240, minimumThreshold: 50, unitCostEstimate: 45 },
       { name: 'Sharbati Wheat Flour (Atta)', category: 'grain', unit: 'kg', currentStock: 310, minimumThreshold: 60, unitCostEstimate: 36 },
@@ -470,10 +639,10 @@ const seed = async () => {
     ];
 
     for (const it of inventoryList) {
-      const itemDoc = await InventoryItem.create({ ...it, mess: kosiMess._id, lastRestockedAt: new Date() });
+      const itemDoc = await InventoryItem.create({ ...it, mess: kautilyaMess._id, lastRestockedAt: new Date() });
       await StockTransaction.create({
         item: itemDoc._id,
-        mess: kosiMess._id,
+        mess: kautilyaMess._id,
         type: 'purchase',
         quantity: it.currentStock,
         previousStock: 0,
@@ -482,8 +651,8 @@ const seed = async () => {
         vendor: 'Patna Wholesale Grains',
         invoiceNumber: `INV-2026-${Math.floor(Math.random() * 9000 + 1000)}`,
         remarks: 'Monthly opening stock intake',
-        performedBy: managerKosi._id,
-        recordedBy: managerKosi._id
+        performedBy: managerKautilya._id,
+        recordedBy: managerKautilya._id
       });
     }
     console.log('[Seed] Populated 10 Inventory Commodities with low-stock test triggers & stock receipts.');
@@ -508,11 +677,14 @@ const seed = async () => {
     console.log('[Seed] Created verified student feedback records.');
 
     // 12. Populate Grievance / Complaint Tickets with SLA Tracking
+    const ayushStudent = studentDocs.find((s) => s.email === 'student@messmate.edu') || studentDocs[0];
+    const priyaStudent = studentDocs.find((s) => s.email === 'priya.kumari@messmate.edu') || studentDocs[studentDocs.length - 1];
+
     const complaintsSeed = [
       {
         complaintId: 'CMP-2026-0001',
-        complainant: studentDocs[4]._id, // Ayush
-        mess: kosiMess._id,
+        complainant: ayushStudent._id,
+        mess: kautilyaMess._id,
         category: 'hygiene',
         priority: 'high',
         subject: 'Water dispenser filter near dining hall entrance needs cleaning',
@@ -523,8 +695,8 @@ const seed = async () => {
       },
       {
         complaintId: 'CMP-2026-0002',
-        complainant: studentDocs[18]._id, // Priya
-        mess: kosiMess._id,
+        complainant: priyaStudent._id,
+        mess: kadambiniMess._id,
         category: 'food_quality',
         priority: 'medium',
         subject: 'Dal salt proportion in Monday dinner was slightly high',
@@ -535,7 +707,7 @@ const seed = async () => {
         resolvedAt: new Date(),
         responses: [
           {
-            by: managerKosi._id,
+            by: managerKadambini._id,
             role: 'mess_manager',
             message: 'Cooks instructed to use standardized measuring spoons for salt in bulk preparation.',
             isInternal: false,
@@ -555,25 +727,44 @@ const seed = async () => {
       title: 'Special Feast on Friday Evening',
       content: 'A special dinner including Veg Biryani, Kadai Paneer, and Gulab Jamun will be served this Friday from 19:30 to 22:00. Advance opt-out cutoff is Friday 15:00.',
       priority: 'important',
-      hostel: kosiHostel._id,
-      mess: kosiMess._id,
-      publishedBy: wardenKosi._id,
+      hostel: kautilyaHostel._id,
+      mess: kautilyaMess._id,
+      publishedBy: wardenKautilya._id,
       targetRoles: [ROLES.STUDENT, ROLES.MESS_STAFF, ROLES.MESS_MANAGER]
     });
-    console.log('[Seed] Pinned announcement created.');
+
+    await Announcement.create({
+      title: 'Kadambini Mess Routine Hygiene Audit',
+      content: 'Routine monthly deep-cleaning and pest control scheduled this Sunday after lunch session. Dinner service will resume on normal schedule.',
+      priority: 'normal',
+      hostel: kadambiniHostel._id,
+      mess: kadambiniMess._id,
+      publishedBy: wardenKadambini._id,
+      targetRoles: [ROLES.STUDENT, ROLES.MESS_STAFF, ROLES.MESS_MANAGER]
+    });
+    console.log('[Seed] Pinned announcements created for Kautilya & Kadambini.');
 
     console.log('\n======================================================');
     console.log('  MESSMATE COMPREHENSIVE SEEDING COMPLETED');
     console.log('======================================================\n');
-    console.log('Demo Credentials for All 5 Roles:');
+    console.log('NIT Patna Hostels Configured:');
+    console.table([
+      { Hostel: 'Kautilya Hostel', Code: 'H-KAUTILYA', Type: 'Boys', Capacity: 450, Mess: 'Kautilya Central Mess Block' },
+      { Hostel: 'Nagarjuna Hostel', Code: 'H-NAGARJUNA', Type: 'Boys', Capacity: 450, Mess: 'Nagarjuna Dining Hall' },
+      { Hostel: 'Aryabhatta Hostel', Code: 'H-ARYABHATTA', Type: 'Boys', Capacity: 500, Mess: 'Aryabhatta Food Court' },
+      { Hostel: 'Kadambini Hostel', Code: 'H-KADAMBINI', Type: 'Girls', Capacity: 400, Mess: 'Kadambini Dining Facility' }
+    ]);
+
+    console.log('\nDemo Credentials for All Roles:');
     console.table([
       { Role: 'Super Admin', Email: 'admin@messmate.edu', Password: 'Password@123', Access: 'Platform-wide' },
-      { Role: 'Hostel Warden', Email: 'warden@messmate.edu', Password: 'Password@123', Access: 'Kosi Hostel' },
-      { Role: 'Warden (Ganga)', Email: 'warden.ganga@messmate.edu', Password: 'Password@123', Access: 'Ganga Hall' },
-      { Role: 'Mess Manager', Email: 'manager@messmate.edu', Password: 'Password@123', Access: 'Kosi Central Mess' },
-      { Role: 'Mess Staff', Email: 'staff@messmate.edu', Password: 'Password@123', Access: 'Kosi Scanner & Scale' },
-      { Role: 'Student 1', Email: 'student@messmate.edu', Password: 'Password@123', Roll: '2201045' },
-      { Role: 'Student 2 (Priya)', Email: 'priya.kumari18@nitp.ac.in', Password: 'Password@123', Roll: '2201019' }
+      { Role: 'Hostel Warden (Kautilya)', Email: 'warden@messmate.edu', Password: 'Password@123', Access: 'Kautilya Hostel (Boys)' },
+      { Role: 'Hostel Warden (Kadambini)', Email: 'warden.kadambini@messmate.edu', Password: 'Password@123', Access: 'Kadambini Hostel (Girls)' },
+      { Role: 'Mess Manager (Kautilya)', Email: 'manager@messmate.edu', Password: 'Password@123', Access: 'Kautilya Central Mess' },
+      { Role: 'Mess Manager (Kadambini)', Email: 'manager.kadambini@messmate.edu', Password: 'Password@123', Access: 'Kadambini Mess' },
+      { Role: 'Mess Staff (Kautilya)', Email: 'staff@messmate.edu', Password: 'Password@123', Access: 'Kautilya Scanner & Scale' },
+      { Role: 'Student (Male - Kautilya)', Email: 'student@messmate.edu', Password: 'Password@123', Roll: ayushStudent.rollNumber },
+      { Role: 'Student (Female - Kadambini)', Email: 'priya.kumari@messmate.edu', Password: 'Password@123', Roll: priyaStudent.rollNumber }
     ]);
 
     process.exit(0);
