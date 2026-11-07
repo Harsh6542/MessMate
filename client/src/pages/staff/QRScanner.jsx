@@ -15,9 +15,7 @@ import {
   Sparkles,
   Camera,
   CameraOff,
-  ArrowLeft,
-  Flame,
-  Check
+  ArrowLeft
 } from 'lucide-react';
 
 const playSuccessBeep = () => {
@@ -39,15 +37,6 @@ const playSuccessBeep = () => {
   } catch {}
 };
 
-const SPECIAL_ITEMS_OPTIONS = [
-  { id: 'chicken_curry', name: 'Special Chicken Curry / Roast', icon: '🍗' },
-  { id: 'egg_curry_dahi', name: 'Egg Curry & Sweet Curd (Dahi)', icon: '🥚' },
-  { id: 'paneer_special', name: 'Shahi Paneer / Kadai Paneer', icon: '🧀' },
-  { id: 'sweet_dahi_dessert', name: 'Sweet Curd (Dahi) & Dessert', icon: '🥣' },
-  { id: 'weekend_special', name: 'Weekend Special (Fish / Mutton)', icon: '🐟' },
-  { id: 'custom_special', name: 'General Special Mess Food Item', icon: '⭐' }
-];
-
 export const QRScanner = () => {
   const [scanResult, setScanResult] = useState(null);
   const [scanError, setScanError] = useState('');
@@ -55,9 +44,8 @@ export const QRScanner = () => {
   const [scannedCount, setScannedCount] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(true);
 
-  // Scanner Mode: 'regular' (Free entry) or 'special' (₹500 coupon deduction)
-  const [scanMode, setScanMode] = useState('regular'); // 'regular' | 'special'
-  const [selectedSpecialItem, setSelectedSpecialItem] = useState(SPECIAL_ITEMS_OPTIONS[0]);
+  // Scanner Mode: 'regular' (Free entry) or 'coupon' (₹500 coupon deduction)
+  const [scanMode, setScanMode] = useState('regular'); // 'regular' | 'coupon'
 
   const scannerRef = useRef(null);
 
@@ -106,12 +94,10 @@ export const QRScanner = () => {
             setScanError('');
             setScanResult(null);
 
-            const isSpecial = scanMode === 'special';
+            const isCouponMode = scanMode === 'coupon';
             const res = await api.post('/coupons/verify', {
               qrPayload: decodedText,
-              isSpecialItem: isSpecial,
-              specialItemId: isSpecial ? selectedSpecialItem?.id : undefined,
-              specialItemName: isSpecial ? selectedSpecialItem?.name : undefined
+              isCoupon: isCouponMode
             });
 
             if (res.success && res.data) {
@@ -140,7 +126,7 @@ export const QRScanner = () => {
       stopAllWebcamTracks(scannerRef.current);
       scannerRef.current = null;
     };
-  }, [isCameraActive, scanMode, selectedSpecialItem]);
+  }, [isCameraActive, scanMode]);
 
   // Teardown camera on beforeunload
   useEffect(() => {
@@ -190,7 +176,7 @@ export const QRScanner = () => {
           </div>
           <h1 className="text-2xl font-black text-slate-100 tracking-tight">Mess QR Counter Scanner</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Scan student QR code for regular meal entry (Free) or special item redemption (₹500).
+            Scan student QR code for regular meal entry (Free) or mess coupon redemption (₹500).
           </p>
         </div>
 
@@ -224,12 +210,12 @@ export const QRScanner = () => {
         </div>
       </div>
 
-      {/* ── COUNTER MODE SWITCHER (REGULAR FREE VS SPECIAL EXTRA) ── */}
-      <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
+      {/* ── COUNTER MODE SWITCHER ── */}
+      <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
         <div className="flex items-center justify-between text-xs font-bold text-slate-300">
-          <span>Counter Verification Mode:</span>
+          <span>Verification Mode:</span>
           <span className="text-[11px] text-slate-400">
-            {scanMode === 'regular' ? 'Standard Free Meals' : 'Special Extra Add-ons'}
+            {scanMode === 'regular' ? 'Standard Free Meals' : 'Redeem Mess Coupon'}
           </span>
         </div>
 
@@ -247,47 +233,24 @@ export const QRScanner = () => {
           </button>
 
           <button
-            onClick={() => setScanMode('special')}
+            onClick={() => setScanMode('coupon')}
             className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border ${
-              scanMode === 'special'
+              scanMode === 'coupon'
                 ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md'
                 : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'
             }`}
           >
-            <Flame className="w-3.5 h-3.5" />
-            Special Item (Redeem ₹500)
+            <Sparkles className="w-3.5 h-3.5" />
+            Redeem Coupon (₹500)
           </button>
         </div>
-
-        {/* If Special mode is active, choose item */}
-        {scanMode === 'special' && (
-          <div className="pt-2 border-t border-slate-800 space-y-1.5">
-            <span className="text-[11px] text-amber-300 font-semibold block">
-              Special Item to Issue:
-            </span>
-            <select
-              value={selectedSpecialItem.id}
-              onChange={(e) => {
-                const found = SPECIAL_ITEMS_OPTIONS.find((it) => it.id === e.target.value);
-                if (found) setSelectedSpecialItem(found);
-              }}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-amber-400"
-            >
-              {SPECIAL_ITEMS_OPTIONS.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.icon} {item.name} (1 Coupon / ₹500)
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
       </div>
 
       {/* Verification Result Notification Card */}
       {scanResult && (
         <div
           className={`p-5 rounded-3xl shadow-xl space-y-3 animate-fade-in ${
-            scanResult.isSpecialItem
+            scanResult.isCoupon
               ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950'
               : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950'
           }`}
@@ -299,8 +262,8 @@ export const QRScanner = () => {
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider bg-slate-950/20 px-2 py-0.5 rounded-md">
-                  {scanResult.isSpecialItem
-                    ? 'Special Item Redeemed (-₹500)'
+                  {scanResult.isCoupon
+                    ? 'Mess Coupon Redeemed (-₹500)'
                     : 'Regular Meal Verified (Included in Fees)'}
                 </span>
                 <h2 className="text-xl font-black mt-1 leading-tight">
@@ -310,11 +273,6 @@ export const QRScanner = () => {
                   Roll: {scanResult.student?.rollNumber} • Room: {scanResult.student?.roomNumber || 'N/A'} •{' '}
                   {scanResult.mealSession?.mealType?.toUpperCase()}
                 </p>
-                {scanResult.specialItemName && (
-                  <p className="text-xs font-black text-slate-950 mt-1">
-                    Item Issued: {scanResult.specialItemName}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -327,12 +285,12 @@ export const QRScanner = () => {
             </button>
           </div>
 
-          {/* Student Special Wallet Balance status */}
+          {/* Student Wallet Status */}
           {wallet && (
             <div className="pt-2 border-t border-slate-950/15 flex items-center justify-between text-xs font-bold text-slate-950">
               <span className="flex items-center gap-1.5">
                 <Wallet className="w-3.5 h-3.5" />
-                Special Balance: ₹{wallet.balanceAmount} ({Math.max(0, wallet.totalCouponsAllocated - wallet.couponsUsed)} left)
+                Remaining Balance: ₹{wallet.balanceAmount} ({Math.max(0, wallet.totalCouponsAllocated - wallet.couponsUsed)} coupons left)
               </span>
               <span className="bg-slate-950/20 px-2 py-0.5 rounded-lg text-[11px]">
                 Month: {wallet.currentMonthCouponsUsed} / {wallet.monthlyMaxCoupons || 2} (Max ₹1,000/mo)

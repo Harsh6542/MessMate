@@ -285,7 +285,7 @@ export const StaffDashboard = () => {
                   >
                     <div>
                       <p className="font-bold text-slate-100 text-xs text-amber-300">
-                        {pay.specialItemName || 'Special Food Add-on'}
+                        {pay.specialItemName || 'Mess Coupon (₹500)'}
                       </p>
                       <p className="text-[11px] text-slate-200 font-bold">
                         {pay.student?.name || `${pay.student?.firstName || ''} ${pay.student?.lastName || ''}`.trim() || 'Student'}
@@ -425,7 +425,7 @@ export const StaffDashboard = () => {
                 {messInfo?.name || 'Mess Dining Counter'}
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Scan & Pay for Special Food Items (Chicken, Egg, Dahi, Paneer)
+                Scan & Pay 1 Mess Coupon (₹500)
               </p>
             </div>
 
@@ -440,7 +440,7 @@ export const StaffDashboard = () => {
             </div>
 
             <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs text-slate-300 space-y-1">
-              <p className="font-bold text-amber-300">Special Items: ₹500 (1 Coupon)</p>
+              <p className="font-bold text-amber-300">Mess Coupon: ₹500 (1 Coupon)</p>
               <p className="text-[11px] text-emerald-400 font-semibold">
                 Regular daily meals are 100% Free (Covered by hostel fee)
               </p>
