@@ -8,10 +8,33 @@ const api = axios.create({
   }
 });
 
-// Response interceptor for unified error message extraction
+// Request interceptor to attach Bearer token from localStorage
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('messmate_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor for unified error message extraction and token sync
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    // Automatically save token if returned by any auth response
+    if (response.data?.token) {
+      localStorage.setItem('messmate_token', response.data.token);
+    }
+    return response.data;
+  },
   (error) => {
+    // If unauthorized, clear stale token
+    if (error.response?.status === 401) {
+      localStorage.removeItem('messmate_token');
+    }
+
     const customMessage =
       error.response?.data?.error?.message ||
       error.response?.data?.message ||
@@ -22,4 +45,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-

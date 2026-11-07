@@ -91,9 +91,12 @@ export const Login = () => {
             <label className="block text-xs font-medium text-slate-300">
               Password
             </label>
-            <span className="text-[11px] text-emerald-400 hover:text-emerald-300 cursor-pointer">
+            <Link
+              to="/forgot-password"
+              className="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
+            >
               Forgot password?
-            </span>
+            </Link>
           </div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">

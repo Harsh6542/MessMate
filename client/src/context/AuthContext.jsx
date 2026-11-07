@@ -30,8 +30,12 @@ export const AuthProvider = ({ children }) => {
 
   // Login handler
   const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const res = await api.post('/auth/login', { email: normalizedEmail, password });
     if (res.success && res.data?.user) {
+      if (res.token) {
+        localStorage.setItem('messmate_token', res.token);
+      }
       setUser(res.data.user);
       return res.data.user;
     }
@@ -40,8 +44,15 @@ export const AuthProvider = ({ children }) => {
 
   // Student registration handler
   const register = async (userData) => {
-    const res = await api.post('/auth/register', userData);
+    const payload = {
+      ...userData,
+      email: (userData.email || '').trim().toLowerCase()
+    };
+    const res = await api.post('/auth/register', payload);
     if (res.success && res.data?.user) {
+      if (res.token) {
+        localStorage.setItem('messmate_token', res.token);
+      }
       setUser(res.data.user);
       return res.data.user;
     }
@@ -53,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post('/auth/logout');
     } finally {
+      localStorage.removeItem('messmate_token');
       setUser(null);
     }
   };
