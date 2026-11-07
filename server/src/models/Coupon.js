@@ -25,6 +25,25 @@ const couponSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    amount: {
+      type: Number,
+      default: 500
+    },
+    transactionId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true
+    },
+    paymentMethod: {
+      type: String,
+      enum: ['student_scan_counter', 'staff_scan_student', 'manual_verify'],
+      default: 'student_scan_counter'
+    },
+    semester: {
+      type: String,
+      default: '2026-SPRING'
+    },
     status: {
       type: String,
       enum: Object.values(COUPON_STATUS),

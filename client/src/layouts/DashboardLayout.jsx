@@ -22,7 +22,8 @@ import {
   ScanLine,
   FileSpreadsheet,
   ShieldCheck,
-  Check
+  Check,
+  Wallet
 } from 'lucide-react';
 
 export const DashboardLayout = () => {
@@ -46,7 +47,7 @@ export const DashboardLayout = () => {
           { name: 'Dashboard', path: '/student/dashboard', icon: LayoutDashboard },
           { name: 'Weekly Menu', path: '/student/menu', icon: Calendar },
           { name: 'Meal Declaration', path: '/student/declarations', icon: Calendar },
-          { name: 'Digital Coupon', path: '/student/coupon', icon: QrCode },
+          { name: 'Wallet & Pay Coupon', path: '/student/coupon', icon: Wallet },
           { name: 'Guest Meal Booking', path: '/student/guest-meals', icon: Users },
           { name: 'Feedback & Ratings', path: '/student/feedback', icon: Star },
           { name: 'Grievance / Complaints', path: '/student/complaints', icon: AlertCircle }

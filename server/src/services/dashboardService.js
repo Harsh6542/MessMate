@@ -126,7 +126,19 @@ export const getStudentDashboardData = async (user) => {
     },
     guestRequests,
     recentComplaints,
-    announcements
+    announcements,
+    couponWallet: {
+      semesterTotalAmount: user.couponWallet?.semesterTotalAmount || 6000,
+      balanceAmount: typeof user.couponWallet?.balanceAmount === 'number' ? user.couponWallet.balanceAmount : 6000,
+      couponsUsed: user.couponWallet?.couponsUsed || 0,
+      totalCouponsAllocated: user.couponWallet?.totalCouponsAllocated || 12,
+      couponsRemaining: Math.max(0, (user.couponWallet?.totalCouponsAllocated || 12) - (user.couponWallet?.couponsUsed || 0)),
+      currentMonthCouponsUsed: user.couponWallet?.currentMonthCouponsUsed || 0,
+      monthlyCouponsRemaining: Math.max(0, (user.couponWallet?.monthlyMaxCoupons || 2) - (user.couponWallet?.currentMonthCouponsUsed || 0)),
+      monthlyMaxCoupons: user.couponWallet?.monthlyMaxCoupons || 2,
+      couponValue: user.couponWallet?.couponValue || 500
+    },
+    uniqueStudentQR: user.uniqueStudentQR || `MESSMATE:STUDENT:${user._id}:${user.rollNumber || 'STU'}`
   };
 };
 
@@ -200,7 +212,15 @@ export const getStaffDashboardData = async (staffUser) => {
     }
   }
 
+  const messDoc = await MessFacility.findById(messId);
+  const counterQR = messDoc?.counterQR || `MESSMATE:COUNTER:${messId}:${encodeURIComponent((messDoc?.name || 'Mess').replace(/\s+/g, '_'))}`;
+
   return {
+    messInfo: {
+      id: messId,
+      name: messDoc?.name || 'Assigned Mess',
+      counterQR
+    },
     activeSession: activeStats,
     todayBreakdown,
     recentScans,

@@ -1,180 +1,661 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import {
+  Wallet,
   QrCode,
-  Clock,
+  ScanLine,
   CheckCircle2,
-  AlertTriangle,
+  AlertCircle,
+  Clock,
+  Sparkles,
+  ArrowUpRight,
+  ShieldCheck,
   RefreshCw,
   Utensils,
+  Receipt,
   User,
-  ShieldCheck
+  CreditCard,
+  Building2,
+  X,
+  ChevronRight
 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+
+// Synthetic UPI / PhonePe style chime using Web Audio API
+const playPaymentSuccessChime = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    // Two-tone cheerful success chime: E5 (659Hz) -> A5 (880Hz) -> C#6 (1108Hz)
+    osc.frequency.setValueAtTime(659.25, now);
+    osc.frequency.setValueAtTime(880.0, now + 0.1);
+    osc.frequency.setValueAtTime(1108.73, now + 0.22);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.7);
+  } catch {
+    // Non-fatal if browser blocks audio autoplay
+  }
+};
 
 export const DigitalCoupon = () => {
   const { user } = useAuth();
-  const [couponData, setCouponData] = useState(null);
-  const [sessionData, setSessionData] = useState(null);
+  const [walletData, setWalletData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [timeLeft, setTimeLeft] = useState('');
+  const [activeTab, setActiveTab] = useState('scan_pay'); // 'scan_pay' | 'my_qr' | 'history'
 
-  const loadCoupon = async () => {
+  // Scanner & Payment state
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannedPayload, setScannedPayload] = useState(null);
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentSuccessData, setPaymentSuccessData] = useState(null);
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const scannerRef = useRef(null);
+
+  // Fetch student wallet and transaction passbook
+  const fetchWallet = async () => {
     try {
       setLoading(true);
-      setErrorMsg('');
-      const res = await api.post('/coupons/generate');
-      if (res.success && res.data?.coupon) {
-        setCouponData(res.data.coupon);
-        setSessionData(res.data.session);
+      const res = await api.get('/coupons/wallet');
+      const data = res?.data || res;
+      if (res?.success || data?.wallet) {
+        setWalletData(data);
+        if (data.recentTransactions) {
+          setRecentTransactions(data.recentTransactions);
+        }
       }
     } catch (err) {
-      setErrorMsg(err.message || 'Unable to retrieve meal coupon');
+      toast.error(err.message || 'Failed to load coupon wallet');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCoupon();
+    fetchWallet();
   }, []);
 
-  // Expiration countdown ticker
+  // Initialize html5-qrcode scanner when scanner modal/view opens
   useEffect(() => {
-    if (!couponData?.expiresAt) return;
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const expiry = new Date(couponData.expiresAt).getTime();
-      const distance = expiry - now;
-
-      if (distance < 0) {
-        setTimeLeft('Coupon Expired');
-        clearInterval(timer);
-      } else {
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        setTimeLeft(`${hours > 0 ? hours + 'h ' : ''}${minutes}m ${seconds}s`);
+    if (!isScanning) {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
       }
-    }, 1000);
+      return;
+    }
 
-    return () => clearInterval(timer);
-  }, [couponData]);
+    const timer = setTimeout(() => {
+      try {
+        const scanner = new Html5QrcodeScanner(
+          'student-counter-reader',
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+            showTorchButtonIfSupported: true
+          },
+          false
+        );
+
+        scannerRef.current = scanner;
+
+        const onScanSuccess = (decodedText) => {
+          handleDetectedCounterQR(decodedText);
+        };
+
+        const onScanFailure = () => {
+          // Frame read fail, ignore
+        };
+
+        scanner.render(onScanSuccess, onScanFailure);
+      } catch (err) {
+        console.error('Camera init error:', err);
+      }
+    }, 150);
+
+    return () => {
+      clearTimeout(timer);
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
+      }
+    };
+  }, [isScanning]);
+
+  const handleDetectedCounterQR = (qrString) => {
+    if (scannerRef.current) {
+      scannerRef.current.clear().catch(console.error);
+      scannerRef.current = null;
+    }
+    setIsScanning(false);
+    setScannedPayload(qrString);
+  };
+
+  // Perform Payment
+  const executePayment = async (counterQRToPay) => {
+    try {
+      setIsPaying(true);
+      const res = await api.post('/coupons/pay-counter', {
+        counterQR: counterQRToPay || scannedPayload
+      });
+
+      const receipt = res?.data || res;
+      if (res?.success || receipt?.transactionId) {
+        playPaymentSuccessChime();
+        setPaymentSuccessData(receipt);
+        setScannedPayload(null);
+        toast.success('Payment of ₹500 Coupon Successful!');
+        fetchWallet(); // Refresh balance and passbook
+      }
+    } catch (err) {
+      toast.error(err.message || 'Payment failed. Please check coupon limits.');
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
+  // Quick Pay helper for desktop / testing
+  const handleQuickPayAssignedMess = () => {
+    const defaultMessQR = walletData?.student?.messId
+      ? `MESSMATE:COUNTER:${walletData.student.messId}:${walletData.student.mess || 'Mess'}`
+      : `MESSMATE:COUNTER:assigned_mess`;
+    setScannedPayload(defaultMessQR);
+  };
+
+  const wallet = walletData?.wallet || {
+    balanceAmount: 6000,
+    semesterTotalAmount: 6000,
+    totalCouponsAllocated: 12,
+    couponsUsed: 0,
+    couponsRemaining: 12,
+    currentMonthCouponsUsed: 0,
+    monthlyMaxCoupons: 2,
+    monthlyCouponsRemaining: 2
+  };
+
+  const isMonthlyLimitReached = wallet.currentMonthCouponsUsed >= (wallet.monthlyMaxCoupons || 2);
+  const isSemesterLimitReached = wallet.couponsRemaining <= 0 || wallet.balanceAmount < 500;
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Digital Meal Coupon</h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Show this QR code at the dining hall counter for attendance verification.
-        </p>
+    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+      {/* Page Title & Refresh */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
+            <Wallet className="w-6 h-6 text-emerald-400" />
+            Mess Coupon Wallet & Pay
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Total Semester Allotment: ₹6,000 (12 Coupons @ ₹500 each) • Monthly Limit: 2 Coupons (₹1,000)
+          </p>
+        </div>
+        <button
+          onClick={fetchWallet}
+          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+          title="Refresh Wallet"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        </button>
       </div>
 
-      {loading ? (
-        <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center justify-center gap-3">
-          <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs font-medium text-slate-500">Generating cryptographic QR token...</p>
-        </div>
-      ) : errorMsg ? (
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center space-y-4">
-          <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto">
-            <AlertTriangle className="w-6 h-6" />
-          </div>
-          <h3 className="text-base font-bold text-slate-800">Coupon Unavailable</h3>
-          <p className="text-xs text-slate-600 leading-relaxed max-w-xs mx-auto">{errorMsg}</p>
-          <button
-            onClick={loadCoupon}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Retry
-          </button>
-        </div>
-      ) : (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-          {/* Coupon Header Banner */}
-          <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-white flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
-                {sessionData?.mealType} Session
+      {/* ── PHONEPE STYLE SEMESTER WALLET CARD ── */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 shadow-2xl p-6 sm:p-7 text-white">
+        {/* Decorative background glows */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-5">
+          {/* Top Row: Brand & Status */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg">
+                MessMate UPI Wallet
               </span>
-              <h2 className="text-lg font-bold">
-                {new Date(sessionData?.date || Date.now()).toLocaleDateString(undefined, {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric'
-                })}
-              </h2>
+              <span className="text-xs text-slate-400 font-medium">Spring 2026 Semester</span>
             </div>
-            <div className="text-right">
-              <span className="inline-block px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                {couponData?.status === 'redeemed' ? 'REDEEMED' : 'READY TO SCAN'}
-              </span>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/20">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Active Allotment
             </div>
           </div>
 
-          {/* QR Code Container */}
-          <div className="p-8 flex flex-col items-center justify-center text-center space-y-4 bg-slate-50/50">
-            {couponData?.status === 'redeemed' ? (
-              <div className="py-8 space-y-3">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800">Meal Already Served</h3>
-                <p className="text-xs text-slate-500 max-w-xs">
-                  This coupon was successfully scanned and attendance verified at{' '}
-                  {new Date(couponData.redeemedAt).toLocaleTimeString()}.
-                </p>
+          {/* Main Balance Display */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-1">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                Available Semester Balance
+              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  ₹{wallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">
+                  / ₹{wallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Total
+                </span>
               </div>
-            ) : (
-              <>
-                <div className="p-4 bg-white rounded-2xl shadow-md border border-slate-200/80">
-                  <QRCodeSVG
-                    value={couponData?.qrPayload || ''}
-                    size={220}
-                    level="H"
-                    includeMargin={true}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-slate-700 flex items-center justify-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    Expires in: <span className="text-emerald-600 font-mono font-bold">{timeLeft || 'Calculating...'}</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    Single-use cryptographic token. Do not share screenshot.
-                  </p>
-                </div>
-              </>
+            </div>
+
+            <div className="text-left sm:text-right">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                Coupons Remaining
+              </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/90 rounded-xl border border-slate-700/80">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span className="text-base font-black text-amber-300">
+                  {wallet.couponsRemaining} / {wallet.totalCouponsAllocated} Coupons
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Monthly Quota Meter (Max 2 coupons / ₹1000 per month) */}
+          <div className="pt-3 border-t border-slate-800/80 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                Monthly Quota (Max 2 coupons / ₹1,000 per month)
+              </span>
+              <span className="font-bold text-slate-200">
+                {wallet.currentMonthCouponsUsed} / {wallet.monthlyMaxCoupons || 2} Used this month
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/60">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isMonthlyLimitReached
+                    ? 'bg-rose-500'
+                    : wallet.currentMonthCouponsUsed === 1
+                    ? 'bg-amber-400'
+                    : 'bg-emerald-400'
+                }`}
+                style={{
+                  width: `${Math.min(100, ((wallet.currentMonthCouponsUsed || 0) / (wallet.monthlyMaxCoupons || 2)) * 100)}%`
+                }}
+              />
+            </div>
+
+            {isMonthlyLimitReached && (
+              <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Monthly limit reached (2 coupons used). Next quota unlocks on 1st of next month.
+              </p>
+            )}
+            {isSemesterLimitReached && (
+              <p className="text-[11px] text-rose-400 font-semibold flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Semester quota exhausted! All 12 coupons (₹6,000) have been redeemed.
+              </p>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* Student Identification Footer */}
-          <div className="p-5 bg-white border-t border-slate-100 flex items-center justify-between text-xs">
+      {/* ── NAVIGATION TABS ── */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-800">
+        <button
+          onClick={() => setActiveTab('scan_pay')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'scan_pay'
+              ? 'bg-emerald-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+          }`}
+        >
+          <ScanLine className="w-4 h-4" />
+          Scan & Pay (PhonePe)
+        </button>
+
+        <button
+          onClick={() => setActiveTab('my_qr')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'my_qr'
+              ? 'bg-emerald-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+          }`}
+        >
+          <QrCode className="w-4 h-4" />
+          My Unique QR Code
+        </button>
+
+        <button
+          onClick={() => setActiveTab('history')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${
+            activeTab === 'history'
+              ? 'bg-emerald-500 text-slate-950 shadow-md'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+          }`}
+        >
+          <Receipt className="w-4 h-4" />
+          Passbook ({recentTransactions.length})
+        </button>
+      </div>
+
+      {/* ── TAB 1: SCAN & PAY (PHONEPE FLOW) ── */}
+      {activeTab === 'scan_pay' && (
+        <div className="space-y-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center space-y-5">
+            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+              <ScanLine className="w-8 h-8" />
+            </div>
+
+            <div className="max-w-md mx-auto space-y-1.5">
+              <h2 className="text-lg font-black text-slate-100">Pay at Mess Counter Standee</h2>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Scan the Standee QR placed at your hostel mess counter. 1 Coupon (₹500) will be deducted from your semester balance.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                disabled={isMonthlyLimitReached || isSemesterLimitReached}
+                onClick={() => setIsScanning(true)}
+                className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition active:scale-98"
+              >
+                <ScanLine className="w-4 h-4" />
+                Open Camera Scanner
+              </button>
+
+              <button
+                disabled={isMonthlyLimitReached || isSemesterLimitReached}
+                onClick={handleQuickPayAssignedMess}
+                className="w-full sm:w-auto px-5 py-3.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 flex items-center justify-center gap-2 transition"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                Quick Pay at {walletData?.student?.mess || 'Hostel Mess'}
+              </button>
+            </div>
+
+            {/* Rules reminder pill */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-full border border-slate-700/60 text-[11px] text-slate-400">
+              <span>₹500 / Meal</span>
+              <span>•</span>
+              <span>Max 2 meals / month</span>
+              <span>•</span>
+              <span>12 meals / semester</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 2: MY UNIQUE PERMANENT QR CODE ── */}
+      {activeTab === 'my_qr' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-center">
+          <div>
+            <h2 className="text-lg font-black text-slate-100">My Permanent Student Mess QR</h2>
+            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+              Mess staff can scan this unique cryptographic QR code on their counter scanner to verify your identity and redeem your meal coupon.
+            </p>
+          </div>
+
+          {/* QR Display Card */}
+          <div className="inline-block p-5 bg-white rounded-3xl shadow-2xl border border-slate-700">
+            <QRCodeSVG
+              value={walletData?.uniqueStudentQR || `MESSMATE:STUDENT:${user?.id}:${user?.rollNumber || 'STU'}`}
+              size={220}
+              level="H"
+              includeMargin={true}
+            />
+          </div>
+
+          {/* Student Profile Card */}
+          <div className="max-w-md mx-auto p-4 bg-slate-800/80 rounded-2xl border border-slate-700 flex items-center justify-between text-left text-xs">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-sm">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 font-black flex items-center justify-center text-sm border border-emerald-500/30">
                 {user?.firstName?.[0]}
                 {user?.lastName?.[0]}
               </div>
               <div>
-                <p className="font-bold text-slate-800">
+                <p className="font-bold text-slate-200">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-[11px] text-slate-400">Roll: {user?.rollNumber || 'N/A'}</p>
+                <p className="text-slate-400 text-[11px]">Roll: {user?.rollNumber || 'N/A'}</p>
               </div>
             </div>
+
             <div className="text-right">
-              <span className="text-[11px] text-slate-500 font-medium block">
-                {user?.hostel?.name || 'Hostel Resident'}
-              </span>
-              <span className="text-[10px] text-emerald-600 font-semibold flex items-center justify-end gap-1">
-                <ShieldCheck className="w-3 h-3" /> Eligible
-              </span>
+              <p className="font-semibold text-slate-300">{walletData?.student?.hostel || 'Hostel Resident'}</p>
+              <p className="text-slate-400 text-[11px]">Room: {walletData?.student?.roomNumber || 'N/A'}</p>
             </div>
+          </div>
+
+          <p className="text-[11px] text-slate-500">
+            Linked to Semester Wallet: ₹{wallet.balanceAmount} ({wallet.couponsRemaining} coupons remaining)
+          </p>
+        </div>
+      )}
+
+      {/* ── TAB 3: PASSBOOK & HISTORY ── */}
+      {activeTab === 'history' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <Receipt className="w-4 h-4 text-emerald-400" />
+              Wallet Passbook & Redeemed Coupons
+            </h2>
+            <span className="text-xs font-semibold text-slate-400">
+              {recentTransactions.length} Transactions
+            </span>
+          </div>
+
+          {recentTransactions.length === 0 ? (
+            <div className="text-center py-10 text-slate-500 text-xs">
+              No coupons redeemed yet. Your semester allowance of ₹6,000 (12 coupons) is fully intact!
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {recentTransactions.map((tx) => (
+                <div
+                  key={tx.id || tx.transactionId}
+                  className="p-3.5 bg-slate-800/60 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold shrink-0">
+                      <Utensils className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-200 uppercase">
+                        {tx.mealType} Coupon
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-mono">
+                        {tx.transactionId}
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {new Date(tx.redeemedAt).toLocaleDateString()} at{' '}
+                        {new Date(tx.redeemedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="font-black text-rose-400 text-sm block">
+                      -₹{tx.amount || 500}
+                    </span>
+                    <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Paid
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── CAMERA SCANNER MODAL ── */}
+      {isScanning && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-in fade-in duration-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-200 font-bold text-sm">
+                <ScanLine className="w-4 h-4 text-emerald-400" />
+                Scan Mess Standee QR
+              </div>
+              <button
+                onClick={() => setIsScanning(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="bg-black rounded-2xl overflow-hidden border border-slate-800">
+              <div id="student-counter-reader" className="w-full"></div>
+            </div>
+
+            <p className="text-center text-xs text-slate-400">
+              Point camera at the Mess Standee QR code on the counter.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── PAYMENT CONFIRMATION SHEET ── */}
+      {scannedPayload && (
+        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full space-y-5 shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                Payment Confirmation
+              </span>
+              <button
+                onClick={() => setScannedPayload(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="text-center space-y-1">
+              <span className="text-xs text-slate-400">Paying To Mess Counter</span>
+              <h3 className="text-xl font-black text-white">
+                {walletData?.student?.mess || 'Hostel Dining Hall'}
+              </h3>
+              <p className="text-xs text-indigo-400 font-medium">1 Meal Coupon</p>
+            </div>
+
+            {/* Price Box */}
+            <div className="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400">Coupon Value</span>
+                <span className="text-lg font-black text-white">₹500.00</span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/60">
+                <span>Debited From</span>
+                <span className="font-semibold text-slate-200">Mess Semester Wallet</span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>Balance After Payment</span>
+                <span className="font-semibold text-emerald-400">
+                  ₹{Math.max(0, (wallet.balanceAmount || 6000) - 500)} ({wallet.couponsRemaining - 1} left)
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>Monthly Quota After</span>
+                <span className="font-semibold text-amber-300">
+                  {wallet.currentMonthCouponsUsed + 1} / {wallet.monthlyMaxCoupons || 2} Used
+                </span>
+              </div>
+            </div>
+
+            {/* Pay Button */}
+            <button
+              disabled={isPaying}
+              onClick={() => executePayment(scannedPayload)}
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/25 transition active:scale-98 disabled:opacity-50"
+            >
+              {isPaying ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+                  Processing Payment...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4" />
+                  Pay ₹500 from Mess Wallet
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── PHONEPE STYLE PAYMENT SUCCESS CELEBRATION ── */}
+      {paymentSuccessData && (
+        <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-emerald-500/30 rounded-3xl p-7 max-w-md w-full text-center space-y-6 shadow-2xl shadow-emerald-500/20 animate-in zoom-in-95 duration-200">
+            {/* Animated Checkmark Circle */}
+            <div className="relative mx-auto w-20 h-20">
+              <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+              <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-slate-950 shadow-xl">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-white tracking-tight">₹500.00 Paid</h2>
+              <p className="text-xs font-semibold text-emerald-400">Payment & Meal Attendance Verified</p>
+              <p className="text-xs text-slate-400">
+                Paid to {paymentSuccessData.messName || 'Mess Counter'}
+              </p>
+            </div>
+
+            {/* Receipt Summary Box */}
+            <div className="p-4 bg-slate-800/80 rounded-2xl border border-slate-700/80 text-left text-xs space-y-2">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Transaction ID</span>
+                <span className="font-mono font-bold text-slate-200">
+                  {paymentSuccessData.transactionId}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Meal Session</span>
+                <span className="font-semibold text-slate-200 uppercase">
+                  {paymentSuccessData.mealType}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Time & Date</span>
+                <span className="text-slate-300">
+                  {new Date(paymentSuccessData.paidAt).toLocaleTimeString()} •{' '}
+                  {new Date(paymentSuccessData.paidAt).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-slate-700/60">
+                <span className="text-slate-400">Remaining Wallet Balance</span>
+                <span className="font-bold text-emerald-400">
+                  ₹{paymentSuccessData.walletBalance} ({paymentSuccessData.couponsRemaining} coupons left)
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setPaymentSuccessData(null);
+                setActiveTab('history');
+              }}
+              className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl transition shadow-lg shadow-emerald-500/20"
+            >
+              Done / View in Passbook
+            </button>
           </div>
         </div>
       )}
@@ -183,4 +664,3 @@ export const DigitalCoupon = () => {
 };
 
 export default DigitalCoupon;
-

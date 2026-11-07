@@ -18,7 +18,9 @@ import {
   Sparkles,
   TrendingUp,
   RefreshCw,
-  ShieldAlert
+  ShieldAlert,
+  Wallet,
+  ScanLine
 } from 'lucide-react';
 
 export const StudentDashboard = () => {
@@ -100,6 +102,50 @@ export const StudentDashboard = () => {
         {/* Decorative corner icon */}
         <Utensils className="absolute -bottom-8 -right-8 w-48 h-48 text-slate-800/40 pointer-events-none" />
       </div>
+
+      {/* Semester Wallet Banner Widget */}
+      {dashboardData?.couponWallet && (
+        <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
+              <Wallet className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                  Mess Wallet
+                </span>
+                <span className="text-xs text-slate-400">Spring 2026 Semester</span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-2xl font-black text-white">
+                  ₹{dashboardData.couponWallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
+                </span>
+                <span className="text-xs text-slate-400 font-semibold">
+                  • {dashboardData.couponWallet.couponsRemaining} / {dashboardData.couponWallet.totalCouponsAllocated} Coupons Left
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <span className="text-[11px] text-slate-400 block font-medium">Monthly Usage Limit</span>
+              <span className="text-xs font-bold text-slate-200">
+                {dashboardData.couponWallet.currentMonthCouponsUsed} / {dashboardData.couponWallet.monthlyMaxCoupons || 2} used (Max ₹1,000/mo)
+              </span>
+            </div>
+
+            <Link
+              to="/student/coupon"
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 transition active:scale-98"
+            >
+              <ScanLine className="w-3.5 h-3.5" />
+              Scan & Pay
+            </Link>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="min-h-[250px] flex items-center justify-center">

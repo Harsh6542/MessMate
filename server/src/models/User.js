@@ -79,6 +79,22 @@ const userSchema = new mongoose.Schema(
       default: null,
       index: true
     },
+    uniqueStudentQR: {
+      type: String,
+      sparse: true,
+      index: true
+    },
+    couponWallet: {
+      semesterTotalAmount: { type: Number, default: 6000 },
+      couponValue: { type: Number, default: 500 },
+      totalCouponsAllocated: { type: Number, default: 12 },
+      couponsUsed: { type: Number, default: 0 },
+      balanceAmount: { type: Number, default: 6000 },
+      currentMonthCouponsUsed: { type: Number, default: 0 },
+      lastRedemptionMonth: { type: String, default: '' },
+      monthlyMaxCoupons: { type: Number, default: 2 },
+      monthlyMaxAmount: { type: Number, default: 1000 }
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -115,8 +131,27 @@ userSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-// Pre-save hook: Hash password if modified
+// Pre-save hook: Hash password if modified & ensure unique QR and coupon wallet
 userSchema.pre('save', async function (next) {
+  if (this.role === ROLES.STUDENT) {
+    if (!this.uniqueStudentQR) {
+      this.uniqueStudentQR = `MESSMATE:STUDENT:${this._id}:${this.rollNumber || 'STU'}`;
+    }
+    if (!this.couponWallet || typeof this.couponWallet.balanceAmount !== 'number') {
+      this.couponWallet = {
+        semesterTotalAmount: 6000,
+        couponValue: 500,
+        totalCouponsAllocated: 12,
+        couponsUsed: 0,
+        balanceAmount: 6000,
+        currentMonthCouponsUsed: 0,
+        lastRedemptionMonth: new Date().toISOString().slice(0, 7),
+        monthlyMaxCoupons: 2,
+        monthlyMaxAmount: 1000
+      };
+    }
+  }
+
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);

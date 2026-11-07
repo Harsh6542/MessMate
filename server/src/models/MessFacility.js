@@ -44,6 +44,10 @@ const messFacilitySchema = new mongoose.Schema(
       enum: Object.values(BILLING_POLICIES),
       default: BILLING_POLICIES.FIXED_MONTHLY
     },
+    counterQR: {
+      type: String,
+      default: ''
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -54,6 +58,14 @@ const messFacilitySchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+messFacilitySchema.pre('save', function (next) {
+  if (!this.counterQR) {
+    const slug = encodeURIComponent((this.name || 'Mess').replace(/\s+/g, '_'));
+    this.counterQR = `MESSMATE:COUNTER:${this._id}:${slug}`;
+  }
+  next();
+});
 
 export const MessFacility = mongoose.model('MessFacility', messFacilitySchema);
 export default MessFacility;

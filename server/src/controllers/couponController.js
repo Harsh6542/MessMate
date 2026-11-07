@@ -2,21 +2,57 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   generateOrGetCoupon,
   redeemCoupon,
-  manualVerifyStudent
+  manualVerifyStudent,
+  getStudentWallet,
+  payCounterQR,
+  getMessCounterQR,
+  getMessCounterPayments
 } from '../services/couponService.js';
+
+// @desc    Get student coupon wallet details & recent transactions
+// @route   GET /api/v1/coupons/wallet
+// @access  Student
+export const getWallet = asyncHandler(async (req, res) => {
+  const data = await getStudentWallet(req.user._id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Coupon wallet retrieved successfully',
+    data
+  });
+});
+
+// @desc    Student PhonePe / UPI-style Scan & Pay at Mess Counter Standee
+// @route   POST /api/v1/coupons/pay-counter
+// @access  Student
+export const payCounter = asyncHandler(async (req, res) => {
+  const { counterQR } = req.body;
+
+  const result = await payCounterQR({
+    studentId: req.user._id,
+    counterQR
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Meal Coupon Paid & Attendance Verified Successfully',
+    data: result
+  });
+});
 
 // @desc    Generate or retrieve active meal coupon
 // @route   POST /api/v1/coupons/generate
 // @access  Student
 export const generateCoupon = asyncHandler(async (req, res) => {
-  const { coupon, session, isNew } = await generateOrGetCoupon(req.user._id);
+  const { coupon, session, isNew, wallet } = await generateOrGetCoupon(req.user._id);
 
   res.status(isNew ? 201 : 200).json({
     success: true,
     message: isNew ? 'Digital meal coupon generated successfully' : 'Retrieved active coupon',
     data: {
       coupon,
-      session
+      session,
+      wallet
     }
   });
 });
@@ -58,3 +94,28 @@ export const manualVerify = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get Counter QR Standee details for Staff/Manager
+// @route   GET /api/v1/coupons/counter-qr
+// @access  Mess Staff, Mess Manager, Admin
+export const getCounterQR = asyncHandler(async (req, res) => {
+  const data = await getMessCounterQR(req.user._id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Mess Counter QR retrieved successfully',
+    data
+  });
+});
+
+// @desc    Get live counter payments for Staff/Manager
+// @route   GET /api/v1/coupons/counter-payments
+// @access  Mess Staff, Mess Manager, Admin
+export const getCounterPayments = asyncHandler(async (req, res) => {
+  const payments = await getMessCounterPayments(req.user._id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Counter payments retrieved',
+    data: payments
+  });
+});
