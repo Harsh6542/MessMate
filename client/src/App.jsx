@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 
@@ -85,8 +86,9 @@ const RootRedirect = () => {
 
 export const App = () => {
   return (
-    <AuthProvider>
-      <SocketProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SocketProvider>
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Toaster
             position="top-right"
@@ -190,6 +192,7 @@ export const App = () => {
         </Router>
       </SocketProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 };
 
