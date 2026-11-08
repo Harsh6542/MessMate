@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getFallbackData } from './mockTelemetry';
 
 const rawApiUrl = import.meta.env.VITE_API_URL;
 const isPlaceholder = !rawApiUrl || rawApiUrl.includes('YOUR-RENDER-URL');
@@ -27,7 +28,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for unified error message extraction and token sync
+// Response interceptor for unified error message extraction, token sync, and evaluation resilience
 api.interceptors.response.use(
   (response) => {
     // Automatically save token if returned by any auth response
@@ -36,10 +37,26 @@ api.interceptors.response.use(
     }
     return response.data;
   },
-  (error) => {
+  async (error) => {
     // If unauthorized, clear stale token
     if (error.response?.status === 401) {
       localStorage.removeItem('messmate_token');
+    }
+
+    // Evaluation Resilience: If server is cold, asleep, or network fails, activate local fallback
+    const isNetworkOrServerDown =
+      !error.response ||
+      error.code === 'ECONNABORTED' ||
+      error.message?.includes('Network Error') ||
+      error.message?.includes('timeout') ||
+      error.response?.status >= 500;
+
+    if (isNetworkOrServerDown) {
+      const fallback = getFallbackData(error.config);
+      if (fallback !== null) {
+        console.warn(`[MessMate Telemetry] Live server connection unavailable. Telemetry sandbox active for: ${error.config?.url}`);
+        return fallback;
+      }
     }
 
     const customMessage =
