@@ -42,6 +42,23 @@ export const AuthProvider = ({ children }) => {
     throw new Error(res.message || 'Login failed');
   };
 
+  // Staff and Manager login handler using ID & PIN
+  const staffLogin = async (staffId, pin, role) => {
+    const res = await api.post('/auth/staff-login', {
+      staffId: (staffId || '').trim(),
+      pin: (pin || '').trim(),
+      role
+    });
+    if (res.success && res.data?.user) {
+      if (res.token) {
+        localStorage.setItem('messmate_token', res.token);
+      }
+      setUser(res.data.user);
+      return res.data.user;
+    }
+    throw new Error(res.message || 'Staff login failed');
+  };
+
   // Student registration handler
   const register = async (userData) => {
     const payload = {
@@ -87,6 +104,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!user,
         role: user?.role,
         login,
+        staffLogin,
         register,
         logout,
         updateProfile,

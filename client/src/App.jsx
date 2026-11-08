@@ -50,6 +50,20 @@ import KitchenPrepSheet from './pages/staff/KitchenPrepSheet';
 import WasteEntryForm from './pages/staff/WasteEntryForm';
 import GuestMealRequest from './pages/student/GuestMealRequest';
 
+// Helper to resolve canonical dashboard route per user role
+const getDashboardPath = (role) => {
+  switch (role) {
+    case 'mess_staff':
+      return '/staff/dashboard';
+    case 'mess_manager':
+      return '/manager/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
+    default:
+      return '/student/dashboard';
+  }
+};
+
 // Root redirector based on authentication status
 const RootRedirect = () => {
   const { user, loading } = useAuth();
@@ -66,7 +80,7 @@ const RootRedirect = () => {
     return <Navigate to="/login" replace />;
   }
 
-  return <Navigate to={`/${user.role}/dashboard`} replace />;
+  return <Navigate to={getDashboardPath(user.role)} replace />;
 };
 
 export const App = () => {
@@ -146,6 +160,12 @@ export const App = () => {
                 </Route>
               </Route>
             </Route>
+
+            {/* Fallback Aliases for legacy /mess_staff and /mess_manager routes */}
+            <Route path="/mess_staff" element={<Navigate to="/staff/dashboard" replace />} />
+            <Route path="/mess_staff/*" element={<Navigate to="/staff/dashboard" replace />} />
+            <Route path="/mess_manager" element={<Navigate to="/manager/dashboard" replace />} />
+            <Route path="/mess_manager/*" element={<Navigate to="/manager/dashboard" replace />} />
 
             {/* Catch-all 404 Route */}
             <Route

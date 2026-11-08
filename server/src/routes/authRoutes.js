@@ -2,6 +2,7 @@ import express from 'express';
 import {
   register,
   login,
+  staffLogin,
   logout,
   getMe,
   updateProfile,
@@ -14,6 +15,7 @@ import { validate } from '../middleware/validate.js';
 import {
   registerValidator,
   loginValidator,
+  staffLoginValidator,
   changePasswordValidator,
   forgotPasswordValidator,
   resetPasswordValidator
@@ -23,6 +25,7 @@ const router = express.Router();
 
 router.post('/register', validate(registerValidator), register);
 router.post('/login', validate(loginValidator), login);
+router.post('/staff-login', validate(staffLoginValidator), staffLogin);
 router.post('/forgot-password', validate(forgotPasswordValidator), forgotPassword);
 router.post('/reset-password/:token', validate(resetPasswordValidator), resetPassword);
 router.post('/logout', authenticate, logout);

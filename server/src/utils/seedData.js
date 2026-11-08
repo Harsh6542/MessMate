@@ -288,6 +288,8 @@ const seed = async () => {
       lastName: 'Sharma',
       email: 'manager@messmate.edu',
       password: 'Password@123',
+      staffId: 'MGR-101',
+      staffPin: '1234',
       role: ROLES.MESS_MANAGER,
       gender: 'male',
       phone: '9999900010',
@@ -319,6 +321,8 @@ const seed = async () => {
       lastName: 'Rao',
       email: 'manager.kadambini@messmate.edu',
       password: 'Password@123',
+      staffId: 'MGR-102',
+      staffPin: '1234',
       role: ROLES.MESS_MANAGER,
       gender: 'female',
       phone: '9999900011',
@@ -350,6 +354,8 @@ const seed = async () => {
       lastName: 'Prasad',
       email: 'manager.nagarjuna@messmate.edu',
       password: 'Password@123',
+      staffId: 'MGR-103',
+      staffPin: '1234',
       role: ROLES.MESS_MANAGER,
       gender: 'male',
       phone: '9999900012',
@@ -381,6 +387,8 @@ const seed = async () => {
       lastName: 'Singh',
       email: 'manager.aryabhatta@messmate.edu',
       password: 'Password@123',
+      staffId: 'MGR-104',
+      staffPin: '1234',
       role: ROLES.MESS_MANAGER,
       gender: 'male',
       phone: '9999900013',
@@ -410,11 +418,11 @@ const seed = async () => {
 
     // 6. Create Mess Staff Members
     const staffMembers = [
-      { firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', phone: '9999900020', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
-      { firstName: 'Vikram', lastName: 'Yadav', email: 'staff2@messmate.edu', phone: '9999900021', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
-      { firstName: 'Sunita', lastName: 'Devi', email: 'staff.kadambini@messmate.edu', phone: '9999900022', hostel: kadambiniHostel._id, mess: kadambiniMess._id, gender: 'female' },
-      { firstName: 'Sunil', lastName: 'Paswan', email: 'staff.nagarjuna@messmate.edu', phone: '9999900023', hostel: nagarjunaHostel._id, mess: nagarjunaMess._id, gender: 'male' },
-      { firstName: 'Santosh', lastName: 'Thakur', email: 'staff.aryabhatta@messmate.edu', phone: '9999900024', hostel: aryabhattaHostel._id, mess: aryabhattaMess._id, gender: 'male' }
+      { firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', staffId: 'STF-101', staffPin: '1234', phone: '9999900020', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
+      { firstName: 'Vikram', lastName: 'Yadav', email: 'staff2@messmate.edu', staffId: 'STF-102', staffPin: '1234', phone: '9999900021', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
+      { firstName: 'Sunita', lastName: 'Devi', email: 'staff.kadambini@messmate.edu', staffId: 'STF-103', staffPin: '1234', phone: '9999900022', hostel: kadambiniHostel._id, mess: kadambiniMess._id, gender: 'female' },
+      { firstName: 'Sunil', lastName: 'Paswan', email: 'staff.nagarjuna@messmate.edu', staffId: 'STF-104', staffPin: '1234', phone: '9999900023', hostel: nagarjunaHostel._id, mess: nagarjunaMess._id, gender: 'male' },
+      { firstName: 'Santosh', lastName: 'Thakur', email: 'staff.aryabhatta@messmate.edu', staffId: 'STF-105', staffPin: '1234', phone: '9999900024', hostel: aryabhattaHostel._id, mess: aryabhattaMess._id, gender: 'male' }
     ];
 
     const staffDocs = [];
@@ -705,9 +713,9 @@ const seed = async () => {
     console.log('\nDemo Credentials for Active Roles:');
     console.table([
       { Role: 'Super Admin', Email: 'admin@messmate.edu', Password: 'Password@123', Access: 'Platform-wide' },
-      { Role: 'Mess Manager (Kautilya)', Email: 'manager@messmate.edu', Password: 'Password@123', Access: 'Kautilya Central Mess' },
-      { Role: 'Mess Manager (Kadambini)', Email: 'manager.kadambini@messmate.edu', Password: 'Password@123', Access: 'Kadambini Mess' },
-      { Role: 'Mess Staff (Kautilya)', Email: 'staff@messmate.edu', Password: 'Password@123', Access: 'Kautilya Scanner & Scale' },
+      { Role: 'Mess Manager (Kautilya)', Email: 'manager@messmate.edu', StaffID: 'MGR-101', PIN: '1234', Password: 'Password@123', Access: 'Kautilya Central Mess' },
+      { Role: 'Mess Manager (Kadambini)', Email: 'manager.kadambini@messmate.edu', StaffID: 'MGR-102', PIN: '1234', Password: 'Password@123', Access: 'Kadambini Mess' },
+      { Role: 'Mess Staff (Kautilya)', Email: 'staff@messmate.edu', StaffID: 'STF-101', PIN: '1234', Password: 'Password@123', Access: 'Kautilya Scanner & Scale' },
       { Role: 'Student (Male - Kautilya)', Email: 'student@messmate.edu', Password: 'Password@123', Roll: ayushStudent.rollNumber },
       { Role: 'Student (Female - Kadambini)', Email: 'priya.kumari@messmate.edu', Password: 'Password@123', Roll: priyaStudent.rollNumber }
     ]);

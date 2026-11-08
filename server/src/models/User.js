@@ -84,6 +84,18 @@ const userSchema = new mongoose.Schema(
       sparse: true,
       index: true
     },
+    staffId: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      sparse: true,
+      unique: true,
+      index: true
+    },
+    staffPin: {
+      type: String,
+      select: false
+    },
     couponWallet: {
       semesterTotalAmount: { type: Number, default: 6000 },
       balanceAmount: { type: Number, default: 6000 },
@@ -150,6 +162,11 @@ userSchema.pre('save', async function (next) {
     }
   }
 
+  if (this.isModified('staffPin') && this.staffPin && !this.staffPin.startsWith('$2')) {
+    const salt = await bcrypt.genSalt(10);
+    this.staffPin = await bcrypt.hash(this.staffPin, salt);
+  }
+
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
@@ -159,6 +176,16 @@ userSchema.pre('save', async function (next) {
 // Compare password helper method
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Compare staff PIN helper method
+userSchema.methods.comparePin = async function (candidatePin) {
+  if (!this.staffPin) return false;
+  const pinStr = String(candidatePin).trim();
+  if (this.staffPin.startsWith('$2')) {
+    return await bcrypt.compare(pinStr, this.staffPin);
+  }
+  return this.staffPin === pinStr;
 };
 
 // Generate JWT token helper method

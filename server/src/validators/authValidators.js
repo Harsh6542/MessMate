@@ -51,6 +51,17 @@ export const loginValidator = [
     .withMessage('Password is required')
 ];
 
+export const staffLoginValidator = [
+  body('staffId')
+    .trim()
+    .notEmpty()
+    .withMessage('Staff/Manager ID is required'),
+  body('pin')
+    .trim()
+    .notEmpty()
+    .withMessage('PIN or Password is required')
+];
+
 export const forgotPasswordValidator = [
   body('email')
     .trim()

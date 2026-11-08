@@ -118,6 +118,62 @@ export const login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res, `Welcome back, ${user.firstName}!`);
 });
 
+// @desc    Login staff or manager using Staff/Manager ID & PIN
+// @route   POST /api/v1/auth/staff-login
+// @access  Public
+export const staffLogin = asyncHandler(async (req, res, next) => {
+  const { staffId, pin, role } = req.body;
+  const rawId = (staffId || '').trim();
+  const cleanId = rawId.toUpperCase();
+  const cleanPin = (pin || '').trim();
+
+  // Search by staffId OR email
+  const query = {
+    $or: [
+      { staffId: cleanId },
+      { email: rawId.toLowerCase() }
+    ]
+  };
+
+  if (role) {
+    query.role = role;
+  } else {
+    query.role = { $in: [ROLES.MESS_STAFF, ROLES.MESS_MANAGER] };
+  }
+
+  const user = await User.findOne(query)
+    .select('+password +staffPin')
+    .populate('hostel mess');
+
+  if (!user) {
+    return next(new AppError('Invalid ID or PIN. Account not found.', 401, 'INVALID_CREDENTIALS'));
+  }
+
+  if (!user.isActive) {
+    return next(
+      new AppError('This staff account has been deactivated. Please contact hostel admin.', 403, 'ACCOUNT_DEACTIVATED')
+    );
+  }
+
+  // Verify PIN or password
+  let isValid = false;
+  if (user.staffPin) {
+    isValid = await user.comparePin(cleanPin);
+  }
+  if (!isValid && user.password) {
+    isValid = await user.comparePassword(cleanPin);
+  }
+
+  if (!isValid) {
+    return next(new AppError('Invalid ID or PIN.', 401, 'INVALID_CREDENTIALS'));
+  }
+
+  user.lastLogin = new Date();
+  await user.save({ validateBeforeSave: false });
+
+  sendTokenResponse(user, 200, res, `Welcome back, ${user.firstName}!`);
+});
+
 // @desc    Logout user & clear cookie
 // @route   POST /api/v1/auth/logout
 // @access  Authenticated
