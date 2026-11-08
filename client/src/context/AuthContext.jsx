@@ -5,10 +5,30 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem('messmate_token'));
+    } catch {
+      return false;
+    }
+  });
 
-  // Check current session from server HTTP-only cookie
+  // Check current session from saved token / server session
   const checkAuth = useCallback(async () => {
+    let token = null;
+    try {
+      token = localStorage.getItem('messmate_token');
+    } catch {
+      // LocalStorage access failure
+    }
+
+    // If there is no token stored, user is not logged in; do not block UI with cold backend ping
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await api.get('/auth/me');
@@ -16,9 +36,11 @@ export const AuthProvider = ({ children }) => {
         setUser(res.data.user);
       } else {
         setUser(null);
+        localStorage.removeItem('messmate_token');
       }
     } catch {
       setUser(null);
+      localStorage.removeItem('messmate_token');
     } finally {
       setLoading(false);
     }

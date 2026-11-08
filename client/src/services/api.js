@@ -9,6 +9,7 @@ const api = axios.create({
     ? (import.meta.env.PROD ? defaultProductionUrl : '/api/v1')
     : rawApiUrl,
   withCredentials: true,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
   }

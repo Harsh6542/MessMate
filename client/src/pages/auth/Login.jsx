@@ -58,11 +58,18 @@ const getDashboardPath = (role) => {
 };
 
 export const Login = () => {
-  const { login, staffLogin, register: registerAuth } = useAuth();
+  const { user, login, staffLogin, register: registerAuth } = useAuth();
   const { theme, isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  // If user is already authenticated with active session, redirect to their role dashboard
+  useEffect(() => {
+    if (user && !location.state?.fromLogout) {
+      navigate(getDashboardPath(user.role), { replace: true });
+    }
+  }, [user, navigate, location.state]);
 
   // Active view: null | 'student_login' | 'student_register' | 'staff_login' | 'manager_login' | 'admin_login' | 'interactive_demo'
   const [activeModal, setActiveModal] = useState(null);
