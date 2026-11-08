@@ -20,7 +20,12 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || window.location.origin;
+    const rawSocketUrl = import.meta.env.VITE_SOCKET_URL;
+    const isPlaceholder = !rawSocketUrl || rawSocketUrl.includes('YOUR-RENDER-URL');
+    const defaultProductionSocketUrl = 'https://messmate-5jhj.onrender.com';
+    const socketUrl = isPlaceholder
+      ? (import.meta.env.PROD ? defaultProductionSocketUrl : window.location.origin)
+      : rawSocketUrl;
     const socketInstance = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling']

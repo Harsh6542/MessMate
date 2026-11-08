@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+const rawApiUrl = import.meta.env.VITE_API_URL;
+const isPlaceholder = !rawApiUrl || rawApiUrl.includes('YOUR-RENDER-URL');
+const defaultProductionUrl = 'https://messmate-5jhj.onrender.com/api/v1';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: isPlaceholder
+    ? (import.meta.env.PROD ? defaultProductionUrl : '/api/v1')
+    : rawApiUrl,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
