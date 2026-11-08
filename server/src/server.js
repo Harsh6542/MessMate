@@ -15,19 +15,19 @@ const httpServer = http.createServer(app);
 initSocket(httpServer);
 
 const startServer = async () => {
-  try {
-    // Await database connection before accepting client traffic
-    await connectDB();
+  // 1. Start HTTP server immediately so Render port-binding detects the service as Live
+  httpServer.listen(PORT, () => {
+    console.log(`[MessMate Server] Running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`[MessMate Server] Real-time WebSockets initialized via Socket.IO`);
+    console.log(`[MessMate Server] Health check available on port ${PORT}`);
+  });
 
-    httpServer.listen(PORT, () => {
-      console.log(`[MessMate Server] Running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-      console.log(`[MessMate Server] Real-time WebSockets initialized via Socket.IO`);
-      console.log(`[MessMate Server] Health check available at http://localhost:${PORT}/api/v1/health`);
-    });
+  // 2. Connect to database with retry handling
+  try {
+    await connectDB();
   } catch (err) {
-    console.error(`[Server Fatal Error] Failed to connect to database: ${err.message}`);
-    console.error('[Server Fatal Error] Server stopped. Check your internet/hotspot connection and restart.');
-    process.exit(1);
+    console.error(`[Server Database Warning] Initial connection to database failed: ${err.message}`);
+    console.error('[Server Database Warning] In MongoDB Atlas, ensure Network Access whitelist includes 0.0.0.0/0 (Allow Access from Anywhere).');
   }
 };
 

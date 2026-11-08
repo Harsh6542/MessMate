@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -80,9 +81,11 @@ app.use(cookieParser());
 
 // 6. Health check route
 app.get('/api/v1/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
   res.status(200).json({
     success: true,
     message: 'MessMate API is healthy and operational.',
+    database: dbStatus,
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
