@@ -19,7 +19,10 @@ import {
   Activity,
   X,
   Scale,
-  Key
+  Key,
+  ShieldCheck,
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 
 export const AdminDashboard = () => {
@@ -251,11 +254,11 @@ export const AdminDashboard = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-            <Building className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
+            <Building className="w-6 h-6 text-emerald-500" />
             Super Administrator Console
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             Institutional management: account provisioning, role assignments, multi-hostel configuration, and platform audit feeds.
           </p>
         </div>
@@ -266,7 +269,7 @@ export const AdminDashboard = () => {
               if (activeTab === 'overview') fetchAdminStats();
               else fetchUsers();
             }}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+            className="p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 transition shadow-sm"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading || usersLoading ? 'animate-spin' : ''}`} />
@@ -274,14 +277,14 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+      {/* Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
         <button
           onClick={() => setActiveTab('overview')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 ${
             activeTab === 'overview'
-              ? 'bg-slate-800 text-emerald-400 border border-slate-700'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <Activity className="w-3.5 h-3.5" />
@@ -292,8 +295,8 @@ export const AdminDashboard = () => {
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 ${
             activeTab === 'users'
-              ? 'bg-slate-800 text-emerald-400 border border-slate-700'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <Users className="w-3.5 h-3.5" />
@@ -304,8 +307,8 @@ export const AdminDashboard = () => {
           onClick={() => setActiveTab('hostels')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 ${
             activeTab === 'hostels'
-              ? 'bg-slate-800 text-emerald-400 border border-slate-700'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <Building className="w-3.5 h-3.5" />
@@ -320,112 +323,205 @@ export const AdminDashboard = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* System KPIs */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Total Users
-                </span>
-                <div className="text-2xl font-black text-slate-100 mt-1">{counts.totalUsers || 0}</div>
-                <p className="text-[10px] text-slate-500 mt-0.5">Platform accounts</p>
-              </div>
-
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Active Students
-                </span>
-                <div className="text-2xl font-black text-emerald-400 mt-1">{counts.students || 0}</div>
-                <p className="text-[10px] text-slate-500 mt-0.5">Hostel residents</p>
-              </div>
-
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Mess Staff
-                </span>
-                <div className="text-2xl font-black text-cyan-400 mt-1">{counts.staff || 0}</div>
-                <p className="text-[10px] text-slate-500 mt-0.5">Scanners & workers</p>
-              </div>
-
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Total Meals Served
-                </span>
-                <div className="text-2xl font-black text-amber-400 mt-1">
-                  {counts.totalMealsServed || 0}
+            {/* System KPIs Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+              {/* Total Users */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
+                    Total Users
+                  </span>
+                  <div className="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                    <Users className="w-3.5 h-3.5" />
+                  </div>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-0.5">Attendance logs</p>
+                <div className="mt-2">
+                  <div className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {counts.totalUsers || 0}
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Platform accounts</p>
+                </div>
               </div>
 
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Waste Logged
-                </span>
-                <div className="text-2xl font-black text-rose-400 mt-1">
-                  {counts.totalWasteLoggedKg || 0} <span className="text-xs font-normal text-slate-400">kg</span>
+              {/* Active Students */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
+                    Active Students
+                  </span>
+                  <div className="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                  </div>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-0.5">Physical scale logs</p>
+                <div className="mt-2">
+                  <div className="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                    {counts.students || 0}
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Hostel residents</p>
+                </div>
               </div>
 
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
-                  Total Grievances
-                </span>
-                <div className="text-2xl font-black text-slate-200 mt-1">
-                  {counts.totalComplaints || 0}
+              {/* Mess Staff */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
+                    Mess Staff
+                  </span>
+                  <div className="w-7 h-7 rounded-xl bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+                    <Utensils className="w-3.5 h-3.5" />
+                  </div>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-0.5">Tickets processed</p>
+                <div className="mt-2">
+                  <div className="text-2xl lg:text-3xl font-black text-cyan-600 dark:text-cyan-400 tracking-tight">
+                    {counts.staff || 0}
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Scanners & workers</p>
+                </div>
+              </div>
+
+              {/* Total Meals Served */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
+                    Meals Served
+                  </span>
+                  <div className="w-7 h-7 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <Activity className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <div className="text-2xl lg:text-3xl font-black text-amber-600 dark:text-amber-400 tracking-tight">
+                    {counts.totalMealsServed || 0}
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Attendance logs</p>
+                </div>
+              </div>
+
+              {/* Waste Logged */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
+                    Waste Logged
+                  </span>
+                  <div className="w-7 h-7 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                    <Scale className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <div className="text-2xl lg:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight flex items-baseline gap-1">
+                    {counts.totalWasteLoggedKg || 0}
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">kg</span>
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Physical scale logs</p>
+                </div>
+              </div>
+
+              {/* Grievances */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
+                    Grievances
+                  </span>
+                  <div className="w-7 h-7 rounded-xl bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <div className="text-2xl lg:text-3xl font-black text-violet-600 dark:text-violet-400 tracking-tight">
+                    {counts.totalComplaints || 0}
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Tickets processed</p>
+                </div>
               </div>
             </div>
 
             {/* Hostels Infrastructure Grid */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <Building className="w-4 h-4 text-emerald-400" />
-                Active NIT Patna Hostels & Resident Capacities
-              </h3>
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <Building className="w-4 h-4 text-emerald-500" />
+                  Active NIT Patna Hostels & Resident Capacities
+                </h3>
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  4 Facilities Configured
+                </span>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {(adminData?.hostels || []).map((h) => (
-                  <div
-                    key={h._id}
-                    className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-slate-100 text-sm">{h.name}</h4>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">
-                          {h.code}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {(adminData?.hostels || []).map((h) => {
+                  const isGirls = h.type === 'girls' || h.name?.toLowerCase().includes('kadambini');
+                  const capacity = h.capacity || (isGirls ? 400 : 450);
+                  const residents = h.residentsCount || 0;
+                  const pct = Math.min(100, Math.round((residents / capacity) * 100));
+
+                  return (
+                    <div
+                      key={h._id}
+                      className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h4 className="font-bold text-slate-900 dark:text-white text-base leading-snug">
+                              {h.name}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider border ${
+                                  isGirls
+                                    ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/60'
+                                    : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/60'
+                                }`}
+                              >
+                                {isGirls ? 'Girls Hostel' : 'Boys Hostel'}
+                              </span>
+                              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                Cap: {capacity}
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className="text-[10px] font-mono font-bold px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/80 shrink-0">
+                            {h.code}
+                          </span>
+                        </div>
+
+                        {/* Occupancy Progress Bar */}
+                        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                          <div className="flex items-center justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                            <span>Occupancy</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">{pct}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                              style={{ width: `${Math.max(6, pct)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                        <span className="text-slate-600 dark:text-slate-400 font-medium">Assigned Residents:</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                          {residents} {residents === 1 ? 'student' : 'students'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1 capitalize">
-                        Type: {h.type || 'Boys'} • Total Rooms: {h.totalRooms || 250}
-                      </p>
                     </div>
-
-                    <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Assigned Residents:</span>
-                      <span className="text-emerald-400 font-black text-sm">
-                        {h.residentsCount || 0} students
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            {/* System Runtime Health Banner */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-400">
-              <div className="flex items-center gap-2.5">
-                <Server className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  Runtime: <b className="text-slate-200">Node.js ES Modules</b> • Mode:{' '}
-                  <b className="text-slate-200 capitalize">{adminData?.systemInfo?.nodeEnv}</b> • Uptime:{' '}
-                  <b className="text-slate-200">{Math.round((adminData?.systemInfo?.uptimeSeconds || 0) / 60)} mins</b>
-                </span>
+            {/* Institutional System Status Banner */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
+              <div className="flex items-center gap-2.5 font-medium">
+                <Shield className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>National Institute of Technology Patna • MessMate Institutional System</span>
               </div>
-              <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                API Cluster Healthy
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800/60 self-start sm:self-auto">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                All Dining Facilities Active & Operational
               </span>
             </div>
           </div>
@@ -441,7 +537,7 @@ export const AdminDashboard = () => {
                   placeholder="Search by name, roll, or email..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 pl-9 outline-none focus:border-emerald-500"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs rounded-xl px-3 py-2 pl-9 outline-none focus:border-emerald-500 shadow-sm"
                 />
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
@@ -449,7 +545,7 @@ export const AdminDashboard = () => {
               <select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
-                className="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 shadow-sm"
               >
                 <option value="">All Roles</option>
                 <option value="student">Student</option>
@@ -463,16 +559,16 @@ export const AdminDashboard = () => {
               <button
                 onClick={handleCleanDummyUsers}
                 disabled={purging}
-                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700/80 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
+                className="px-3.5 py-2 bg-amber-50 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-750 border border-amber-200 dark:border-amber-500/40 text-amber-700 dark:text-amber-400 font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
                 title="Purge dummy accounts and free up roll numbers for real mess operations"
               >
-                <Trash2 className="w-3.5 h-3.5 text-amber-400" />
+                <Trash2 className="w-3.5 h-3.5 text-amber-500" />
                 {purging ? 'Purging Dummies...' : 'Clean Dummy Users'}
               </button>
 
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 Provision Account
@@ -485,27 +581,27 @@ export const AdminDashboard = () => {
               <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : (
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-lg">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-700/80">
+                  <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                      <th className="px-4 py-3">User</th>
-                      <th className="px-4 py-3">Role</th>
-                      <th className="px-4 py-3">Hostel</th>
-                      <th className="px-4 py-3">Mess Facility</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3 text-right">Actions</th>
+                      <th className="px-4 py-3 font-bold">User</th>
+                      <th className="px-4 py-3 font-bold">Role</th>
+                      <th className="px-4 py-3 font-bold">Hostel</th>
+                      <th className="px-4 py-3 font-bold">Mess Facility</th>
+                      <th className="px-4 py-3 font-bold">Status</th>
+                      <th className="px-4 py-3 text-right font-bold">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
                     {userList.map((u) => (
-                      <tr key={u._id} className="hover:bg-slate-800/50 transition">
+                      <tr key={u._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
                         <td className="px-4 py-3">
-                          <div className="font-bold text-slate-100">
+                          <div className="font-bold text-slate-900 dark:text-white">
                             {u.firstName} {u.lastName}
                           </div>
-                          <div className="text-[10px] text-slate-400">
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
                             {u.email} {u.rollNumber ? `• Roll: ${u.rollNumber}` : ''}
                           </div>
                         </td>
@@ -513,21 +609,21 @@ export const AdminDashboard = () => {
                           <span
                             className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
                               u.role === 'admin'
-                                ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
                                 : u.role === 'mess_manager'
-                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                                 : u.role === 'mess_staff'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : 'bg-slate-700 text-slate-300'
+                                ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                             }`}
                           >
                             {u.role?.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-slate-300">
+                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
                           {u.hostel?.name || '—'}
                         </td>
-                        <td className="px-4 py-3 text-slate-300">
+                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
                           {u.mess?.name || '—'}
                         </td>
                         <td className="px-4 py-3">
@@ -535,8 +631,8 @@ export const AdminDashboard = () => {
                             onClick={() => handleToggleStatus(u)}
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition ${
                               u.isActive
-                                ? 'bg-emerald-500/10 text-emerald-400 hover:bg-rose-500/10 hover:text-rose-400'
-                                : 'bg-rose-500/10 text-rose-400 hover:bg-emerald-500/10 hover:text-emerald-400'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-rose-500/10 hover:text-rose-600'
+                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-emerald-500/10 hover:text-emerald-600'
                             }`}
                           >
                             {u.isActive ? 'Active' : 'Suspended'}
@@ -546,7 +642,7 @@ export const AdminDashboard = () => {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleOpenEdit(u)}
-                              className="p-1.5 text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-slate-700 transition"
+                              className="p-1.5 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                               title="Edit User"
                             >
                               <Edit className="w-3.5 h-3.5" />
@@ -554,7 +650,7 @@ export const AdminDashboard = () => {
                             <button
                               onClick={() => handleDeleteUser(u)}
                               disabled={u.role === 'admin' || u.email === 'admin@messmate.edu'}
-                              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition disabled:opacity-30 disabled:hover:text-slate-400"
+                              className="p-1.5 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition disabled:opacity-30 disabled:hover:text-slate-400"
                               title={u.role === 'admin' ? 'Cannot delete Super Admin' : 'Delete User'}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -572,9 +668,9 @@ export const AdminDashboard = () => {
       ) : (
         /* HOSTELS & MESS TAB */
         <div className="space-y-4">
-          <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-6 shadow-xl space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-              <Building className="w-4 h-4 text-emerald-400" />
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <Building className="w-4 h-4 text-emerald-500" />
               Configured Mess Facilities
             </h3>
 
@@ -582,25 +678,25 @@ export const AdminDashboard = () => {
               {messList.map((m) => (
                 <div
                   key={m._id}
-                  className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2 text-xs"
+                  className="bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-4 space-y-2.5 text-xs shadow-sm"
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="font-black text-slate-100 text-sm">{m.name}</h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">{m.name}</h4>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800/60">
                       Active Facility
                     </span>
                   </div>
 
-                  <div className="text-slate-400 space-y-1 pt-1">
+                  <div className="text-slate-600 dark:text-slate-400 space-y-1 pt-1">
                     <div>
-                      Hostel Link: <b className="text-slate-200">{m.hostel?.name || 'Assigned'}</b>
+                      Hostel Link: <b className="text-slate-900 dark:text-slate-200 font-semibold">{m.hostel?.name || 'Assigned'}</b>
                     </div>
                     <div>
-                      Max Seating Capacity: <b className="text-slate-200">{m.capacity || 400} students</b>
+                      Max Seating Capacity: <b className="text-slate-900 dark:text-slate-200 font-semibold">{m.capacity || 400} students</b>
                     </div>
                     <div>
                       Cutoff Policy:{' '}
-                      <b className="text-slate-200">
+                      <b className="text-slate-900 dark:text-slate-200 font-semibold">
                         Breakfast 21:00 (prev day) • Lunch 09:00 • Dinner 16:00
                       </b>
                     </div>
@@ -614,75 +710,75 @@ export const AdminDashboard = () => {
 
       {/* MODAL: Provision New Account */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-slate-900 dark:text-white">
             <button
               onClick={() => setShowCreateModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <Users className="w-5 h-5 text-emerald-400" />
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-emerald-500" />
               Provision New Account
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Create an administrative, staff, manager or student credential.
             </p>
 
             <form onSubmit={handleCreateUser} className="mt-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">First Name *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">First Name *</label>
                   <input
                     type="text"
                     required
                     value={newUserData.firstName}
                     onChange={(e) => setNewUserData({ ...newUserData, firstName: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Last Name *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Last Name *</label>
                   <input
                     type="text"
                     required
                     value={newUserData.lastName}
                     onChange={(e) => setNewUserData({ ...newUserData, lastName: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address *</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
                 <input
                   type="email"
                   required
                   value={newUserData.email}
                   onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Password *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password *</label>
                   <input
                     type="password"
                     required
                     value={newUserData.password}
                     onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Role *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Role *</label>
                   <select
                     value={newUserData.role}
                     onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="student">Student</option>
                     <option value="mess_staff">Mess Staff</option>
@@ -694,11 +790,11 @@ export const AdminDashboard = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Gender</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Gender</label>
                   <select
                     value={newUserData.gender || 'male'}
                     onChange={(e) => setNewUserData({ ...newUserData, gender: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -706,24 +802,24 @@ export const AdminDashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Room Number</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Room Number</label>
                   <input
                     type="text"
                     value={newUserData.roomNumber}
                     onChange={(e) => setNewUserData({ ...newUserData, roomNumber: e.target.value })}
                     placeholder="e.g. K-104, KD-201"
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 uppercase"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 uppercase"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Hostel</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Hostel</label>
                   <select
                     value={newUserData.hostel}
                     onChange={(e) => setNewUserData({ ...newUserData, hostel: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="">Unassigned</option>
                     {hostelList.map((h) => (
@@ -734,11 +830,11 @@ export const AdminDashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Mess Facility</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Mess Facility</label>
                   <select
                     value={newUserData.mess}
                     onChange={(e) => setNewUserData({ ...newUserData, mess: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="">Unassigned</option>
                     {messList.map((m) => (
@@ -754,14 +850,14 @@ export const AdminDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-emerald-500 text-slate-950 text-xs font-bold rounded-xl disabled:opacity-50"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition disabled:opacity-50"
                 >
                   {submitting ? 'Creating...' : 'Provision User'}
                 </button>
@@ -773,51 +869,51 @@ export const AdminDashboard = () => {
 
       {/* MODAL: Edit User Details */}
       {showEditModal && editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-slate-900 dark:text-white">
             <button
               onClick={() => setShowEditModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <Edit className="w-5 h-5 text-emerald-400" />
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Edit className="w-5 h-5 text-emerald-500" />
               Edit User Account
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Reassign hostel or mess facility for {editingUser.firstName} {editingUser.lastName}.
             </p>
 
             <form onSubmit={handleSaveEdit} className="mt-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">First Name</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">First Name</label>
                   <input
                     type="text"
                     value={editingUser.firstName}
                     onChange={(e) => setEditingUser({ ...editingUser, firstName: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Last Name</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Last Name</label>
                   <input
                     type="text"
                     value={editingUser.lastName}
                     onChange={(e) => setEditingUser({ ...editingUser, lastName: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Role</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Role</label>
                 <select
                   value={editingUser.role}
                   onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                 >
                   <option value="student">Student</option>
                   <option value="mess_staff">Mess Staff</option>
@@ -828,11 +924,11 @@ export const AdminDashboard = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Gender</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Gender</label>
                   <select
                     value={editingUser.gender || 'male'}
                     onChange={(e) => setEditingUser({ ...editingUser, gender: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -840,23 +936,23 @@ export const AdminDashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Room Number</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Room Number</label>
                   <input
                     type="text"
                     value={editingUser.roomNumber || ''}
                     onChange={(e) => setEditingUser({ ...editingUser, roomNumber: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 uppercase"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 uppercase"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Assigned Hostel</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Assigned Hostel</label>
                   <select
                     value={editingUser.hostel || ''}
                     onChange={(e) => setEditingUser({ ...editingUser, hostel: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="">None / Unassigned</option>
                     {hostelList.map((h) => (
@@ -867,11 +963,11 @@ export const AdminDashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Assigned Mess</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Assigned Mess</label>
                   <select
                     value={editingUser.mess || ''}
                     onChange={(e) => setEditingUser({ ...editingUser, mess: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                   >
                     <option value="">None / Unassigned</option>
                     {messList.map((m) => (
@@ -887,14 +983,14 @@ export const AdminDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-emerald-500 text-slate-950 text-xs font-bold rounded-xl disabled:opacity-50"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black rounded-xl transition disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : 'Save Changes'}
                 </button>

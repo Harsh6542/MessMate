@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useSocket } from '../context/SocketContext';
 import api from '../services/api';
 import {
@@ -23,11 +24,14 @@ import {
   FileSpreadsheet,
   ShieldCheck,
   Check,
-  Wallet
+  Wallet,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export const DashboardLayout = () => {
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const socketCtx = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
@@ -142,7 +146,7 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-slate-900 border-r border-slate-800 z-30">
         <div className="flex items-center gap-3 px-6 h-16 border-b border-slate-800">
@@ -280,23 +284,32 @@ export const DashboardLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen">
         {/* Desktop Top Bar */}
-        <header className="hidden md:flex items-center justify-between h-16 px-8 bg-white border-b border-slate-200 relative">
+        <header className="hidden md:flex items-center justify-between h-16 px-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 relative transition-colors duration-200">
           <div>
-            <h1 className="text-base font-semibold text-slate-800">
+            <h1 className="text-base font-semibold text-slate-900 dark:text-white">
               Welcome, {user?.firstName}
             </h1>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {user?.hostel?.name ? `Hostel: ${user.hostel.name}` : 'NIT Patna Mess Ecosystem'}
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Dark/Light Mode Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+            >
+              {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
+            </button>
+
             {/* Notification Bell with Dropdown */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
                 title="Notifications"
-                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative"
+                className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
@@ -308,20 +321,20 @@ export const DashboardLayout = () => {
 
               {/* Notification Panel */}
               {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-fade-in">
-                  <div className="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800">Notifications</span>
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-50 overflow-hidden animate-fade-in">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 dark:text-white">Notifications</span>
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllRead}
-                        className="text-[10px] text-emerald-600 hover:underline font-semibold"
+                        className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:underline font-semibold"
                       >
                         Mark all as read
                       </button>
                     )}
                   </div>
 
-                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
                     {notifList.length === 0 ? (
                       <div className="p-6 text-center text-xs text-slate-400">
                         No notifications yet.
@@ -330,12 +343,12 @@ export const DashboardLayout = () => {
                       notifList.map((n) => (
                         <div
                           key={n._id}
-                          className={`p-3 text-xs transition-colors hover:bg-slate-50 ${
-                            !n.isRead ? 'bg-emerald-50/40' : ''
+                          className={`p-3 text-xs transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                            !n.isRead ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ''
                           }`}
                         >
-                          <p className="font-bold text-slate-800">{n.title}</p>
-                          <p className="text-slate-500 mt-0.5 text-[11px]">{n.message}</p>
+                          <p className="font-bold text-slate-800 dark:text-slate-200">{n.title}</p>
+                          <p className="text-slate-500 dark:text-slate-400 mt-0.5 text-[11px]">{n.message}</p>
                           <span className="text-[9px] text-slate-400 mt-1 block">
                             {new Date(n.createdAt).toLocaleTimeString()}
                           </span>
@@ -347,13 +360,13 @@ export const DashboardLayout = () => {
               )}
             </div>
 
-            <div className="h-6 w-px bg-slate-200"></div>
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
             <Link
               to="/profile"
-              className="flex items-center gap-2.5 text-slate-700 hover:text-slate-900 group"
+              className="flex items-center gap-2.5 text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white group"
             >
-              <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-semibold flex items-center justify-center text-xs group-hover:ring-2 group-hover:ring-emerald-500 transition-all">
+              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold flex items-center justify-center text-xs group-hover:ring-2 group-hover:ring-emerald-500 transition-all">
                 {user?.firstName?.[0]}
                 {user?.lastName?.[0]}
               </div>
