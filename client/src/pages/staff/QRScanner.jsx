@@ -177,8 +177,8 @@ export const QRScanner = () => {
               </span>
             )}
           </div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight">Mess QR Counter Scanner</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Mess QR Counter Scanner</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Scan student QR code for regular meal entry (Free) or mess coupon redemption (₹500).
           </p>
         </div>
@@ -206,18 +206,18 @@ export const QRScanner = () => {
             )}
           </button>
 
-          <div className="text-right pl-2 border-l border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Verified</span>
-            <span className="text-xl font-black text-emerald-400">{scannedCount}</span>
+          <div className="text-right pl-2 border-l border-slate-200 dark:border-slate-800">
+            <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Verified</span>
+            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">{scannedCount}</span>
           </div>
         </div>
       </div>
 
       {/* ── COUNTER MODE SWITCHER ── */}
-      <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-300">
+      <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl space-y-3 shadow-sm">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
           <span>Verification Mode:</span>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">
             {scanMode === 'regular' ? 'Standard Free Meals (Included in Hostel Fee)' : 'Redeem Wallet Payment'}
           </span>
         </div>
@@ -228,7 +228,7 @@ export const QRScanner = () => {
             className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border ${
               scanMode === 'regular'
                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
-                : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'
+                : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Utensils className="w-3.5 h-3.5" />
@@ -240,7 +240,7 @@ export const QRScanner = () => {
             className={`p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border ${
               scanMode === 'coupon'
                 ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md'
-                : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'
+                : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -250,10 +250,10 @@ export const QRScanner = () => {
 
         {/* Amount Input for Wallet Payment Mode */}
         {scanMode === 'coupon' && (
-          <div className="pt-2 border-t border-slate-800 space-y-2">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-semibold">Enter Amount to Deduct (₹1 - ₹1,000):</span>
-              <span className="font-bold text-amber-300">₹{redeemAmount}</span>
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Enter Amount to Deduct (₹1 - ₹1,000):</span>
+              <span className="font-bold text-amber-600 dark:text-amber-300">₹{redeemAmount}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -264,7 +264,7 @@ export const QRScanner = () => {
                   max="1000"
                   value={redeemAmount}
                   onChange={(e) => setRedeemAmount(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-white font-bold text-sm focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-3 py-2 text-slate-900 dark:text-white font-bold text-sm focus:outline-none focus:border-amber-400 shadow-sm"
                   placeholder="Amount"
                 />
               </div>
@@ -277,7 +277,7 @@ export const QRScanner = () => {
                     className={`px-2.5 py-2 text-xs font-bold rounded-xl border transition ${
                       redeemAmount === preset
                         ? 'bg-amber-400 text-slate-950 border-amber-400'
-                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-sm'
                     }`}
                   >
                     ₹{preset}
@@ -367,17 +367,17 @@ export const QRScanner = () => {
       )}
 
       {/* HTML5 QR Camera View Container or Inactive State */}
-      <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl overflow-hidden min-h-[320px] flex flex-col items-center justify-center">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm dark:shadow-xl overflow-hidden min-h-[320px] flex flex-col items-center justify-center">
         {isCameraActive ? (
-          <div id="qr-reader" className="w-full rounded-2xl overflow-hidden text-slate-100"></div>
+          <div id="qr-reader" className="w-full rounded-2xl overflow-hidden text-slate-900 dark:text-slate-100"></div>
         ) : (
           <div className="text-center py-12 space-y-4">
-            <div className="w-16 h-16 bg-slate-800 rounded-3xl flex items-center justify-center mx-auto text-slate-500 border border-slate-700">
+            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700">
               <CameraOff className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-200">Camera is Turned Off</h3>
-              <p className="text-xs text-slate-400 max-w-xs mx-auto">
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Camera is Turned Off</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                 Webcam hardware has been released. Click below to re-activate the camera when ready to scan.
               </p>
             </div>

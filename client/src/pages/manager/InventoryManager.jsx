@@ -216,9 +216,9 @@ export const InventoryManager = () => {
           </button>
           <button
             onClick={() => setShowAddItemModal(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition"
+            className="px-3.5 py-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition"
           >
-            <Plus className="w-4 h-4 text-emerald-400" />
+            <Plus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             New Item
           </button>
         </div>
@@ -250,41 +250,41 @@ export const InventoryManager = () => {
 
       {/* KPI Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-          <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Catalogued Items</span>
-          <div className="text-2xl font-black text-slate-100 mt-1">{items.length}</div>
-          <p className="text-[10px] text-slate-500 mt-0.5">Active food stock lines</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Catalogued Items</span>
+          <div className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-1">{items.length}</div>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Active food stock lines</p>
         </div>
 
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-          <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Low Stock Warnings</span>
-          <div className="text-2xl font-black text-amber-400 mt-1">{alerts.length}</div>
-          <p className="text-[10px] text-slate-500 mt-0.5">At or below reorder level</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Low Stock Warnings</span>
+          <div className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">{alerts.length}</div>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">At or below reorder level</p>
         </div>
 
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-          <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Estimated Valuation</span>
-          <div className="text-2xl font-black text-emerald-400 mt-1">₹{Math.round(totalEstimatedValue).toLocaleString()}</div>
-          <p className="text-[10px] text-slate-500 mt-0.5">Approx. on-hand capital</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estimated Valuation</span>
+          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹{Math.round(totalEstimatedValue).toLocaleString()}</div>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Approx. on-hand capital</p>
         </div>
 
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-          <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Stock Status</span>
-          <div className="text-2xl font-black text-cyan-400 mt-1">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Stock Status</span>
+          <div className="text-2xl font-black text-cyan-600 dark:text-cyan-400 mt-1">
             {alerts.length === 0 ? 'Optimal' : 'Needs Action'}
           </div>
-          <p className="text-[10px] text-slate-500 mt-0.5">Supply pipeline condition</p>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Supply pipeline condition</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-3 border-b border-slate-800 pb-2">
+      <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-2">
         <button
           onClick={() => setActiveTab('inventory')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 ${
             activeTab === 'inventory'
-              ? 'bg-slate-800 text-emerald-400 border border-slate-700'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 shadow-sm'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <Package className="w-3.5 h-3.5" />
@@ -295,8 +295,8 @@ export const InventoryManager = () => {
           onClick={() => setActiveTab('transactions')}
           className={`px-4 py-2 text-xs font-bold rounded-xl transition flex items-center gap-2 ${
             activeTab === 'transactions'
-              ? 'bg-slate-800 text-emerald-400 border border-slate-700'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 shadow-sm'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
           <History className="w-3.5 h-3.5" />
@@ -315,7 +315,7 @@ export const InventoryManager = () => {
                   placeholder="Search item name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-800/80 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 pl-9 outline-none focus:border-emerald-500"
+                  className="w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 pl-9 outline-none shadow-sm focus:border-emerald-500"
                 />
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
@@ -323,7 +323,7 @@ export const InventoryManager = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-slate-800/80 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 outline-none shadow-sm focus:border-emerald-500"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>
@@ -338,8 +338,8 @@ export const InventoryManager = () => {
                 onClick={() => setLowStockFilter(!lowStockFilter)}
                 className={`px-3 py-2 text-xs font-bold rounded-xl border transition ${
                   lowStockFilter
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                    : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-slate-200'
+                    ? 'bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-500/40'
+                    : 'bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700/60 shadow-sm hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 Low Stock Only
@@ -347,7 +347,7 @@ export const InventoryManager = () => {
 
               <button
                 onClick={fetchInventory}
-                className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700"
+                className="p-2 bg-white hover:bg-slate-50 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"
                 title="Refresh"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -361,16 +361,16 @@ export const InventoryManager = () => {
               <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : items.length === 0 ? (
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-10 text-center">
-              <Package className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-300">No Inventory Items Found</h3>
+            <div className="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-10 text-center shadow-sm">
+              <Package className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-300">No Inventory Items Found</h3>
               <p className="text-xs text-slate-500 mt-1">Add items or reset your search filters.</p>
             </div>
           ) : (
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-lg">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-700/80">
+                  <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700/80">
                     <tr>
                       <th className="px-4 py-3">Item Details</th>
                       <th className="px-4 py-3">Category</th>
@@ -380,54 +380,54 @@ export const InventoryManager = () => {
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
                     {items.map((item) => {
                       const isLowStock = item.currentStock <= item.minimumThreshold;
                       return (
-                        <tr key={item._id} className="hover:bg-slate-800/50 transition">
+                        <tr key={item._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                           <td className="px-4 py-3">
-                            <div className="font-bold text-slate-100">{item.name}</div>
+                            <div className="font-bold text-slate-900 dark:text-slate-100">{item.name}</div>
                             {item.lastRestockedAt && (
                               <div className="text-[10px] text-slate-500">
                                 Restocked {new Date(item.lastRestockedAt).toLocaleDateString()}
                               </div>
                             )}
                           </td>
-                          <td className="px-4 py-3 capitalize text-slate-400">
+                          <td className="px-4 py-3 capitalize text-slate-500 dark:text-slate-400">
                             {item.category?.replace('_', ' ')}
                           </td>
                           <td className="px-4 py-3">
                             <span
                               className={`font-black text-sm ${
-                                isLowStock ? 'text-amber-400' : 'text-slate-100'
+                                isLowStock ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-slate-100'
                               }`}
                             >
                               {item.currentStock} {item.unit}
                             </span>
                             {isLowStock && (
-                              <span className="ml-2 inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20">
+                              <span className="ml-2 inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20">
                                 Low
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-slate-400">
+                          <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                             {item.minimumThreshold} {item.unit}
                           </td>
-                          <td className="px-4 py-3 text-slate-300">
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                             {item.unitCostEstimate > 0 ? `₹${item.unitCostEstimate}/${item.unit}` : '—'}
                           </td>
                           <td className="px-4 py-3 text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => handleOpenTransaction(item, 'consumption')}
-                                className="px-2.5 py-1 bg-slate-700/80 hover:bg-slate-700 text-rose-300 font-bold text-[11px] rounded-lg transition"
+                                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-rose-600 dark:text-rose-300 font-bold text-[11px] rounded-lg transition"
                                 title="Record Kitchen Usage"
                               >
                                 Consume
                               </button>
                               <button
                                 onClick={() => handleOpenTransaction(item, 'purchase')}
-                                className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold text-[11px] rounded-lg border border-emerald-500/20 transition"
+                                className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] rounded-lg border border-emerald-200 dark:border-emerald-500/20 transition"
                                 title="Record Restock / Purchase"
                               >
                                 Restock
@@ -445,10 +445,10 @@ export const InventoryManager = () => {
         </>
       ) : (
         /* Transactions Tab */
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-lg">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-700/80">
+              <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700/80">
                 <tr>
                   <th className="px-4 py-3">Timestamp</th>
                   <th className="px-4 py-3">Item</th>
@@ -459,7 +459,7 @@ export const InventoryManager = () => {
                   <th className="px-4 py-3">Remarks</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80 text-slate-300">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
                 {transactions.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="px-4 py-8 text-center text-slate-500 italic">
@@ -468,8 +468,8 @@ export const InventoryManager = () => {
                   </tr>
                 ) : (
                   transactions.map((tx) => (
-                    <tr key={tx._id} className="hover:bg-slate-800/50 transition">
-                      <td className="px-4 py-3 text-slate-400 text-[11px]">
+                    <tr key={tx._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-[11px]">
                         {new Date(tx.createdAt).toLocaleString([], {
                           month: 'short',
                           day: 'numeric',
@@ -477,30 +477,30 @@ export const InventoryManager = () => {
                           minute: '2-digit'
                         })}
                       </td>
-                      <td className="px-4 py-3 font-bold text-slate-200">{tx.item?.name || 'Item'}</td>
+                      <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-200">{tx.item?.name || 'Item'}</td>
                       <td className="px-4 py-3">
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                             tx.type === 'purchase'
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                               : tx.type === 'consumption'
-                              ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                              : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                           }`}
                         >
                           {tx.type}
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-100">
+                      <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-100">
                         {tx.type === 'purchase' ? `+${tx.quantity}` : `-${tx.quantity}`} {tx.item?.unit}
                       </td>
-                      <td className="px-4 py-3 font-black text-slate-200">
+                      <td className="px-4 py-3 font-black text-slate-900 dark:text-slate-200">
                         {tx.newStock} {tx.item?.unit}
                       </td>
-                      <td className="px-4 py-3 text-slate-400">
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                         {tx.performedBy ? `${tx.performedBy.firstName} (${tx.performedBy.role})` : 'System'}
                       </td>
-                      <td className="px-4 py-3 text-slate-500 italic text-[11px]">
+                      <td className="px-4 py-3 text-slate-400 dark:text-slate-500 italic text-[11px]">
                         {tx.remarks || tx.vendor || '—'}
                       </td>
                     </tr>

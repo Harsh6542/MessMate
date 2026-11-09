@@ -105,23 +105,23 @@ export const StudentDashboard = () => {
 
       {/* Semester Wallet Banner Widget */}
       {dashboardData?.couponWallet && (
-        <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-500/30 rounded-3xl p-5 shadow-sm dark:shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center shrink-0">
               <Wallet className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-md">
                   Mess Wallet
                 </span>
-                <span className="text-xs text-slate-400">Regular Meals are Free</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Regular Meals are Free</span>
               </div>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-2xl font-black text-white">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">
                   ₹{dashboardData.couponWallet.balanceAmount?.toLocaleString('en-IN') || '6,000'}
                 </span>
-                <span className="text-xs text-slate-400 font-semibold">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                   / ₹{dashboardData.couponWallet.semesterTotalAmount?.toLocaleString('en-IN') || '6,000'} Semester Balance
                 </span>
               </div>
@@ -130,9 +130,9 @@ export const StudentDashboard = () => {
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <span className="text-[11px] text-slate-400 block font-medium">Monthly Allowance</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Monthly Allowance</span>
               <span className={`text-xs font-bold ${
-                (dashboardData.couponWallet.monthlyRemaining ?? 1000) <= 0 ? 'text-rose-400' : 'text-emerald-400'
+                (dashboardData.couponWallet.monthlyRemaining ?? 1000) <= 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'
               }`}>
                 ₹{(dashboardData.couponWallet.monthlyRemaining ?? 1000).toLocaleString('en-IN')} / ₹1,000 remaining
               </span>
@@ -140,7 +140,7 @@ export const StudentDashboard = () => {
 
             <Link
               to="/student/coupon"
-              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 transition active:scale-98"
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-1.5 transition active:scale-98"
             >
               <ScanLine className="w-3.5 h-3.5" />
               Scan & Pay
@@ -154,10 +154,10 @@ export const StudentDashboard = () => {
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : !dashboardData ? (
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-8 text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
-          <h3 className="text-base font-bold text-slate-200">Connecting to Mess Telemetry...</h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-4 shadow-sm">
+          <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Connecting to Mess Telemetry...</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
             Unable to load meal dashboard information. Please make sure the backend server is running and click retry.
           </p>
           <button
@@ -171,31 +171,31 @@ export const StudentDashboard = () => {
         <>
           {/* Active / Next Meal Hero Card */}
           {nextSession ? (
-            <div className="bg-slate-800/50 border border-slate-700/80 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl relative overflow-hidden">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
                   <div className="flex items-center gap-2.5 mb-1.5">
                     <span
                       className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider ${
                         nextSession.isActive
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse'
-                          : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                          ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/40 animate-pulse'
+                          : 'bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30'
                       }`}
                     >
                       {nextSession.isActive ? '• Serving Now' : 'Upcoming Meal'}
                     </span>
-                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                       {nextSession.mealType}
                     </span>
                   </div>
 
-                  <h3 className="text-xl md:text-2xl font-black text-slate-100 capitalize">
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white capitalize">
                     {nextSession.mealType} Session
                   </h3>
 
-                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-2">
-                    <span className="flex items-center gap-1 text-slate-300 font-semibold">
-                      <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-2">
+                    <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300 font-semibold">
+                      <Clock className="w-3.5 h-3.5 text-emerald-500" />
                       {new Date(nextSession.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
                       -{' '}
                       {new Date(nextSession.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -203,7 +203,7 @@ export const StudentDashboard = () => {
                     <span>•</span>
                     <span>
                       Cutoff:{' '}
-                      <b className="text-slate-300">
+                      <b className="text-slate-800 dark:text-slate-200">
                         {new Date(nextSession.cutoffTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </b>
                     </span>
@@ -211,23 +211,23 @@ export const StudentDashboard = () => {
 
                   {/* Opt-out state indicator */}
                   {dashboardData?.hasDeclaredOptOut ? (
-                    <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-300 text-xs font-bold border border-rose-500/30">
-                      <XCircle className="w-4 h-4 text-rose-400" />
+                    <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs font-bold border border-rose-200 dark:border-rose-500/30">
+                      <XCircle className="w-4 h-4 text-rose-500" />
                       You have declared absence for this meal (Coupon Inactive)
                     </div>
                   ) : (
-                    <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-300 text-xs font-bold border border-emerald-500/30">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-500/30">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       Meal Confirmed (Eligible for instant QR Coupon)
                     </div>
                   )}
                 </div>
 
                 {/* Right side Action & Menu Preview */}
-                <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 lg:w-96">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center justify-between">
+                <div className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 lg:w-96 shadow-sm">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-between">
                     <span>Menu Dishes</span>
-                    <Link to="/student/menu" className="text-[10px] text-emerald-400 hover:underline">
+                    <Link to="/student/menu" className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
                       Full Menu →
                     </Link>
                   </h4>
@@ -241,7 +241,7 @@ export const StudentDashboard = () => {
                       {todayMenu.dishes.map((dish, i) => (
                         <span
                           key={dish._id || i}
-                          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700"
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-xs"
                         >
                           {dish.name}
                         </span>
@@ -249,10 +249,10 @@ export const StudentDashboard = () => {
                     </div>
                   )}
 
-                  <div className="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between">
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700/80 flex items-center justify-between">
                     <Link
                       to="/student/coupon"
-                      className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs text-center rounded-xl shadow-md transition flex items-center justify-center gap-1.5"
+                      className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs text-center rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-1.5"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       Open QR Coupon
@@ -264,59 +264,59 @@ export const StudentDashboard = () => {
           ) : null}
 
           {/* Quick Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">
                 Meals Attended
               </span>
-              <div className="text-2xl font-black text-slate-100 mt-1">
+              <div className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white mt-1">
                 {stats?.attendedPast30Days || 0}
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">In the past 30 days</p>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">In the past 30 days</p>
             </div>
 
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">
                 Declared Opt-Outs
               </span>
-              <div className="text-2xl font-black text-rose-400 mt-1">
+              <div className="text-2xl lg:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1">
                 {stats?.optOutsPast30Days || 0}
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">Planned absences saved food</p>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Planned absences saved food</p>
             </div>
 
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">
                 Guest Passes
               </span>
-              <div className="text-2xl font-black text-cyan-400 mt-1">
+              <div className="text-2xl lg:text-3xl font-black text-cyan-600 dark:text-cyan-400 mt-1">
                 {dashboardData?.guestRequests?.length || 0}
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">Upcoming visitor tickets</p>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Upcoming visitor tickets</p>
             </div>
 
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">
                 Open Grievances
               </span>
-              <div className="text-2xl font-black text-amber-400 mt-1">
+              <div className="text-2xl lg:text-3xl font-black text-amber-600 dark:text-amber-400 mt-1">
                 {dashboardData?.recentComplaints?.filter((c) => c.status !== 'closed' && c.status !== 'resolved').length || 0}
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">Active tickets in SLA</p>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">Active tickets in SLA</p>
             </div>
           </div>
 
           {/* Grievances & Announcements Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* My Recent Grievances */}
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-5 shadow-lg flex flex-col justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-sm dark:shadow-lg flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-500" />
                     My Grievance & Complaint Tickets
                   </h3>
-                  <Link to="/student/complaints" className="text-xs text-emerald-400 hover:underline">
+                  <Link to="/student/complaints" className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
                     View All →
                   </Link>
                 </div>
@@ -331,31 +331,31 @@ export const StudentDashboard = () => {
                       <Link
                         key={c._id}
                         to={`/student/complaints/${c._id}`}
-                        className="block bg-slate-900/80 hover:bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs transition"
+                        className="block bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs transition"
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-slate-200">{c.title || c.subject}</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-200">{c.title || c.subject}</span>
                           <span
                             className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
                               c.status === 'resolved'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                             }`}
                           >
                             {c.status?.replace('_', ' ')}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400 line-clamp-1">{c.description}</p>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-1">{c.description}</p>
                       </Link>
                     ))}
                   </div>
                 )}
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
                 <Link
                   to="/student/complaints/new"
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition"
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 transition"
                 >
                   + Lodge New Grievance
                 </Link>
@@ -363,10 +363,10 @@ export const StudentDashboard = () => {
             </div>
 
             {/* Mess Announcements Bulletin */}
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-5 shadow-lg">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-sm dark:shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-emerald-500" />
                   Mess Announcements & Bulletins
                 </h3>
               </div>
@@ -380,18 +380,18 @@ export const StudentDashboard = () => {
                   {dashboardData.announcements.map((a) => (
                     <div
                       key={a._id}
-                      className="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-xs"
+                      className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs"
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-slate-100 flex items-center gap-1.5">
-                          {a.isPinned && <span className="text-emerald-400">📌</span>}
+                        <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          {a.isPinned && <span className="text-emerald-500">📌</span>}
                           {a.title}
                         </span>
                         <span className="text-[10px] text-slate-500">
                           {new Date(a.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-300 leading-relaxed">{a.content}</p>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{a.content}</p>
                     </div>
                   ))}
                 </div>

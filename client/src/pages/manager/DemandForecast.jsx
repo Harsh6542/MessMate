@@ -83,11 +83,11 @@ export const DemandForecast = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-            <TrendingUp className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+            <TrendingUp className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             Meal Demand Forecasting & Portions
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Algorithmic meal demand prediction combining student opt-outs, approved guest tickets & historical turnout patterns.
           </p>
         </div>
@@ -99,14 +99,14 @@ export const DemandForecast = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-slate-800/80 border border-slate-700/80 text-slate-200 text-xs rounded-xl px-3 py-2 pl-9 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+              className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 pl-9 shadow-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
             />
             <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           </div>
 
           <button
             onClick={() => fetchDemand(selectedDate)}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700/80 transition"
+            className="p-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition"
             title="Refresh Predictions"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -119,9 +119,9 @@ export const DemandForecast = () => {
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : !prepData?.prepSheets?.length ? (
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-12 text-center">
-          <Utensils className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-300">No Meal Sessions Configured</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-12 text-center shadow-sm">
+          <Utensils className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Meal Sessions Configured</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
             No active meal sessions were found for the selected date. Ensure the mess weekly menu is active.
           </p>
@@ -129,7 +129,7 @@ export const DemandForecast = () => {
       ) : (
         <>
           {/* Meal Session Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800">
             {prepData.prepSheets.map((sheet, idx) => (
               <button
                 key={sheet.sessionId}
@@ -137,7 +137,7 @@ export const DemandForecast = () => {
                 className={`px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
                   selectedSessionIndex === idx
                     ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 border border-slate-700/60'
+                    : 'bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700/60 shadow-sm'
                 }`}
               >
                 <span>{sheet.mealType}</span>
@@ -145,7 +145,7 @@ export const DemandForecast = () => {
                   className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                     selectedSessionIndex === idx
                       ? 'bg-slate-950/20 text-slate-950'
-                      : 'bg-slate-700/60 text-slate-300'
+                      : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {sheet.targetCookingServings} heads
@@ -157,26 +157,26 @@ export const DemandForecast = () => {
           {currentSheet && (
             <div className="space-y-6">
               {/* Formula & Status Ribbon */}
-              <div className="bg-gradient-to-r from-emerald-950/30 via-slate-900 to-slate-900 border border-emerald-500/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="bg-emerald-50/60 dark:bg-gradient-to-r dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                       Demand Optimization Engine
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                       Formula: Declared Demand = Residents ({currentSheet.declaredDemand + (currentSheet.optOutCount || 0) - (currentSheet.approvedGuests || 0)}) − Opt-Outs + Approved Guests
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 text-xs">
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <Clock className="w-3.5 h-3.5 text-slate-500" />
+                  <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
                     <span>Cutoff Passed: </span>
-                    <span className="font-semibold text-slate-200">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
                       {new Date(currentSheet.cutoffTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -185,75 +185,75 @@ export const DemandForecast = () => {
 
               {/* Grid of Key Breakdown Metrics */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-                  <div className="flex items-center justify-between text-slate-400 mb-1">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
                     <span className="text-[11px] font-medium uppercase tracking-wider">Declared Opt-Outs</span>
-                    <UserX className="w-4 h-4 text-rose-400" />
+                    <UserX className="w-4 h-4 text-rose-500" />
                   </div>
-                  <div className="text-2xl font-black text-rose-400">{currentSheet.declaredDemand !== undefined ? prepData.prepSheets[selectedSessionIndex]?.menu ? 'Active' : '-' : '-'}</div>
-                  <p className="text-[10px] text-slate-500 mt-1">Students eating outside or home</p>
+                  <div className="text-2xl font-black text-rose-600 dark:text-rose-400">{currentSheet.declaredDemand !== undefined ? prepData.prepSheets[selectedSessionIndex]?.menu ? 'Active' : '-' : '-'}</div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Students eating outside or home</p>
                 </div>
 
-                <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-                  <div className="flex items-center justify-between text-slate-400 mb-1">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
                     <span className="text-[11px] font-medium uppercase tracking-wider">Approved Guests</span>
-                    <UserPlus className="w-4 h-4 text-cyan-400" />
+                    <UserPlus className="w-4 h-4 text-cyan-500" />
                   </div>
-                  <div className="text-2xl font-black text-cyan-400">+{currentSheet.approvedGuests || 0}</div>
-                  <p className="text-[10px] text-slate-500 mt-1">Visiting students / family tickets</p>
+                  <div className="text-2xl font-black text-cyan-600 dark:text-cyan-400">+{currentSheet.approvedGuests || 0}</div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Visiting students / family tickets</p>
                 </div>
 
-                <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-                  <div className="flex items-center justify-between text-slate-400 mb-1">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
                     <span className="text-[11px] font-medium uppercase tracking-wider">Historical Turnout</span>
-                    <ShieldCheck className="w-4 h-4 text-amber-400" />
+                    <ShieldCheck className="w-4 h-4 text-amber-500" />
                   </div>
-                  <div className="text-2xl font-black text-amber-400">{currentSheet.turnoutRate || '94%'}</div>
-                  <p className="text-[10px] text-slate-500 mt-1">Past 30-day attendance fidelity</p>
+                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400">{currentSheet.turnoutRate || '94%'}</div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Past 30-day attendance fidelity</p>
                 </div>
 
-                <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-4">
-                  <div className="flex items-center justify-between text-slate-400 mb-1">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
                     <span className="text-[11px] font-medium uppercase tracking-wider">Walk-in Buffer</span>
-                    <Users className="w-4 h-4 text-emerald-400" />
+                    <Users className="w-4 h-4 text-emerald-500" />
                   </div>
-                  <div className="text-2xl font-black text-emerald-400">+{currentSheet.safetyBuffer || 5}</div>
-                  <p className="text-[10px] text-slate-500 mt-1">Contingency portion margin</p>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">+{currentSheet.safetyBuffer || 5}</div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Contingency portion margin</p>
                 </div>
               </div>
 
               {/* Recommended vs Approved Cooking Quantity Card */}
-              <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 md:p-6 shadow-xl">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-5 md:p-6 shadow-sm dark:shadow-xl">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                   <div>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
                       Recommendation Comparison
                     </span>
                     <div className="flex items-baseline gap-4 mt-1">
                       <div>
-                        <span className="text-xs text-slate-400">Algorithmic Suggestion: </span>
-                        <span className="text-2xl font-extrabold text-emerald-400">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">Algorithmic Suggestion: </span>
+                        <span className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
                           {currentSheet.recommendedQuantity}
                         </span>
-                        <span className="text-xs text-slate-400 ml-1">servings</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">servings</span>
                       </div>
-                      <div className="text-slate-600">|</div>
+                      <div className="text-slate-300 dark:text-slate-600">|</div>
                       <div>
-                        <span className="text-xs text-slate-400">Net Declared Demand: </span>
-                        <span className="text-lg font-bold text-slate-200">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">Net Declared Demand: </span>
+                        <span className="text-lg font-bold text-slate-800 dark:text-slate-200">
                           {currentSheet.declaredDemand}
                         </span>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-400 mt-2">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                       Review and finalize the final cooking count. This value directly updates the kitchen preparation sheet.
                     </p>
                   </div>
 
                   {/* Quantity Adjustment Input */}
-                  <div className="flex items-center gap-3 bg-slate-900/90 border border-slate-700 rounded-xl p-2.5 self-start lg:self-auto">
+                  <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 self-start lg:self-auto">
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                      <label className="block text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1">
                         Approved Head Count
                       </label>
                       <input
@@ -261,14 +261,14 @@ export const DemandForecast = () => {
                         min="0"
                         value={adjustedQuantities[currentSheet.sessionId] ?? currentSheet.targetCookingServings}
                         onChange={(e) => handleQuantityChange(currentSheet.sessionId, e.target.value)}
-                        className="w-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-lg font-black text-emerald-400 outline-none focus:border-emerald-500"
+                        className="w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-lg font-black text-emerald-600 dark:text-emerald-400 outline-none focus:border-emerald-500 shadow-sm"
                       />
                     </div>
 
                     <button
                       onClick={() => handleSaveQuantity(currentSheet.sessionId)}
                       disabled={saving}
-                      className="h-full mt-4 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center gap-1.5 transition disabled:opacity-50"
+                      className="h-full mt-4 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center gap-1.5 transition shadow-sm disabled:opacity-50"
                     >
                       <Save className="w-3.5 h-3.5" />
                       {saving ? 'Saving...' : 'Approve Quantity'}
@@ -278,9 +278,9 @@ export const DemandForecast = () => {
               </div>
 
               {/* Kitchen Menu & Bulk Ingredient Preview */}
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-                  <Utensils className="w-4 h-4 text-emerald-400" />
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300 mb-4 flex items-center gap-2">
+                  <Utensils className="w-4 h-4 text-emerald-500" />
                   Menu Dishes & Estimated Bulk Raw Material Required (for {adjustedQuantities[currentSheet.sessionId] ?? currentSheet.targetCookingServings} Servings)
                 </h3>
 
@@ -293,16 +293,16 @@ export const DemandForecast = () => {
                     {currentSheet.menu.dishes.map((dish, i) => (
                       <div
                         key={dish._id || i}
-                        className="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-between"
+                        className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 flex flex-col justify-between"
                       >
                         <div>
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-xs text-slate-200">{dish.name}</span>
+                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200">{dish.name}</span>
                             <span
                               className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${
                                 dish.isVeg
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                               }`}
                             >
                               {dish.isVeg ? 'VEG' : 'NON-VEG'}
@@ -311,9 +311,9 @@ export const DemandForecast = () => {
                           <p className="text-[10px] text-slate-500 mt-0.5 capitalize">{dish.category?.replace('_', ' ')}</p>
                         </div>
 
-                        <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between">
-                          <span className="text-[10px] text-slate-400">{dish.portionNote}</span>
-                          <span className="text-xs font-extrabold text-emerald-400">
+                        <div className="mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">{dish.portionNote}</span>
+                          <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
                             {dish.estimatedRawKg > 0 ? `~${dish.estimatedRawKg} kg raw` : 'Batch prep'}
                           </span>
                         </div>

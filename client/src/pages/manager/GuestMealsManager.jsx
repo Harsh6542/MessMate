@@ -75,11 +75,11 @@ export const GuestMealsManager = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
+            <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             Guest Meal Bookings & Visitor Approvals
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Approve or reject student guest meal tickets. Approved guests automatically increment kitchen prep sheets.
           </p>
         </div>
@@ -87,7 +87,7 @@ export const GuestMealsManager = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={fetchRequests}
-            className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+            className="p-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -96,7 +96,7 @@ export const GuestMealsManager = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2 overflow-x-auto">
           {[
             { label: 'All Requests', val: '' },
@@ -110,7 +110,7 @@ export const GuestMealsManager = () => {
               className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition ${
                 statusFilter === tab.val
                   ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                  : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 border border-slate-700/60'
+                  : 'bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700/60 shadow-sm'
               }`}
             >
               {tab.label}
@@ -122,7 +122,7 @@ export const GuestMealsManager = () => {
           <select
             value={mealFilter}
             onChange={(e) => setMealFilter(e.target.value)}
-            className="bg-slate-800/80 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-1.5 outline-none focus:border-emerald-500"
+            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-1.5 outline-none shadow-sm focus:border-emerald-500"
           >
             <option value="">All Meal Types</option>
             <option value="breakfast">Breakfast</option>
@@ -138,9 +138,9 @@ export const GuestMealsManager = () => {
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : requests.length === 0 ? (
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-12 text-center">
-          <Users className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-slate-300">No Guest Meal Requests Found</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-12 text-center shadow-sm">
+          <Users className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-300">No Guest Meal Requests Found</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
             When students submit guest meal requests, they will appear here for manager authorization.
           </p>
@@ -150,60 +150,60 @@ export const GuestMealsManager = () => {
           {requests.map((req) => (
             <div
               key={req._id}
-              className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-600 transition shadow-lg"
+              className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition shadow-sm hover:shadow-md"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
                       req.status === 'approved'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                         : req.status === 'rejected'
-                        ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                     }`}
                   >
                     {req.status}
                   </span>
 
-                  <span className="text-xs font-bold text-slate-300 capitalize">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 capitalize">
                     {req.mealType}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-200">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600">
                     {req.requestedBy?.firstName?.[0] || 'S'}
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-100">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">
                       {req.requestedBy?.firstName} {req.requestedBy?.lastName}
                     </h4>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
                       Roll: {req.requestedBy?.rollNumber} • Room: {req.requestedBy?.roomNumber || 'N/A'}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-3 bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400 text-[11px]">Meal Date:</span>
-                    <span className="font-semibold text-slate-200">
+                <div className="mt-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">Meal Date:</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-200">
                       {new Date(req.date).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400 text-[11px]">Guest Count:</span>
-                    <span className="font-bold text-emerald-400">
+                  <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">Guest Count:</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
                       {req.guestCount} {req.guestCount === 1 ? 'Guest' : 'Guests'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400 text-[11px]">Total Tariff:</span>
-                    <span className="font-bold text-slate-200">₹{req.totalAmountINR}</span>
+                  <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px]">Total Tariff:</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-200">₹{req.totalAmountINR}</span>
                   </div>
-                  <div className="pt-1 border-t border-slate-800 text-[11px] text-slate-400">
-                    <span className="font-semibold text-slate-300">Purpose: </span>
+                  <div className="pt-1 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">Purpose: </span>
                     {req.purpose}
                   </div>
                   {req.guestNames?.length > 0 && (
@@ -212,7 +212,7 @@ export const GuestMealsManager = () => {
                     </div>
                   )}
                   {req.rejectionReason && (
-                    <div className="text-[10px] text-rose-400 italic pt-1">
+                    <div className="text-[10px] text-rose-600 dark:text-rose-400 italic pt-1">
                       Reason: {req.rejectionReason}
                     </div>
                   )}
@@ -221,14 +221,14 @@ export const GuestMealsManager = () => {
 
               {/* Actions */}
               {req.status === 'pending' && (
-                <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
                   <button
                     onClick={() => {
                       setRejectModalReq(req);
                       setRejectionReason('');
                     }}
                     disabled={processing}
-                    className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold rounded-xl border border-rose-500/20 transition flex items-center gap-1"
+                    className="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-500/20 transition flex items-center gap-1"
                   >
                     <XCircle className="w-3.5 h-3.5" />
                     Reject
@@ -236,7 +236,7 @@ export const GuestMealsManager = () => {
                   <button
                     onClick={() => handleDecision(req._id, 'approved')}
                     disabled={processing}
-                    className="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1"
+                    className="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1"
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
                     Approve

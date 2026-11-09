@@ -101,11 +101,11 @@ export const StaffDashboard = () => {
       {/* Staff Greeting & Standee Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-            <ScanLine className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
+            <ScanLine className="w-6 h-6 text-emerald-500" />
             Mess Staff Operations Command
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             Logged in as {user?.firstName} ({user?.role?.replace('_', ' ')?.toUpperCase()}) • Fast QR verification & PhonePe-style live counter payments.
           </p>
         </div>
@@ -113,7 +113,7 @@ export const StaffDashboard = () => {
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setShowStandeeModal(true)}
-            className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition active:scale-98"
+            className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition active:scale-98"
           >
             <QrCode className="w-4 h-4" />
             Mess Counter Standee
@@ -121,7 +121,7 @@ export const StaffDashboard = () => {
 
           <button
             onClick={fetchStaffDashboard}
-            className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+            className="p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 transition shadow-sm"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -137,14 +137,14 @@ export const StaffDashboard = () => {
         <>
           {/* Pending Waste Log Alert Banner */}
           {pendingWaste && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-center justify-between gap-3">
+            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-sm">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
                 <div>
-                  <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                  <h4 className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                     Scale Log Pending for {pendingWaste.mealType?.toUpperCase()}
                   </h4>
-                  <p className="text-xs text-slate-300 mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                     Please weigh the unserved surplus and plate waste containers to close the session record.
                   </p>
                 </div>
@@ -152,7 +152,7 @@ export const StaffDashboard = () => {
 
               <Link
                 to="/staff/waste-entry"
-                className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shrink-0 transition"
+                className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shrink-0 transition shadow-sm"
               >
                 Log Weights Now →
               </Link>
@@ -161,7 +161,7 @@ export const StaffDashboard = () => {
 
           {/* Active Meal Shift Hero Card */}
           {activeSess ? (
-            <div className="bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-6 shadow-2xl space-y-6">
+            <div className="bg-white dark:bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-6 shadow-sm dark:shadow-2xl space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -169,14 +169,14 @@ export const StaffDashboard = () => {
                       className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider ${
                         activeSess.isActive
                           ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25 animate-pulse'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                       }`}
                     >
                       {activeSess.isActive ? '● ACTIVE MEAL SESSION' : 'UPCOMING SESSION'}
                     </span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       Window:{' '}
-                      <b className="text-slate-200">
+                      <b className="text-slate-800 dark:text-slate-200">
                         {new Date(activeSess.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
                         -{' '}
                         {new Date(activeSess.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -184,37 +184,37 @@ export const StaffDashboard = () => {
                     </span>
                   </div>
 
-                  <h2 className="text-3xl font-black text-slate-100 uppercase tracking-tight">
+                  <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
                     {activeSess.mealType} Service
                   </h2>
                 </div>
 
                 {/* Big Live Attendance Counts */}
-                <div className="flex items-center gap-4 bg-slate-800/80 border border-slate-700 rounded-2xl p-4 self-start md:self-auto">
+                <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 self-start md:self-auto shadow-sm">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Served Count</span>
-                    <span className="text-3xl font-black text-emerald-400">{activeSess.actualServedCount}</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Served Count</span>
+                    <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{activeSess.actualServedCount}</span>
                   </div>
-                  <div className="w-px h-8 bg-slate-700" />
+                  <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Expected Heads</span>
-                    <span className="text-2xl font-bold text-slate-200">{activeSess.declaredDemand}</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Expected Heads</span>
+                    <span className="text-2xl font-bold text-slate-800 dark:text-slate-200">{activeSess.declaredDemand}</span>
                   </div>
-                  <div className="w-px h-8 bg-slate-700" />
+                  <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Remaining</span>
-                    <span className="text-2xl font-bold text-amber-400">{activeSess.remainingExpected}</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">Remaining</span>
+                    <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">{activeSess.remainingExpected}</span>
                   </div>
                 </div>
               </div>
 
               {/* Progress Bar */}
               <div>
-                <div className="flex justify-between text-xs text-slate-400 mb-1.5 font-bold">
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5 font-bold">
                   <span>Attendance Progress</span>
-                  <span className="text-emerald-400">{activeSess.percentageServed}% Served</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">{activeSess.percentageServed}% Served</span>
                 </div>
-                <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
                   <div
                     className="bg-emerald-500 h-full rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(100, activeSess.percentageServed)}%` }}
@@ -226,7 +226,7 @@ export const StaffDashboard = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
                 <Link
                   to="/staff/scanner"
-                  className="py-4 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+                  className="py-4 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider rounded-2xl shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2"
                 >
                   <ScanLine className="w-5 h-5" />
                   Scan Student QR
@@ -234,45 +234,45 @@ export const StaffDashboard = () => {
 
                 <button
                   onClick={() => setShowStandeeModal(true)}
-                  className="py-4 px-4 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-700 transition flex items-center justify-center gap-2"
+                  className="py-4 px-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2 shadow-sm"
                 >
-                  <QrCode className="w-4 h-4 text-emerald-400" />
+                  <QrCode className="w-4 h-4 text-emerald-500" />
                   Show Counter QR
                 </button>
 
                 <Link
                   to="/staff/manual-verify"
-                  className="py-4 px-4 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-700 transition flex items-center justify-center gap-2"
+                  className="py-4 px-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2 shadow-sm"
                 >
-                  <Users className="w-4 h-4 text-cyan-400" />
+                  <Users className="w-4 h-4 text-cyan-500" />
                   Manual Roll Search
                 </Link>
 
                 <Link
                   to="/staff/waste-entry"
-                  className="py-4 px-4 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-700 transition flex items-center justify-center gap-2"
+                  className="py-4 px-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2 shadow-sm"
                 >
-                  <TrendingDown className="w-4 h-4 text-rose-400" />
+                  <TrendingDown className="w-4 h-4 text-rose-500" />
                   Log Scale Waste
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-10 text-center">
-              <Utensils className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-slate-300">No Shift Currently Scheduled</h3>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-10 text-center shadow-sm">
+              <Utensils className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-300">No Shift Currently Scheduled</h3>
             </div>
           )}
 
           {/* Real-time PhonePe-style Counter Payments Feed */}
           {livePayments.length > 0 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-500" />
                   Live Counter QR Payments (PhonePe Flow)
                 </h3>
-                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">
                   {livePayments.length} Payments Received
                 </span>
               </div>
@@ -281,28 +281,28 @@ export const StaffDashboard = () => {
                 {livePayments.slice(0, 6).map((pay) => (
                   <div
                     key={pay._id || pay.transactionId}
-                    className="p-3.5 bg-slate-800/70 border border-slate-700/80 rounded-2xl flex items-center justify-between text-xs"
+                    className="p-3.5 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-2xl flex items-center justify-between text-xs shadow-xs"
                   >
                     <div>
-                      <p className="font-bold text-slate-100 text-xs text-amber-300">
+                      <p className="font-bold text-amber-700 dark:text-amber-300 text-xs">
                         {pay.specialItemName || `Mess Payment (₹${pay.amount || 500})`}
                       </p>
-                      <p className="text-[11px] text-slate-200 font-bold">
+                      <p className="text-[11px] text-slate-900 dark:text-slate-200 font-bold">
                         {pay.student?.name || `${pay.student?.firstName || ''} ${pay.student?.lastName || ''}`.trim() || 'Student'}
                       </p>
-                      <p className="text-[10px] text-slate-400 font-mono">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                         Roll: {pay.student?.rollNumber || 'N/A'} • Room: {pay.student?.roomNumber || '—'}
                       </p>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500">
                         {pay.redeemedAt ? new Date(pay.redeemedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                       </span>
                     </div>
 
                     <div className="text-right">
-                      <span className="font-black text-emerald-400 text-sm block">
+                      <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm block">
                         +₹{pay.amount || 500}
                       </span>
-                      <span className="text-[9px] uppercase font-bold text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                      <span className="text-[9px] uppercase font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-500/30">
                         Paid
                       </span>
                     </div>
@@ -314,8 +314,8 @@ export const StaffDashboard = () => {
 
           {/* Today's 3 Shifts Overview */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-emerald-500" />
               Today's Meal Shifts Breakdown
             </h3>
 
@@ -323,16 +323,16 @@ export const StaffDashboard = () => {
               {todayBreakdown.map((s) => (
                 <div
                   key={s.sessionId}
-                  className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between"
+                  className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
                 >
                   <div>
-                    <h4 className="font-black text-sm uppercase text-slate-200">{s.mealType}</h4>
-                    <span className="text-[10px] text-slate-400 capitalize">Status: {s.status}</span>
+                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-slate-100">{s.mealType}</h4>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">Status: {s.status}</span>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-xl font-black text-emerald-400">{s.actualServedCount}</span>
-                    <span className="text-xs text-slate-400"> / {s.declaredDemand} heads</span>
+                    <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">{s.actualServedCount}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400"> / {s.declaredDemand} heads</span>
                   </div>
                 </div>
               ))}
@@ -341,57 +341,47 @@ export const StaffDashboard = () => {
 
           {/* Recent Live Scans Audit Table */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               Recent Attendance Verifications ({recentScans.length})
             </h3>
 
             {recentScans.length === 0 ? (
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center text-slate-500 text-xs">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-8 text-center text-slate-500 text-xs shadow-sm">
                 No attendance scans recorded for this mess session yet.
               </div>
             ) : (
-              <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-lg">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-700/80">
+                    <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
                       <tr>
-                        <th className="px-4 py-3">Student Name</th>
-                        <th className="px-4 py-3">Roll Number</th>
-                        <th className="px-4 py-3">Room</th>
-                        <th className="px-4 py-3">Verification Mode</th>
-                        <th className="px-4 py-3 text-right">Time Verified</th>
+                        <th className="px-4 py-3 font-bold">Student Name</th>
+                        <th className="px-4 py-3 font-bold">Roll Number</th>
+                        <th className="px-4 py-3 font-bold">Room</th>
+                        <th className="px-4 py-3 font-bold">Verification Mode</th>
+                        <th className="px-4 py-3 text-right font-bold">Time Verified</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
                       {recentScans.map((scan) => (
-                        <tr key={scan._id} className="hover:bg-slate-800/50 transition">
-                          <td className="px-4 py-2.5 font-bold text-slate-100">
-                            {scan.student?.firstName} {scan.student?.lastName}
+                        <tr key={scan._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
+                          <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">
+                            {scan.student?.name || `${scan.student?.firstName || ''} ${scan.student?.lastName || ''}`.trim() || 'Student'}
                           </td>
-                          <td className="px-4 py-2.5 text-slate-300 font-mono">
+                          <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-300">
                             {scan.student?.rollNumber || 'N/A'}
                           </td>
-                          <td className="px-4 py-2.5 text-slate-400">
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                             {scan.student?.roomNumber || '—'}
                           </td>
-                          <td className="px-4 py-2.5">
-                            <span
-                              className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                                scan.verificationType === 'manual_override'
-                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                  : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              }`}
-                            >
-                              {scan.verificationType?.replace('_', ' ') || 'QR SCAN'}
+                          <td className="px-4 py-3">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                              {scan.verificationMethod || 'qr_scan'}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-right text-slate-400 font-mono text-[11px]">
-                            {new Date(scan.verifiedAt || scan.timestamp).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              second: '2-digit'
-                            })}
+                          <td className="px-4 py-3 text-right text-slate-500 dark:text-slate-400 font-mono">
+                            {new Date(scan.timestamp).toLocaleTimeString()}
                           </td>
                         </tr>
                       ))}

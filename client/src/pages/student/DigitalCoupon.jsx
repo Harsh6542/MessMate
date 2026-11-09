@@ -241,17 +241,17 @@ export const DigitalCoupon = () => {
       {/* Page Title & Refresh */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-            <Wallet className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+            <Wallet className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             Mess Wallet & Pay
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Total Semester Allotment: ₹6,000 • Monthly Limit: Up to ₹1,000 (Flexible ₹1 - ₹1,000)
           </p>
         </div>
         <button
           onClick={fetchWallet}
-          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+          className="p-2.5 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition"
           title="Refresh Wallet"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -259,11 +259,11 @@ export const DigitalCoupon = () => {
       </div>
 
       {/* ── POLICY NOTICE ── */}
-      <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 flex items-start gap-3">
-        <Info className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-        <div className="text-xs text-slate-300 leading-relaxed">
-          <span className="font-bold text-emerald-300">Regular Meals are Free: </span>
-          Your usual daily meals (Breakfast, Lunch, Dinner) are <b className="text-white">100% included in your hostel fee</b> with no wallet deduction. You can make any payment from <b className="text-white">₹1 to ₹1,000</b> at the counter from your allotted ₹6,000 semester wallet whenever you want extra mess items. Up to ₹1,000 can be spent per month; if monthly balance reaches ₹0, payments pause until next month when ₹1,000 will be added again.
+      <div className="bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl p-4 flex items-start gap-3 shadow-sm">
+        <Info className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+        <div className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+          <span className="font-bold text-emerald-700 dark:text-emerald-300">Regular Meals are Free: </span>
+          Your usual daily meals (Breakfast, Lunch, Dinner) are <b className="text-slate-900 dark:text-white">100% included in your hostel fee</b> with no wallet deduction. You can make any payment from <b className="text-slate-900 dark:text-white">₹1 to ₹1,000</b> at the counter from your allotted ₹6,000 semester wallet whenever you want extra mess items. Up to ₹1,000 can be spent per month; if monthly balance reaches ₹0, payments pause until next month when ₹1,000 will be added again.
         </div>
       </div>
 
@@ -361,13 +361,13 @@ export const DigitalCoupon = () => {
       </div>
 
       {/* ── NAVIGATION TABS ── */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-800">
+      <div className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <button
           onClick={() => setActiveTab('scan_pay')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${
             activeTab === 'scan_pay'
               ? 'bg-emerald-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <ScanLine className="w-4 h-4" />
@@ -379,7 +379,7 @@ export const DigitalCoupon = () => {
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${
             activeTab === 'my_qr'
               ? 'bg-emerald-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <QrCode className="w-4 h-4" />
@@ -391,7 +391,7 @@ export const DigitalCoupon = () => {
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition ${
             activeTab === 'history'
               ? 'bg-emerald-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
           }`}
         >
           <Receipt className="w-4 h-4" />
@@ -401,21 +401,21 @@ export const DigitalCoupon = () => {
 
       {/* ── TAB 1: SCAN & PAY (PHONEPE FLOW) ── */}
       {activeTab === 'scan_pay' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center space-y-5">
-          <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-sm dark:shadow-xl">
+          <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
             <ScanLine className="w-8 h-8" />
           </div>
 
           <div className="max-w-md mx-auto space-y-1.5">
-            <h2 className="text-lg font-black text-slate-100">Pay at Mess Counter Standee</h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Pay at Mess Counter Standee</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Scan the Standee QR placed at the mess counter or use Quick Pay to pay any flexible amount from ₹1 to ₹1,000 from your semester wallet.
             </p>
           </div>
 
           {isMonthlyLimitReached && (
-            <div className="max-w-md mx-auto p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-xs font-semibold flex items-center gap-2 text-left">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <div className="max-w-md mx-auto p-3.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 rounded-2xl text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2 text-left">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
               <span>
                 Monthly limit reached (₹0 remaining this month). Payments are paused. Next month ₹1,000 will be added again into your wallet.
               </span>
@@ -427,7 +427,7 @@ export const DigitalCoupon = () => {
             <button
               disabled={isMonthlyLimitReached || isSemesterLimitReached}
               onClick={() => setIsScanning(true)}
-              className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition active:scale-98"
+              className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 transition active:scale-98"
             >
               <ScanLine className="w-4 h-4" />
               Open Camera Scanner
@@ -436,14 +436,14 @@ export const DigitalCoupon = () => {
             <button
               disabled={isMonthlyLimitReached || isSemesterLimitReached}
               onClick={handleQuickPayAssignedMess}
-              className="w-full sm:w-auto px-5 py-3.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 flex items-center justify-center gap-2 transition"
+              className="w-full sm:w-auto px-5 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 dark:text-slate-200 font-bold text-xs rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 transition"
             >
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <Sparkles className="w-4 h-4 text-amber-500" />
               Quick Pay at {walletData?.student?.mess || 'Hostel Mess'}
             </button>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 rounded-full border border-slate-700/60 text-[11px] text-slate-400">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/60 rounded-full border border-slate-200 dark:border-slate-700/60 text-[11px] text-slate-600 dark:text-slate-400">
             <span>Flexible ₹1 – ₹1,000</span>
             <span>•</span>
             <span>Max ₹1,000 / month</span>
@@ -455,16 +455,16 @@ export const DigitalCoupon = () => {
 
       {/* ── TAB 2: MY UNIQUE PERMANENT QR CODE ── */}
       {activeTab === 'my_qr' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-center">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-center shadow-sm dark:shadow-xl">
           <div>
-            <h2 className="text-lg font-black text-slate-100">Permanent Student Mess QR</h2>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+            <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Permanent Student Mess QR</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
               Show this QR code at the mess counter for regular meals or for staff to scan and deduct wallet payments.
             </p>
           </div>
 
           {/* QR Display Card */}
-          <div className="inline-block p-5 bg-white rounded-3xl shadow-2xl border border-slate-700">
+          <div className="inline-block p-5 bg-white rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700">
             <QRCodeSVG
               value={walletData?.uniqueStudentQR || `MESSMATE:STUDENT:${user?.id}:${user?.rollNumber || 'STU'}`}
               size={220}
@@ -475,45 +475,45 @@ export const DigitalCoupon = () => {
 
           {/* Dual Usage Clarification */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto text-left text-xs">
-            <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-1">
-              <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+            <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
+              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Regular Meal Entry
               </span>
-              <p className="text-slate-400 text-[11px]">
+              <p className="text-slate-600 dark:text-slate-400 text-[11px]">
                 Everyday breakfast, lunch & dinner. <b>100% Free / ₹0 deducted</b> from wallet.
               </p>
             </div>
 
-            <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-1">
-              <span className="font-bold text-amber-300 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-1">
+              <span className="font-bold text-amber-600 dark:text-amber-300 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 Mess Wallet Payment
               </span>
-              <p className="text-slate-400 text-[11px]">
+              <p className="text-slate-600 dark:text-slate-400 text-[11px]">
                 Staff can scan this to deduct any payment amount (₹1 to ₹1,000) from your semester wallet.
               </p>
             </div>
           </div>
 
           {/* Student Profile Card */}
-          <div className="max-w-md mx-auto p-4 bg-slate-800/80 rounded-2xl border border-slate-700 flex items-center justify-between text-left text-xs">
+          <div className="max-w-md mx-auto p-4 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-between text-left text-xs">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 font-black flex items-center justify-center text-sm border border-emerald-500/30">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-black flex items-center justify-center text-sm border border-emerald-200 dark:border-emerald-500/30">
                 {user?.firstName?.[0]}
                 {user?.lastName?.[0]}
               </div>
               <div>
-                <p className="font-bold text-slate-200">
+                <p className="font-bold text-slate-800 dark:text-slate-200">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-slate-400 text-[11px]">Roll: {user?.rollNumber || 'N/A'}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px]">Roll: {user?.rollNumber || 'N/A'}</p>
               </div>
             </div>
 
             <div className="text-right">
-              <p className="font-semibold text-slate-300">{walletData?.student?.hostel || 'Hostel Resident'}</p>
-              <p className="text-slate-400 text-[11px]">Room: {walletData?.student?.roomNumber || 'N/A'}</p>
+              <p className="font-semibold text-slate-700 dark:text-slate-300">{walletData?.student?.hostel || 'Hostel Resident'}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-[11px]">Room: {walletData?.student?.roomNumber || 'N/A'}</p>
             </div>
           </div>
         </div>
@@ -521,13 +521,13 @@ export const DigitalCoupon = () => {
 
       {/* ── TAB 3: PASSBOOK & HISTORY ── */}
       {activeTab === 'history' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm dark:shadow-xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <Receipt className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <Receipt className="w-4 h-4 text-emerald-500" />
               Mess Wallet Passbook
             </h2>
-            <span className="text-xs font-semibold text-slate-400">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               {recentTransactions.length} Transactions
             </span>
           </div>
@@ -542,17 +542,17 @@ export const DigitalCoupon = () => {
               {recentTransactions.map((tx) => (
                 <div
                   key={tx.id || tx.transactionId}
-                  className="p-3.5 bg-slate-800/60 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 text-xs"
+                  className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 text-xs"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0 border border-emerald-100 dark:border-transparent">
                       <Utensils className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-100 uppercase">
+                      <p className="font-bold text-slate-800 dark:text-slate-100 uppercase">
                         Mess Payment
                       </p>
-                      <p className="text-[11px] text-slate-400 font-mono">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                         {tx.transactionId}
                       </p>
                       <p className="text-[10px] text-slate-500">
@@ -564,10 +564,10 @@ export const DigitalCoupon = () => {
                   </div>
 
                   <div className="text-right">
-                    <span className="font-black text-rose-400 text-sm block">
+                    <span className="font-black text-rose-600 dark:text-rose-400 text-sm block">
                       -₹{tx.amount || 500}
                     </span>
-                    <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">
                       Redeemed
                     </span>
                   </div>

@@ -141,11 +141,11 @@ export const WasteEntryForm = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-          <Scale className="w-6 h-6 text-rose-400" />
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+          <Scale className="w-6 h-6 text-rose-500" />
           Meal Scale Log & Waste Entry
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           Record empirical weight measurements after each meal service to monitor kitchen surplus and student plate waste.
         </p>
       </div>
@@ -157,11 +157,11 @@ export const WasteEntryForm = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Form */}
-          <div className="lg:col-span-2 bg-slate-800/40 border border-slate-700/60 rounded-3xl p-6 shadow-xl">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Session Selector */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                   Select Meal Session *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -173,7 +173,7 @@ export const WasteEntryForm = () => {
                       className={`py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition flex flex-col items-center gap-1 ${
                         selectedSessionId === s.sessionId
                           ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/25'
-                          : 'bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200'
+                          : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
                       <span>{s.mealType}</span>
@@ -188,7 +188,7 @@ export const WasteEntryForm = () => {
               {/* Servings Row */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Total Prepared Servings
                   </label>
                   <input
@@ -197,12 +197,12 @@ export const WasteEntryForm = () => {
                     placeholder="e.g. 450"
                     value={formData.totalPreparedServings}
                     onChange={(e) => setFormData({ ...formData, totalPreparedServings: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Total Actual Served (Attendance)
                   </label>
                   <input
@@ -211,15 +211,15 @@ export const WasteEntryForm = () => {
                     placeholder="e.g. 415"
                     value={formData.totalActualServed}
                     onChange={(e) => setFormData({ ...formData, totalActualServed: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
                   />
                 </div>
               </div>
 
               {/* Physical Scale Weights Row */}
-              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-800">
-                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
-                  <div className="flex items-center justify-between text-amber-400 mb-1.5">
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-slate-800">
+                <div className="bg-amber-50/50 dark:bg-slate-900/80 border border-amber-200/80 dark:border-slate-800 rounded-2xl p-4">
+                  <div className="flex items-center justify-between text-amber-600 dark:text-amber-400 mb-1.5">
                     <span className="text-xs font-bold uppercase tracking-wider">Unserved Surplus</span>
                     <UtensilsCrossed className="w-4 h-4" />
                   </div>
@@ -232,15 +232,15 @@ export const WasteEntryForm = () => {
                       placeholder="0.0"
                       value={formData.unservedSurplusWeightKg}
                       onChange={(e) => handleWeightChange('unservedSurplusWeightKg', e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 text-2xl font-black text-amber-400 rounded-xl px-3 py-2 outline-none focus:border-amber-500"
+                      className="w-full bg-white dark:bg-slate-800 border border-amber-300 dark:border-slate-700 text-2xl font-black text-amber-600 dark:text-amber-400 rounded-xl px-3 py-2 outline-none focus:border-amber-500"
                     />
-                    <span className="text-sm font-bold text-slate-400">kg</span>
+                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400">kg</span>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Food left over in kitchen vessels</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Food left over in kitchen vessels</p>
                 </div>
 
-                <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
-                  <div className="flex items-center justify-between text-rose-400 mb-1.5">
+                <div className="bg-rose-50/50 dark:bg-slate-900/80 border border-rose-200/80 dark:border-slate-800 rounded-2xl p-4">
+                  <div className="flex items-center justify-between text-rose-600 dark:text-rose-400 mb-1.5">
                     <span className="text-xs font-bold uppercase tracking-wider">Plate Waste</span>
                     <Trash2 className="w-4 h-4" />
                   </div>
@@ -253,18 +253,18 @@ export const WasteEntryForm = () => {
                       placeholder="0.0"
                       value={formData.plateWasteWeightKg}
                       onChange={(e) => handleWeightChange('plateWasteWeightKg', e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 text-2xl font-black text-rose-400 rounded-xl px-3 py-2 outline-none focus:border-rose-500"
+                      className="w-full bg-white dark:bg-slate-800 border border-rose-300 dark:border-slate-700 text-2xl font-black text-rose-600 dark:text-rose-400 rounded-xl px-3 py-2 outline-none focus:border-rose-500"
                     />
-                    <span className="text-sm font-bold text-slate-400">kg</span>
+                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400">kg</span>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Food discarded in wash bins by students</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Food discarded in wash bins by students</p>
                 </div>
               </div>
 
               {/* Cost & Disposal Method */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Est. Financial Loss (₹)
                   </label>
                   <input
@@ -272,18 +272,18 @@ export const WasteEntryForm = () => {
                     min="0"
                     value={formData.estimatedCostLostINR}
                     onChange={(e) => setFormData({ ...formData, estimatedCostLostINR: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Disposal / Recycling Method
                   </label>
                   <select
                     value={formData.disposalMethod}
                     onChange={(e) => setFormData({ ...formData, disposalMethod: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-rose-500"
                   >
                     <option value="biogas">Biogas Plant Conversion</option>
                     <option value="compost">Organic Composting Unit</option>
@@ -296,7 +296,7 @@ export const WasteEntryForm = () => {
 
               {/* Observations / Remarks */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Kitchen Observations & Waste Root Cause
                 </label>
                 <textarea
@@ -304,7 +304,7 @@ export const WasteEntryForm = () => {
                   placeholder="e.g. High plate waste observed for dinner sabzi; rice preparation was 15 kg excess due to rain turnout reduction."
                   value={formData.remarks}
                   onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl p-3 outline-none focus:border-rose-500"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-xs rounded-xl p-3 outline-none focus:border-rose-500"
                 />
               </div>
 
@@ -312,7 +312,7 @@ export const WasteEntryForm = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3.5 bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-rose-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-md shadow-rose-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <Scale className="w-4 h-4" />
                 {submitting ? 'Submitting Scale Record...' : 'Commit Scale Measurement Record'}
@@ -321,10 +321,10 @@ export const WasteEntryForm = () => {
           </div>
 
           {/* Quick Recent Log History */}
-          <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-sm dark:shadow-xl flex flex-col justify-between">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300 mb-3 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-emerald-500" />
                 Recently Logged Scale Weights
               </h3>
 
@@ -337,10 +337,10 @@ export const WasteEntryForm = () => {
                   {recentLogs.map((log) => (
                     <div
                       key={log._id}
-                      className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 text-xs"
+                      className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 text-xs"
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-slate-200 capitalize">
+                        <span className="font-bold text-slate-900 dark:text-slate-200 capitalize">
                           {log.mealSession?.mealType || 'Meal'} Session
                         </span>
                         <span className="text-[10px] text-slate-500">
@@ -348,14 +348,14 @@ export const WasteEntryForm = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between text-slate-400 text-[11px] mt-1">
-                        <span>Surplus: <b className="text-amber-400">{log.unservedSurplusWeightKg} kg</b></span>
-                        <span>Plate: <b className="text-rose-400">{log.plateWasteWeightKg} kg</b></span>
+                      <div className="flex items-center justify-between text-slate-600 dark:text-slate-400 text-[11px] mt-1">
+                        <span>Surplus: <b className="text-amber-600 dark:text-amber-400">{log.unservedSurplusWeightKg} kg</b></span>
+                        <span>Plate: <b className="text-rose-600 dark:text-rose-400">{log.plateWasteWeightKg} kg</b></span>
                       </div>
 
-                      <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
+                      <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-[10px]">
                         <span className="text-slate-500 capitalize">{log.disposalMethod?.replace('_', ' ')}</span>
-                        <span className="text-emerald-400 font-bold">₹{log.estimatedCostLostINR} loss</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">₹{log.estimatedCostLostINR} loss</span>
                       </div>
                     </div>
                   ))}
@@ -363,8 +363,8 @@ export const WasteEntryForm = () => {
               )}
             </div>
 
-            <div className="mt-4 p-3 bg-slate-900/60 border border-slate-800 rounded-2xl text-[11px] text-slate-400">
-              <span className="font-bold text-slate-300 block mb-0.5">Scale Protocol:</span>
+            <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl text-[11px] text-slate-600 dark:text-slate-400">
+              <span className="font-bold text-slate-800 dark:text-slate-300 block mb-0.5">Scale Protocol:</span>
               Always weigh the unserved serving pans before cleaning. Tare the container weight on the scale.
             </div>
           </div>

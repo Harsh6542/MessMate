@@ -136,27 +136,27 @@ export const GuestMealRequest = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-          <Users className="w-6 h-6 text-emerald-400" />
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
+          <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
           Guest Meal Booking & Family Passes
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           Reserve meal tickets for visiting parents, relatives or friends. Bookings are processed by the mess manager.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Booking Form */}
-        <div className="lg:col-span-2 bg-slate-800/40 border border-slate-700/60 rounded-3xl p-6 shadow-xl">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-200 mb-4 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 shadow-sm dark:shadow-xl">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-500" />
             New Guest Meal Reservation
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Visit Date *
                 </label>
                 <input
@@ -165,18 +165,18 @@ export const GuestMealRequest = () => {
                   min={new Date().toISOString().split('T')[0]}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Meal Session *
                 </label>
                 <select
                   value={mealType}
                   onChange={(e) => setMealType(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-emerald-500"
                 >
                   <option value="breakfast">Breakfast (₹60 / guest)</option>
                   <option value="lunch">Lunch (₹90 / guest)</option>
@@ -187,10 +187,10 @@ export const GuestMealRequest = () => {
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-semibold text-slate-300">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Number of Guests (Max 10)
                 </label>
-                <span className="text-xs font-bold text-emerald-400">
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   {guestCount} {guestCount === 1 ? 'Guest' : 'Guests'}
                 </span>
               </div>
@@ -200,13 +200,13 @@ export const GuestMealRequest = () => {
                 max="10"
                 value={guestCount}
                 onChange={(e) => handleGuestCountChange(parseInt(e.target.value, 10))}
-                className="w-full accent-emerald-500 bg-slate-700 h-2 rounded-lg cursor-pointer"
+                className="w-full accent-emerald-500 bg-slate-200 dark:bg-slate-700 h-2 rounded-lg cursor-pointer"
               />
             </div>
 
             {/* Guest Names Inputs */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Guest Name(s)
               </label>
               <div className="space-y-2">
@@ -217,13 +217,13 @@ export const GuestMealRequest = () => {
                       placeholder={`Guest ${i + 1} Name (e.g. Ramesh Kumar)`}
                       value={name}
                       onChange={(e) => handleNameChange(i, e.target.value)}
-                      className="flex-1 bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
+                      className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500"
                     />
                     {guestNames.length > 1 && (
                       <button
                         type="button"
                         onClick={() => handleRemoveNameField(i)}
-                        className="p-2 text-slate-500 hover:text-rose-400"
+                        className="p-2 text-slate-400 hover:text-rose-500"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -234,7 +234,7 @@ export const GuestMealRequest = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Purpose of Visit *
               </label>
               <input
@@ -243,30 +243,30 @@ export const GuestMealRequest = () => {
                 placeholder="e.g. Parents visiting NIT Patna campus / project teammates"
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-emerald-500"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-emerald-500"
               />
             </div>
 
             {/* Estimated Tariff Box */}
-            <div className="bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 flex items-center justify-between">
+            <div className="bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 flex items-center justify-between">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block">
                   Applicable Tariff Breakdown
                 </span>
-                <span className="text-xs text-slate-300">
+                <span className="text-xs text-slate-700 dark:text-slate-300">
                   {guestCount} Guest(s) × ₹{currentRate} per head
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-black text-emerald-400">₹{totalAmount}</span>
-                <span className="text-[10px] text-slate-400 block">Payable at Mess Counter</span>
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">₹{totalAmount}</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Payable at Mess Counter</span>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/25 transition disabled:opacity-50"
+              className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-emerald-500/25 transition disabled:opacity-50"
             >
               {submitting ? 'Submitting Reservation...' : 'Request Guest Meal Pass'}
             </button>
@@ -274,22 +274,22 @@ export const GuestMealRequest = () => {
         </div>
 
         {/* Policy Guidelines Box */}
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-5 shadow-xl space-y-4">
-          <div className="flex items-center gap-2 text-amber-400">
+        <div className="bg-white dark:bg-slate-800/40 border border-slate-200/90 dark:border-slate-700/60 rounded-3xl p-5 shadow-sm dark:shadow-xl space-y-4">
+          <div className="flex items-center gap-2 text-amber-500">
             <Info className="w-5 h-5 shrink-0" />
             <h3 className="text-xs font-bold uppercase tracking-wider">Hostel Mess Guest Policy</h3>
           </div>
 
-          <ul className="text-xs text-slate-400 space-y-2.5 list-disc pl-4 leading-relaxed">
+          <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-2.5 list-disc pl-4 leading-relaxed">
             <li>
-              Submit requests at least <b className="text-slate-300">3 hours</b> before the meal start time so the kitchen can prepare adequate quantities.
+              Submit requests at least <b className="text-slate-800 dark:text-slate-300">3 hours</b> before the meal start time so the kitchen can prepare adequate quantities.
             </li>
             <li>
               Approved guest passes are integrated into the kitchen prep sheet to eliminate avoidable wastage.
             </li>
             <li>
               Standard Guest Tariffs:
-              <div className="mt-1 font-semibold text-slate-300">
+              <div className="mt-1 font-semibold text-slate-800 dark:text-slate-300">
                 • Breakfast: ₹60<br />
                 • Lunch / Dinner: ₹90
               </div>
@@ -303,8 +303,8 @@ export const GuestMealRequest = () => {
 
       {/* Booking History Table */}
       <div className="space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-emerald-400" />
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-300 flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-emerald-500" />
           My Guest Meal Bookings ({requests.length})
         </h3>
 
@@ -313,14 +313,14 @@ export const GuestMealRequest = () => {
             <div className="w-6 h-6 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : requests.length === 0 ? (
-          <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center text-slate-500 text-xs">
+          <div className="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-8 text-center text-slate-500 text-xs shadow-sm">
             You have not booked any guest meals yet.
           </div>
         ) : (
-          <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-lg">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-900/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-700/80">
+                <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700/80">
                   <tr>
                     <th className="px-4 py-3">Meal Date</th>
                     <th className="px-4 py-3">Session</th>
@@ -331,26 +331,26 @@ export const GuestMealRequest = () => {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
                   {requests.map((r) => (
-                    <tr key={r._id} className="hover:bg-slate-800/50 transition">
-                      <td className="px-4 py-3 font-semibold text-slate-200">
+                    <tr key={r._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-200">
                         {new Date(r.date).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-3 capitalize font-bold text-slate-300">{r.mealType}</td>
+                      <td className="px-4 py-3 capitalize font-bold text-slate-800 dark:text-slate-300">{r.mealType}</td>
                       <td className="px-4 py-3">{r.guestCount} Guest(s)</td>
-                      <td className="px-4 py-3 font-bold text-emerald-400">₹{r.totalAmountINR}</td>
-                      <td className="px-4 py-3 text-slate-400 text-[11px]">{r.purpose}</td>
+                      <td className="px-4 py-3 font-bold text-emerald-600 dark:text-emerald-400">₹{r.totalAmountINR}</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-[11px]">{r.purpose}</td>
                       <td className="px-4 py-3">
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                             r.status === 'approved'
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                               : r.status === 'rejected'
-                              ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                               : r.status === 'cancelled'
-                              ? 'bg-slate-700 text-slate-400'
-                              : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                              ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                           }`}
                         >
                           {r.status}
@@ -360,7 +360,7 @@ export const GuestMealRequest = () => {
                         {r.status === 'pending' && (
                           <button
                             onClick={() => handleCancel(r._id)}
-                            className="text-rose-400 hover:text-rose-300 font-bold text-[11px] transition"
+                            className="text-rose-600 dark:text-rose-400 hover:text-rose-500 font-bold text-[11px] transition"
                           >
                             Cancel
                           </button>
