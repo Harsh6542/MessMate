@@ -28,7 +28,9 @@ export const SocketProvider = ({ children }) => {
       : rawSocketUrl;
     const socketInstance = io(socketUrl, {
       withCredentials: true,
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 3,
+      timeout: 5000
     });
 
     socketInstance.on('connect', () => {

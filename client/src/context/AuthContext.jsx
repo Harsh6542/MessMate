@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const res = await api.get('/auth/me');
+      const res = await api.get('/auth/me', { timeout: 5000 });
       if (res.success && res.data?.user) {
         setUser(res.data.user);
       } else {
