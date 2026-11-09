@@ -5,6 +5,7 @@ import { AppError } from '../utils/AppError.js';
 import { createNotification } from '../services/notificationService.js';
 import { emitToUser, emitToRole, emitToRoom } from '../sockets/index.js';
 import { ROLES, MEAL_TYPES } from '../config/constants.js';
+import { isDemoUser } from '../middleware/demoGuard.js';
 
 // Default guest tariff per meal type in INR
 const GUEST_PRICING = {
@@ -194,9 +195,17 @@ export const processGuestDecision = async (req, res, next) => {
       throw new AppError('Decision must be either "approved" or "rejected".', 400, 'INVALID_DECISION');
     }
 
-    const request = await GuestMealRequest.findOne({ _id: id, mess: messId });
+    const request = await GuestMealRequest.findOne({ _id: id, mess: messId }).populate('requestedBy');
     if (!request) {
       throw new AppError('Guest meal request not found in your mess.', 404, 'NOT_FOUND');
+    }
+
+    if (isDemoUser(req.user, req) && !isDemoUser(request.requestedBy, req)) {
+      throw new AppError(
+        'Demo Mode Security: Demo managers cannot modify guest passes requested by real registered students.',
+        403,
+        'DEMO_MANAGER_RESTRICTED'
+      );
     }
 
     if (request.status !== 'pending') {

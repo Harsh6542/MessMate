@@ -257,15 +257,28 @@ const seed = async () => {
 
     console.log('[Seed] Hostels created: Kautilya, Nagarjuna, Aryabhatta (Boys) & Kadambini (Girls).');
 
-    // 3. Create Super Admin
+    // 3. Create Super Admin (Demo Mode)
     const admin = await User.create({
-      firstName: 'System',
+      firstName: 'Demo',
       lastName: 'Administrator',
       email: 'admin@messmate.edu',
       password: 'Password@123',
       role: ROLES.ADMIN,
       gender: 'male',
-      phone: '9999900001'
+      phone: '9999900001',
+      isDemo: true
+    });
+
+    // Real Institutional Super Admin (Full Live Powers: Can Create/Delete Real Users & Staff)
+    await User.create({
+      firstName: 'NIT Patna',
+      lastName: 'System Admin',
+      email: 'admin@nitp.ac.in',
+      password: 'Password@123',
+      role: ROLES.ADMIN,
+      gender: 'male',
+      phone: '9999900000',
+      isDemo: false
     });
 
     // 4. Create Mess Facilities & Managers for each hostel
@@ -280,7 +293,8 @@ const seed = async () => {
       role: ROLES.MESS_MANAGER,
       gender: 'male',
       phone: '9999900010',
-      hostel: kautilyaHostel._id
+      hostel: kautilyaHostel._id,
+      isDemo: true
     });
 
     const kautilyaMess = await MessFacility.create({
@@ -313,7 +327,8 @@ const seed = async () => {
       role: ROLES.MESS_MANAGER,
       gender: 'female',
       phone: '9999900011',
-      hostel: kadambiniHostel._id
+      hostel: kadambiniHostel._id,
+      isDemo: true
     });
 
     const kadambiniMess = await MessFacility.create({
@@ -346,7 +361,8 @@ const seed = async () => {
       role: ROLES.MESS_MANAGER,
       gender: 'male',
       phone: '9999900012',
-      hostel: nagarjunaHostel._id
+      hostel: nagarjunaHostel._id,
+      isDemo: true
     });
 
     const nagarjunaMess = await MessFacility.create({
@@ -379,7 +395,8 @@ const seed = async () => {
       role: ROLES.MESS_MANAGER,
       gender: 'male',
       phone: '9999900013',
-      hostel: aryabhattaHostel._id
+      hostel: aryabhattaHostel._id,
+      isDemo: true
     });
 
     const aryabhattaMess = await MessFacility.create({
@@ -405,16 +422,16 @@ const seed = async () => {
 
     // 6. Create Mess Staff Members
     const staffMembers = [
-      { firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', staffId: 'STF-101', staffPin: '1234', phone: '9999900020', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
-      { firstName: 'Vikram', lastName: 'Yadav', email: 'staff2@messmate.edu', staffId: 'STF-102', staffPin: '1234', phone: '9999900021', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male' },
-      { firstName: 'Sunita', lastName: 'Devi', email: 'staff.kadambini@messmate.edu', staffId: 'STF-103', staffPin: '1234', phone: '9999900022', hostel: kadambiniHostel._id, mess: kadambiniMess._id, gender: 'female' },
-      { firstName: 'Sunil', lastName: 'Paswan', email: 'staff.nagarjuna@messmate.edu', staffId: 'STF-104', staffPin: '1234', phone: '9999900023', hostel: nagarjunaHostel._id, mess: nagarjunaMess._id, gender: 'male' },
-      { firstName: 'Santosh', lastName: 'Thakur', email: 'staff.aryabhatta@messmate.edu', staffId: 'STF-105', staffPin: '1234', phone: '9999900024', hostel: aryabhattaHostel._id, mess: aryabhattaMess._id, gender: 'male' }
+      { firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', staffId: 'STF-101', staffPin: '1234', phone: '9999900020', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male', isDemo: true },
+      { firstName: 'Vikram', lastName: 'Yadav', email: 'staff2@messmate.edu', staffId: 'STF-102', staffPin: '1234', phone: '9999900021', hostel: kautilyaHostel._id, mess: kautilyaMess._id, gender: 'male', isDemo: true },
+      { firstName: 'Sunita', lastName: 'Devi', email: 'staff.kadambini@messmate.edu', staffId: 'STF-103', staffPin: '1234', phone: '9999900022', hostel: kadambiniHostel._id, mess: kadambiniMess._id, gender: 'female', isDemo: true },
+      { firstName: 'Sunil', lastName: 'Paswan', email: 'staff.nagarjuna@messmate.edu', staffId: 'STF-104', staffPin: '1234', phone: '9999900023', hostel: nagarjunaHostel._id, mess: nagarjunaMess._id, gender: 'male', isDemo: true },
+      { firstName: 'Santosh', lastName: 'Thakur', email: 'staff.aryabhatta@messmate.edu', staffId: 'STF-105', staffPin: '1234', phone: '9999900024', hostel: aryabhattaHostel._id, mess: aryabhattaMess._id, gender: 'male', isDemo: true }
     ];
 
     const staffDocs = [];
     for (const s of staffMembers) {
-      const doc = await User.create({ ...s, password: 'Password@123', role: ROLES.MESS_STAFF });
+      const doc = await User.create({ ...s, password: 'Password@123', role: ROLES.MESS_STAFF, isDemo: true });
       staffDocs.push(doc);
     }
 
@@ -436,8 +453,11 @@ const seed = async () => {
         roomNumber: s.roomNumber,
         phone: s.phone,
         hostel: hId,
-        mess: mId
+        mess: mId,
+        isDemo: true
       });
+      studentDocs.push(st);
+    }
       studentDocs.push(st);
     }
     console.log(`[Seed] Created 2 Essential Demo Student accounts: Ayush Singh (Kautilya) & Priya Kumari (Kadambini). All other roll numbers free for real students.`);

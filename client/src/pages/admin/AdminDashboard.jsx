@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 import {
   Building,
   Users,
@@ -27,6 +28,16 @@ import {
 
 export const AdminDashboard = () => {
   const location = useLocation();
+  const { user: currentUser } = useAuth();
+  const isDemoAdmin = Boolean(
+    currentUser?.isDemo ||
+    currentUser?.email === 'admin@messmate.edu' ||
+    (typeof window !== 'undefined' && (
+      localStorage.getItem('messmate_token')?.startsWith('demo_') ||
+      localStorage.getItem('messmate_demo_user') !== null
+    ))
+  );
+
   const getInitialTab = () => {
     if (location.pathname.includes('/users')) return 'users';
     if (location.pathname.includes('/hostels')) return 'hostels';
@@ -62,7 +73,9 @@ export const AdminDashboard = () => {
     roomNumber: '',
     phone: '',
     hostel: '',
-    mess: ''
+    mess: '',
+    staffId: '',
+    staffPin: ''
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -129,6 +142,10 @@ export const AdminDashboard = () => {
   }, [activeTab, searchQuery, selectedRole]);
 
   const handleToggleStatus = async (user) => {
+    if (isDemoAdmin && !user.isDemo && !user.email?.endsWith('@messmate.edu')) {
+      toast.error('🛡️ Demo Evaluation Sandbox: Real accounts cannot be suspended in Demo Mode.');
+      return;
+    }
     try {
       const res = await api.put(`/users/${user._id}/status`, { isActive: !user.isActive });
       if (res.success) {
@@ -142,6 +159,10 @@ export const AdminDashboard = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
+    if (isDemoAdmin) {
+      toast.error('🛡️ Demo Evaluation Sandbox: Account provisioning is locked in Demo Mode to protect institutional data.');
+      return;
+    }
     try {
       setSubmitting(true);
       const res = await api.post('/users', newUserData);
@@ -159,7 +180,9 @@ export const AdminDashboard = () => {
           roomNumber: '',
           phone: '',
           hostel: '',
-          mess: ''
+          mess: '',
+          staffId: '',
+          staffPin: ''
         });
         fetchUsers();
         fetchAdminStats();
@@ -182,6 +205,10 @@ export const AdminDashboard = () => {
 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
+    if (isDemoAdmin && !editingUser.isDemo && !editingUser.email?.endsWith('@messmate.edu')) {
+      toast.error('🛡️ Demo Evaluation Sandbox: Modifying real user accounts is locked in Demo Mode.');
+      return;
+    }
     try {
       setSubmitting(true);
       const res = await api.put(`/users/${editingUser._id}`, {
@@ -208,8 +235,13 @@ export const AdminDashboard = () => {
   };
 
   const handleDeleteUser = async (user) => {
-    if (user.role === 'admin' || user.email === 'admin@messmate.edu') {
-      toast.error('System Super Administrator account cannot be deleted.');
+    if (user.role === 'admin' || user.email === 'admin@messmate.edu' || user.email === 'admin@nitp.ac.in') {
+      toast.error('System Super Administrator accounts cannot be deleted.');
+      return;
+    }
+
+    if (isDemoAdmin) {
+      toast.error('🛡️ Demo Evaluation Sandbox: User deletion is strictly blocked in Demo Mode to protect institutional records.');
       return;
     }
 
@@ -229,6 +261,11 @@ export const AdminDashboard = () => {
   };
 
   const handleCleanDummyUsers = async () => {
+    if (isDemoAdmin) {
+      toast.error('🛡️ Demo Evaluation Sandbox: Purging operations are locked in Demo Mode.');
+      return;
+    }
+
     const confirmMsg = 'Purge all dummy mock students from the database?\n\nThis frees up roll numbers for real students while preserving official Demo accounts (Ayush, Priya, Staff Raju, Manager Suresh, Super Admin) and weekly menus.';
     if (!window.confirm(confirmMsg)) return;
 
@@ -276,6 +313,31 @@ export const AdminDashboard = () => {
           </button>
         </div>
       </div>
+
+      {/* Demo Evaluation Mode Sandbox Banner */}
+      {isDemoAdmin && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-black text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                <span>Demo Evaluation Sandbox Active</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-200 uppercase tracking-wider font-bold">
+                  Protected Quarantine
+                </span>
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 mt-0.5">
+                Real student accounts, balances, and staff profiles are strictly protected from deletion, credential modification, or tampering. All destructive mutations are isolated.
+              </p>
+            </div>
+          </div>
+          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 shrink-0 self-start sm:self-auto bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+            Real Admin Login: <span className="font-bold text-slate-800 dark:text-slate-200">admin@nitp.ac.in</span>
+          </div>
+        </div>
+      )}
 
       {/* Navigation Tabs */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -595,70 +657,90 @@ export const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
-                    {userList.map((u) => (
-                      <tr key={u._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
-                        <td className="px-4 py-3">
-                          <div className="font-bold text-slate-900 dark:text-white">
-                            {u.firstName} {u.lastName}
-                          </div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                            {u.email} {u.rollNumber ? `• Roll: ${u.rollNumber}` : ''}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                              u.role === 'admin'
-                                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
-                                : u.role === 'mess_manager'
-                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                : u.role === 'mess_staff'
-                                ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
-                            }`}
-                          >
-                            {u.role?.replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
-                          {u.hostel?.name || '—'}
-                        </td>
-                        <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
-                          {u.mess?.name || '—'}
-                        </td>
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => handleToggleStatus(u)}
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition ${
-                              u.isActive
-                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-rose-500/10 hover:text-rose-600'
-                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-emerald-500/10 hover:text-emerald-600'
-                            }`}
-                          >
-                            {u.isActive ? 'Active' : 'Suspended'}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => handleOpenEdit(u)}
-                              className="p-1.5 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                              title="Edit User"
+                    {userList.map((u) => {
+                      const isRealUser = !u.isDemo && !u.email?.endsWith('@messmate.edu');
+                      return (
+                        <tr key={u._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900 dark:text-white">
+                                {u.firstName} {u.lastName}
+                              </span>
+                              {isRealUser ? (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 tracking-wider">
+                                  REAL USER
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20">
+                                  DEMO
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                              {u.email} {u.rollNumber ? `• Roll: ${u.rollNumber}` : ''} {u.staffId ? `• ID: ${u.staffId}` : ''}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                                u.role === 'admin'
+                                  ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
+                                  : u.role === 'mess_manager'
+                                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                  : u.role === 'mess_staff'
+                                  ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                              }`}
                             >
-                              <Edit className="w-3.5 h-3.5" />
-                            </button>
+                              {u.role?.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
+                            {u.hostel?.name || '—'}
+                          </td>
+                          <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
+                            {u.mess?.name || '—'}
+                          </td>
+                          <td className="px-4 py-3">
                             <button
-                              onClick={() => handleDeleteUser(u)}
-                              disabled={u.role === 'admin' || u.email === 'admin@messmate.edu'}
-                              className="p-1.5 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition disabled:opacity-30 disabled:hover:text-slate-400"
-                              title={u.role === 'admin' ? 'Cannot delete Super Admin' : 'Delete User'}
+                              onClick={() => handleToggleStatus(u)}
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition ${
+                                u.isActive
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-rose-500/10 hover:text-rose-600'
+                                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-emerald-500/10 hover:text-emerald-600'
+                              }`}
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              {u.isActive ? 'Active' : 'Suspended'}
                             </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => handleOpenEdit(u)}
+                                className="p-1.5 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                                title="Edit User"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteUser(u)}
+                                disabled={u.role === 'admin' || isDemoAdmin || u.email === 'admin@messmate.edu' || u.email === 'admin@nitp.ac.in'}
+                                className="p-1.5 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition disabled:opacity-30 disabled:hover:text-slate-400"
+                                title={
+                                  u.role === 'admin'
+                                    ? 'Cannot delete Super Admin'
+                                    : isDemoAdmin
+                                    ? 'User accounts are protected from deletion in Demo Mode'
+                                    : 'Delete User'
+                                }
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -727,6 +809,18 @@ export const AdminDashboard = () => {
               Create an administrative, staff, manager or student credential.
             </p>
 
+            {isDemoAdmin && (
+              <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-2.5 text-xs text-amber-700 dark:text-amber-300">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+                <div>
+                  <span className="font-bold">Demo Sandbox Notice:</span>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
+                    Live account provisioning and alloting staff IDs/PINs is restricted in Demo Admin mode to keep real institutional data secure. Real administrators (e.g. <code className="bg-amber-500/20 px-1 py-0.5 rounded font-mono text-[10px]">admin@nitp.ac.in</code>) can provision accounts and assign staff credentials.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleCreateUser} className="mt-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -787,6 +881,54 @@ export const AdminDashboard = () => {
                   </select>
                 </div>
               </div>
+
+              {/* Student-specific: Roll Number */}
+              {newUserData.role === 'student' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Roll Number *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 2201045"
+                    value={newUserData.rollNumber}
+                    onChange={(e) => setNewUserData({ ...newUserData, rollNumber: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                  />
+                </div>
+              )}
+
+              {/* Staff / Manager-specific: Staff ID & PIN */}
+              {(newUserData.role === 'mess_staff' || newUserData.role === 'mess_manager') && (
+                <div className="grid grid-cols-2 gap-3 p-3 bg-cyan-500/5 dark:bg-cyan-500/10 border border-cyan-500/20 rounded-xl">
+                  <div>
+                    <label className="block text-xs font-semibold text-cyan-800 dark:text-cyan-300 mb-1">
+                      Staff ID {newUserData.role === 'mess_staff' ? '(e.g. STF-106)' : '(e.g. MGR-105)'}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={newUserData.role === 'mess_staff' ? 'STF-106' : 'MGR-105'}
+                      value={newUserData.staffId}
+                      onChange={(e) => setNewUserData({ ...newUserData, staffId: e.target.value })}
+                      className="w-full bg-white dark:bg-slate-800 border border-cyan-200 dark:border-cyan-800 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-cyan-500 font-mono uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-cyan-800 dark:text-cyan-300 mb-1">
+                      Staff 4-Digit PIN
+                    </label>
+                    <input
+                      type="password"
+                      maxLength={6}
+                      placeholder="e.g. 1234"
+                      value={newUserData.staffPin}
+                      onChange={(e) => setNewUserData({ ...newUserData, staffPin: e.target.value })}
+                      className="w-full bg-white dark:bg-slate-800 border border-cyan-200 dark:border-cyan-800 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:border-cyan-500 font-mono tracking-widest"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -856,10 +998,10 @@ export const AdminDashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || isDemoAdmin}
                   className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition disabled:opacity-50"
                 >
-                  {submitting ? 'Creating...' : 'Provision User'}
+                  {isDemoAdmin ? 'Locked in Demo Mode' : submitting ? 'Provisioning...' : 'Provision User'}
                 </button>
               </div>
             </form>
@@ -885,6 +1027,13 @@ export const AdminDashboard = () => {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Reassign hostel or mess facility for {editingUser.firstName} {editingUser.lastName}.
             </p>
+
+            {isDemoAdmin && !editingUser.isDemo && !editingUser.email?.endsWith('@messmate.edu') && (
+              <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-amber-500" />
+                <span>🛡️ Real accounts are protected from modification in Demo Mode.</span>
+              </div>
+            )}
 
             <form onSubmit={handleSaveEdit} className="mt-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -989,10 +1138,10 @@ export const AdminDashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || (isDemoAdmin && !editingUser.isDemo && !editingUser.email?.endsWith('@messmate.edu'))}
                   className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black rounded-xl transition disabled:opacity-50"
                 >
-                  {submitting ? 'Saving...' : 'Save Changes'}
+                  {isDemoAdmin && !editingUser.isDemo && !editingUser.email?.endsWith('@messmate.edu') ? 'Locked in Demo' : submitting ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

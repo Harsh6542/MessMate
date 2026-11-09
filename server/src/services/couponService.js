@@ -9,6 +9,7 @@ import { generateSecureToken, hashToken } from '../utils/tokenUtils.js';
 import { getCurrentOrNextMealSession, normalizeDate } from './mealSessionService.js';
 import { COUPON_STATUS, DECLARATION_STATUS } from '../config/constants.js';
 import { emitToRoom } from '../sockets/index.js';
+import { isDemoUser } from '../middleware/demoGuard.js';
 
 /**
  * Helper: Ensure student wallet defaults and synchronize calendar month allowance.
@@ -443,6 +444,14 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false, amount =
 
     // If STAFF IS REDEEMING A WALLET PAYMENT:
     if (isCoupon) {
+      if (isDemoUser(staff) && !isDemoUser(student)) {
+        throw new AppError(
+          'Demo Mode Security: Demo staff accounts are sandboxed and cannot deduct real wallet balance from registered students.',
+          403,
+          'DEMO_STAFF_RESTRICTED'
+        );
+      }
+
       const payAmount = Math.round(Number(amount) || 500);
       await checkAndSyncMonthlyWallet(student);
       validateWalletAllowance(student, payAmount);
@@ -639,6 +648,14 @@ export const manualVerifyStudent = async ({ rollNumber, staffId, reason }) => {
 
   if (!student.isActive) {
     throw new AppError('This student account is marked inactive.', 403, 'INACTIVE_STUDENT');
+  }
+
+  if (isDemoUser(staff) && !isDemoUser(student)) {
+    throw new AppError(
+      'Demo Mode Security: Demo staff accounts cannot manually override attendance for real registered students.',
+      403,
+      'DEMO_STAFF_RESTRICTED'
+    );
   }
 
   const targetMessId = staff.mess?._id || student.mess?._id;

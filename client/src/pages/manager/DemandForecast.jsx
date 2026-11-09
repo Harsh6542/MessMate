@@ -134,19 +134,17 @@ export const DemandForecast = () => {
               <button
                 key={sheet.sessionId}
                 onClick={() => setSelectedSessionIndex(idx)}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${
-                  selectedSessionIndex === idx
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition ${selectedSessionIndex === idx
                     ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
                     : 'bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700/60 shadow-sm'
-                }`}
+                  }`}
               >
                 <span>{sheet.mealType}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                    selectedSessionIndex === idx
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${selectedSessionIndex === idx
                       ? 'bg-slate-950/20 text-slate-950'
                       : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300'
-                  }`}
+                    }`}
                 >
                   {sheet.targetCookingServings} heads
                 </span>
@@ -299,11 +297,10 @@ export const DemandForecast = () => {
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-xs text-slate-800 dark:text-slate-200">{dish.name}</span>
                             <span
-                              className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${
-                                dish.isVeg
+                              className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${dish.isVeg
                                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                   : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
-                              }`}
+                                }`}
                             >
                               {dish.isVeg ? 'VEG' : 'NON-VEG'}
                             </span>

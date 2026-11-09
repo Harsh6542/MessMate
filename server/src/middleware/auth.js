@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { AppError } from '../utils/AppError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/User.js';
+import { isDemoUser } from './demoGuard.js';
 
 export const authenticate = asyncHandler(async (req, res, next) => {
   let token;
@@ -57,8 +58,9 @@ export const authenticate = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // 5. Grant access: attach user to req
+  // 5. Grant access: attach user to req with demo identification
   req.user = currentUser;
+  req.user.isDemo = isDemoUser(currentUser, req);
   next();
 });
 
