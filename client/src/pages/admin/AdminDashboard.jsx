@@ -63,6 +63,7 @@ export const AdminDashboard = () => {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [purging, setPurging] = useState(false);
 
   useEffect(() => {
     if (location.pathname.includes('/users')) setActiveTab('users');
@@ -200,6 +201,46 @@ export const AdminDashboard = () => {
       toast.error(err.response?.data?.message || 'Failed to update user.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDeleteUser = async (user) => {
+    if (user.role === 'admin' || user.email === 'admin@messmate.edu') {
+      toast.error('System Super Administrator account cannot be deleted.');
+      return;
+    }
+
+    const confirmMsg = `Permanently delete ${user.firstName} ${user.lastName} (${user.email})?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      const res = await api.delete(`/users/${user._id}`);
+      if (res?.success || res?.status === 'success' || res) {
+        toast.success(`Account for ${user.firstName} deleted successfully.`);
+        fetchUsers();
+        fetchAdminStats();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete user.');
+    }
+  };
+
+  const handleCleanDummyUsers = async () => {
+    const confirmMsg = 'Purge all dummy mock students from the database?\n\nThis frees up roll numbers for real students while preserving official Demo accounts (Ayush, Priya, Staff Raju, Manager Suresh, Super Admin) and weekly menus.';
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      setPurging(true);
+      const res = await api.post('/users/clean-dummy-users');
+      if (res?.success || res?.status === 'success' || res) {
+        toast.success(res?.message || 'Purged dummy users cleanly! Database is fresh.');
+        fetchUsers();
+        fetchAdminStats();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to purge dummy users.');
+    } finally {
+      setPurging(false);
     }
   };
 
@@ -418,13 +459,25 @@ export const AdminDashboard = () => {
               </select>
             </div>
 
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5 self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              Provision Account
-            </button>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <button
+                onClick={handleCleanDummyUsers}
+                disabled={purging}
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700/80 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5"
+                title="Purge dummy accounts and free up roll numbers for real mess operations"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-amber-400" />
+                {purging ? 'Purging Dummies...' : 'Clean Dummy Users'}
+              </button>
+
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                Provision Account
+              </button>
+            </div>
           </div>
 
           {usersLoading ? (
@@ -490,13 +543,23 @@ export const AdminDashboard = () => {
                           </button>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() => handleOpenEdit(u)}
-                            className="p-1.5 text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-slate-700 transition"
-                            title="Edit User"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => handleOpenEdit(u)}
+                              className="p-1.5 text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-slate-700 transition"
+                              title="Edit User"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(u)}
+                              disabled={u.role === 'admin' || u.email === 'admin@messmate.edu'}
+                              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition disabled:opacity-30 disabled:hover:text-slate-400"
+                              title={u.role === 'admin' ? 'Cannot delete Super Admin' : 'Delete User'}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

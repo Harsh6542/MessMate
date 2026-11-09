@@ -6,6 +6,7 @@ import app from './app.js';
 import { connectDB } from './config/database.js';
 import { initSocket } from './sockets/index.js';
 import { backfillStaffCredentials } from './utils/staffBackfill.js';
+import { cleanupDummyUsers } from './utils/cleanupDummyUsers.js';
 
 const PORT = process.env.PORT || 5000;
 
@@ -27,6 +28,7 @@ const startServer = async () => {
   try {
     await connectDB();
     await backfillStaffCredentials();
+    await cleanupDummyUsers();
   } catch (err) {
     console.error(`[Server Database Warning] Initial connection to database failed: ${err.message}`);
     console.error('[Server Database Warning] In MongoDB Atlas, ensure Network Access whitelist includes 0.0.0.0/0 (Allow Access from Anywhere).');

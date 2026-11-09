@@ -166,41 +166,28 @@ const sampleWeeklyMenu = [
   }
 ];
 
-// 30 Students with designated gender
-const studentsSeedList = [
-  // Boys (18)
-  { first: 'Aarav', last: 'Sharma', gender: 'male' },
-  { first: 'Akash', last: 'Gupta', gender: 'male' },
-  { first: 'Ayush', last: 'Singh', gender: 'male' }, // Default student demo
-  { first: 'Chirag', last: 'Jha', gender: 'male' },
-  { first: 'Deepak', last: 'Choudhary', gender: 'male' },
-  { first: 'Gaurav', last: 'Kumar', gender: 'male' },
-  { first: 'Harsh', last: 'Pandey', gender: 'male' },
-  { first: 'Kunal', last: 'Yadav', gender: 'male' },
-  { first: 'Manish', last: 'Tiwari', gender: 'male' },
-  { first: 'Nikhil', last: 'Rao', gender: 'male' },
-  { first: 'Prateek', last: 'Saxena', gender: 'male' },
-  { first: 'Rahul', last: 'Tripathi', gender: 'male' },
-  { first: 'Rishabh', last: 'Chauhan', gender: 'male' },
-  { first: 'Rohan', last: 'Bose', gender: 'male' },
-  { first: 'Sameer', last: 'Khan', gender: 'male' },
-  { first: 'Saurav', last: 'Chatterjee', gender: 'male' },
-  { first: 'Tanmay', last: 'Das', gender: 'male' },
-  { first: 'Utkarsh', last: 'Dubey', gender: 'male' },
-
-  // Girls (12)
-  { first: 'Aditi', last: 'Verma', gender: 'female' },
-  { first: 'Ananya', last: 'Mishra', gender: 'female' },
-  { first: 'Bhavna', last: 'Patel', gender: 'female' },
-  { first: 'Divya', last: 'Sinha', gender: 'female' },
-  { first: 'Ishita', last: 'Roy', gender: 'female' },
-  { first: 'Neha', last: 'Kashyap', gender: 'female' },
-  { first: 'Pooja', last: 'Kumari', gender: 'female' },
-  { first: 'Priya', last: 'Kumari', gender: 'female' }, // Default female student demo
-  { first: 'Rhea', last: 'Menon', gender: 'female' },
-  { first: 'Sakshi', last: 'Agrawal', gender: 'female' },
-  { first: 'Shreya', last: 'Ghosh', gender: 'female' },
-  { first: 'Sneha', last: 'Reddy', gender: 'female' }
+// Official Demo Students (Clean & Production-Ready)
+const demoStudentsList = [
+  {
+    firstName: 'Ayush',
+    lastName: 'Singh',
+    gender: 'male',
+    email: 'student@messmate.edu',
+    rollNumber: '2201003',
+    roomNumber: 'K-103',
+    phone: '9876522003',
+    hostelCode: 'H-KAUTILYA'
+  },
+  {
+    firstName: 'Priya',
+    lastName: 'Kumari',
+    gender: 'female',
+    email: 'priya.kumari@messmate.edu',
+    rollNumber: '2201010',
+    roomNumber: 'KD-102',
+    phone: '9876522010',
+    hostelCode: 'H-KADAMBINI'
+  }
 ];
 
 const seed = async () => {
@@ -431,67 +418,29 @@ const seed = async () => {
       staffDocs.push(doc);
     }
 
-    // 7. Create 30 Students (Roll 2201001 - 2201030)
-    // Male students are distributed among Kautilya (8), Nagarjuna (5), Aryabhatta (5)
-    // Female students (12) are all assigned to Kadambini Hostel
+    // 7. Create Demo Students (Ayush Singh & Priya Kumari)
     const studentDocs = [];
-    let boysCount = 0;
-    let girlsCount = 0;
-
-    for (let i = 0; i < studentsSeedList.length; i++) {
-      const s = studentsSeedList[i];
-      const rollNum = (2201001 + i).toString();
-      let hId, mId, room;
-
-      if (s.gender === 'female') {
-        girlsCount++;
-        hId = kadambiniHostel._id;
-        mId = kadambiniMess._id;
-        room = `KD-${100 + girlsCount}`;
-      } else {
-        boysCount++;
-        if (boysCount <= 8) {
-          hId = kautilyaHostel._id;
-          mId = kautilyaMess._id;
-          room = `K-${100 + boysCount}`;
-        } else if (boysCount <= 13) {
-          hId = nagarjunaHostel._id;
-          mId = nagarjunaMess._id;
-          room = `N-${200 + (boysCount - 8)}`;
-        } else {
-          hId = aryabhattaHostel._id;
-          mId = aryabhattaMess._id;
-          room = `A-${300 + (boysCount - 13)}`;
-        }
-      }
-
-      // Default male student demo: Ayush Singh (i === 2) -> student@messmate.edu
-      // Default female student demo: Priya Kumari -> priya.kumari@messmate.edu
-      let email;
-      if (s.first === 'Ayush' && s.last === 'Singh') {
-        email = 'student@messmate.edu';
-      } else if (s.first === 'Priya' && s.last === 'Kumari') {
-        email = 'priya.kumari@messmate.edu';
-      } else {
-        email = `${s.first.toLowerCase()}.${s.last.toLowerCase()}${i}@nitp.ac.in`;
-      }
+    for (const s of demoStudentsList) {
+      const isAyush = s.email === 'student@messmate.edu';
+      const hId = isAyush ? kautilyaHostel._id : kadambiniHostel._id;
+      const mId = isAyush ? kautilyaMess._id : kadambiniMess._id;
 
       const st = await User.create({
-        firstName: s.first,
-        lastName: s.last,
-        email,
+        firstName: s.firstName,
+        lastName: s.lastName,
+        email: s.email,
         password: 'Password@123',
         role: ROLES.STUDENT,
-        rollNumber: rollNum,
+        rollNumber: s.rollNumber,
         gender: s.gender,
-        roomNumber: room,
-        phone: `98765${(10000 + i).toString()}`,
+        roomNumber: s.roomNumber,
+        phone: s.phone,
         hostel: hId,
         mess: mId
       });
       studentDocs.push(st);
     }
-    console.log(`[Seed] Created 30 Student accounts: 18 Boys (Kautilya, Nagarjuna, Aryabhatta) & 12 Girls (Kadambini).`);
+    console.log(`[Seed] Created 2 Essential Demo Student accounts: Ayush Singh (Kautilya) & Priya Kumari (Kadambini). All other roll numbers free for real students.`);
 
     // 8. Populate Menus for all 4 mess facilities
     const allMesses = [kautilyaMess._id, kadambiniMess._id, nagarjunaMess._id, aryabhattaMess._id];

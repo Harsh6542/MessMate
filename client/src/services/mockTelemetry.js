@@ -459,16 +459,25 @@ export const getFallbackData = (config) => {
   }
 
   // 12. Users
+  if (url.includes('/users/clean-dummy-users')) {
+    return {
+      success: true,
+      purgedCount: 28,
+      message: 'Successfully purged dummy student accounts. Database is fresh and operational.'
+    };
+  }
+
   if (url.includes('/users')) {
     return {
       success: true,
+      message: 'User directory loaded',
       data: {
         users: [
-          { _id: 'u1', firstName: 'Ayush', lastName: 'Singh', email: 'student@messmate.edu', role: 'student', rollNumber: '2201003' },
-          { _id: 'u2', firstName: 'Priya', lastName: 'Kumari', email: 'priya.kumari@messmate.edu', role: 'student', rollNumber: '2201010' },
-          { _id: 'u3', firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', role: 'mess_staff', staffId: 'STF-101' },
-          { _id: 'u4', firstName: 'Suresh', lastName: 'Sharma', email: 'manager@messmate.edu', role: 'mess_manager', staffId: 'MGR-101' },
-          { _id: 'u5', firstName: 'System', lastName: 'Admin', email: 'admin@messmate.edu', role: 'admin' }
+          { _id: 'u1', firstName: 'Ayush', lastName: 'Singh', email: 'student@messmate.edu', role: 'student', rollNumber: '2201003', isActive: true, hostel: { name: 'Kautilya Hostel' }, mess: { name: 'Kautilya Central Mess Block' } },
+          { _id: 'u2', firstName: 'Priya', lastName: 'Kumari', email: 'priya.kumari@messmate.edu', role: 'student', rollNumber: '2201010', isActive: true, hostel: { name: 'Kadambini Hostel' }, mess: { name: 'Kadambini Dining Facility' } },
+          { _id: 'u3', firstName: 'Raju', lastName: 'Kumar', email: 'staff@messmate.edu', role: 'mess_staff', staffId: 'STF-101', isActive: true, hostel: { name: 'Kautilya Hostel' }, mess: { name: 'Kautilya Central Mess Block' } },
+          { _id: 'u4', firstName: 'Suresh', lastName: 'Sharma', email: 'manager@messmate.edu', role: 'mess_manager', staffId: 'MGR-101', isActive: true, hostel: { name: 'Kautilya Hostel' }, mess: { name: 'Kautilya Central Mess Block' } },
+          { _id: 'u5', firstName: 'System', lastName: 'Admin', email: 'admin@messmate.edu', role: 'admin', isActive: true }
         ]
       }
     };
@@ -497,3 +506,4 @@ export const getFallbackData = (config) => {
     data: {}
   };
 };
+

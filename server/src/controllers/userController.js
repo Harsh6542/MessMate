@@ -2,6 +2,7 @@ import { User } from '../models/User.js';
 import { AppError } from '../utils/AppError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ROLES } from '../config/constants.js';
+import { cleanupDummyUsers, PROTECTED_EMAILS } from '../utils/cleanupDummyUsers.js';
 
 // @desc    List all users with filters & pagination
 // @route   GET /api/v1/users
@@ -138,5 +139,42 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     data: {
       user
     }
+  });
+});
+
+// @desc    Delete a user account
+// @route   DELETE /api/v1/users/:id
+// @access  Admin
+export const deleteUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new AppError('User not found', 404, 'NOT_FOUND'));
+  }
+
+  if (user._id.toString() === req.user._id.toString()) {
+    return next(new AppError('You cannot delete your own admin account', 400, 'SELF_DELETE_FORBIDDEN'));
+  }
+
+  if (PROTECTED_EMAILS.includes(user.email)) {
+    return next(new AppError('Protected system/demo persona cannot be deleted to ensure platform stability', 400, 'PROTECTED_ACCOUNT'));
+  }
+
+  await User.findByIdAndDelete(user._id);
+
+  res.status(200).json({
+    success: true,
+    message: `Account for ${user.firstName} ${user.lastName} (${user.email}) deleted successfully.`
+  });
+});
+
+// @desc    Purge all dummy mock students and associated records
+// @route   POST /api/v1/users/clean-dummy-users
+// @access  Admin
+export const cleanDummyUsersController = asyncHandler(async (req, res) => {
+  const result = await cleanupDummyUsers();
+  res.status(200).json({
+    success: true,
+    message: result.message,
+    data: result
   });
 });
