@@ -218,11 +218,29 @@ export const payCounterQR = async ({ studentId, counterQR, amount }) => {
   await checkAndSyncMonthlyWallet(student);
   validateWalletAllowance(student, payAmount);
 
-  // 4. Deduct payment amount from wallet
-  student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - payAmount);
-  student.couponWallet.currentMonthAmountSpent = (student.couponWallet.currentMonthAmountSpent || 0) + payAmount;
-  student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
-  await student.save();
+  // 4. Atomic deduction from wallet to prevent concurrent double-spending
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const updatedStudent = await User.findOneAndUpdate(
+    {
+      _id: studentId,
+      'couponWallet.balanceAmount': { $gte: payAmount }
+    },
+    {
+      $inc: {
+        'couponWallet.balanceAmount': -payAmount,
+        'couponWallet.currentMonthAmountSpent': payAmount
+      },
+      $set: {
+        'couponWallet.lastRedemptionMonth': currentMonth
+      }
+    },
+    { new: true }
+  );
+
+  if (!updatedStudent) {
+    throw new AppError('Insufficient wallet balance or concurrent payment rejected.', 400, 'INSUFFICIENT_BALANCE');
+  }
+  student.couponWallet = updatedStudent.couponWallet;
 
   // 5. Create unique transaction record
   const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
@@ -456,11 +474,29 @@ export const redeemCoupon = async ({ qrData, staffId, isCoupon = false, amount =
       await checkAndSyncMonthlyWallet(student);
       validateWalletAllowance(student, payAmount);
 
-      // Deduct payment amount
-      student.couponWallet.balanceAmount = Math.max(0, student.couponWallet.balanceAmount - payAmount);
-      student.couponWallet.currentMonthAmountSpent = (student.couponWallet.currentMonthAmountSpent || 0) + payAmount;
-      student.couponWallet.lastRedemptionMonth = new Date().toISOString().slice(0, 7);
-      await student.save();
+      // Atomic deduction from wallet to prevent concurrent double-spending
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const updatedStudent = await User.findOneAndUpdate(
+        {
+          _id: student._id,
+          'couponWallet.balanceAmount': { $gte: payAmount }
+        },
+        {
+          $inc: {
+            'couponWallet.balanceAmount': -payAmount,
+            'couponWallet.currentMonthAmountSpent': payAmount
+          },
+          $set: {
+            'couponWallet.lastRedemptionMonth': currentMonth
+          }
+        },
+        { new: true }
+      );
+
+      if (!updatedStudent) {
+        throw new AppError('Insufficient wallet balance or concurrent payment rejected.', 400, 'INSUFFICIENT_BALANCE');
+      }
+      student.couponWallet = updatedStudent.couponWallet;
 
       const transactionId = `TXN-MM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
       const now = new Date();

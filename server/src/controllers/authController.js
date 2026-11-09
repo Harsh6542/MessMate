@@ -268,6 +268,21 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
     return next(new AppError('No account found with this email address.', 404, 'USER_NOT_FOUND'));
   }
 
+  // Security Guard: Prevent public resetting of system administrators
+  if (
+    user.role === ROLES.ADMIN ||
+    user.email === 'admin@messmate.edu' ||
+    user.email === 'admin@nitp.ac.in'
+  ) {
+    return next(
+      new AppError(
+        'System administrator credentials cannot be reset via public reset links. Contact infrastructure security operations.',
+        403,
+        'ADMIN_RESET_FORBIDDEN'
+      )
+    );
+  }
+
   if (!user.isActive) {
     return next(
       new AppError('This account is deactivated. Please contact hostel administration.', 403, 'ACCOUNT_DEACTIVATED')

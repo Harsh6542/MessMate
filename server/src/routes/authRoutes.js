@@ -20,14 +20,15 @@ import {
   forgotPasswordValidator,
   resetPasswordValidator
 } from '../validators/authValidators.js';
+import { authLimiter, forgotPasswordLimiter, registerLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-router.post('/register', validate(registerValidator), register);
-router.post('/login', validate(loginValidator), login);
-router.post('/staff-login', validate(staffLoginValidator), staffLogin);
-router.post('/forgot-password', validate(forgotPasswordValidator), forgotPassword);
-router.post('/reset-password/:token', validate(resetPasswordValidator), resetPassword);
+router.post('/register', registerLimiter, validate(registerValidator), register);
+router.post('/login', authLimiter, validate(loginValidator), login);
+router.post('/staff-login', authLimiter, validate(staffLoginValidator), staffLogin);
+router.post('/forgot-password', forgotPasswordLimiter, validate(forgotPasswordValidator), forgotPassword);
+router.post('/reset-password/:token', authLimiter, validate(resetPasswordValidator), resetPassword);
 router.post('/logout', authenticate, logout);
 router.get('/me', authenticate, getMe);
 router.put('/profile', authenticate, updateProfile);
