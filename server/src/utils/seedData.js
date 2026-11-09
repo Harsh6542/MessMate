@@ -458,8 +458,6 @@ const seed = async () => {
       });
       studentDocs.push(st);
     }
-      studentDocs.push(st);
-    }
     console.log(`[Seed] Created 2 Essential Demo Student accounts: Ayush Singh (Kautilya) & Priya Kumari (Kadambini). All other roll numbers free for real students.`);
 
     // 8. Populate Menus for all 4 mess facilities
